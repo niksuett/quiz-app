@@ -394,10 +394,15 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
 
     grid.innerHTML = `
       <div class="timeline-wrap">
-        <div class="timeline-year-badge" id="timeline-year-display">${midYear}</div>
+        <input type="number" class="timeline-year-input" id="timeline-year-display"
+               min="${min}" max="${max}" step="1" value="${midYear}"
+               oninput="syncTimelineFromInput(this.value)"
+               onblur="clampTimelineInput()"
+               ${myRole === 'host' ? 'disabled' : ''}>
         <input type="range" id="timeline-input" class="timeline-input"
                min="${min}" max="${max}" step="1" value="${midYear}"
-               oninput="updateTimelineDisplay(this.value)">
+               oninput="updateTimelineDisplay(this.value)"
+               ${myRole === 'host' ? 'disabled' : ''}>
         <div class="timeline-tick-labels">${ticks}</div>
         ${myRole !== 'host'
           ? `<button class="btn btn-red slider-submit-btn" id="timeline-submit-btn"
@@ -418,19 +423,25 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
     const midPoint = Math.round((min + max) / 2);
     grid.innerHTML = `
       <div class="slider-wrap">
-        <div class="slider-current-value" id="slider-value-display">
-          ${midPoint.toLocaleString()} ${unit}
+        <div class="slider-value-row">
+          <input type="number" class="slider-number-input" id="slider-value-display"
+                 min="${min}" max="${max}" step="${step}" value="${midPoint}"
+                 oninput="syncSliderFromInput(this.value)"
+                 onblur="clampSliderInput()"
+                 ${myRole === 'host' ? 'disabled' : ''}>
+          ${unit ? `<span class="slider-unit-label">${unit}</span>` : ''}
         </div>
         <input type="range" id="answer-slider" class="answer-slider"
                min="${min}" max="${max}" step="${step}" value="${midPoint}"
-               oninput="updateSliderDisplay(this.value, '${unit}')">
+               oninput="updateSliderDisplay(this.value)"
+               ${myRole === 'host' ? 'disabled' : ''}>
         <div class="slider-bounds">
-          <span>${min.toLocaleString()} ${unit}</span>
-          <span>${max.toLocaleString()} ${unit}</span>
+          <span>${min.toLocaleString()}${unit ? ' ' + unit : ''}</span>
+          <span>${max.toLocaleString()}${unit ? ' ' + unit : ''}</span>
         </div>
         ${myRole !== 'host'
           ? `<button class="btn btn-red slider-submit-btn" id="slider-submit-btn"
-                     onclick="submitSlider('${unit}')">Lock In Answer</button>`
+                     onclick="submitSlider()">Lock In Answer</button>`
           : `<p style="color:#888; margin-top:16px; font-size:0.9rem;">👀 Players are sliding…</p>`
         }
       </div>`;
@@ -518,39 +529,78 @@ socket.on('answer-progress', ({ answered, total }) => {
 
 // ── Slider helper functions ───────────────────────────────────────────────────
 
-// Called every time the slider thumb moves — updates the big number display
-function updateSliderDisplay(value, unit) {
-  document.getElementById('slider-value-display').textContent =
-    `${Number(value).toLocaleString()} ${unit}`;
+// Called every time the slider thumb moves — keeps the number input in sync
+function updateSliderDisplay(value) {
+  const numInput = document.getElementById('slider-value-display');
+  if (numInput) numInput.value = Number(value);
+}
+
+// Called when the player types in the number input — keeps the range slider in sync
+function syncSliderFromInput(value) {
+  const slider = document.getElementById('answer-slider');
+  if (slider) slider.value = value;
+}
+
+// Called when the player leaves the number input — clamps to valid range
+function clampSliderInput() {
+  const numInput = document.getElementById('slider-value-display');
+  const slider   = document.getElementById('answer-slider');
+  if (!numInput || !slider) return;
+  const v = Math.max(parseInt(slider.min) || 0, Math.min(parseInt(slider.max) || 999999, parseInt(numInput.value) || parseInt(slider.value)));
+  numInput.value = v;
+  slider.value   = v;
 }
 
 // Called when the player clicks "Lock In Answer" on an estimation question
-function submitSlider(unit) {
-  const slider = document.getElementById('answer-slider');
-  const btn    = document.getElementById('slider-submit-btn');
-  const value  = parseInt(slider.value, 10);
-  slider.disabled = true;
-  btn.disabled    = true;
-  btn.textContent = 'Locked in!';
+function submitSlider() {
+  clampSliderInput(); // ensure number input and slider agree before reading
+  const slider   = document.getElementById('answer-slider');
+  const numInput = document.getElementById('slider-value-display');
+  const btn      = document.getElementById('slider-submit-btn');
+  const value    = parseInt(slider.value, 10);
+  slider.disabled   = true;
+  if (numInput) numInput.disabled = true;
+  btn.disabled      = true;
+  btn.textContent   = 'Locked in!';
   document.getElementById('speed-bonus-display').classList.add('hidden');
   socket.emit('submit-answer', { answerValue: value });
 }
 
 // ── Timeline helper functions ─────────────────────────────────────────────────
 
-// Called every time the timeline thumb moves — updates the year badge
+// Called every time the timeline thumb moves — keeps the year input in sync
 function updateTimelineDisplay(value) {
-  document.getElementById('timeline-year-display').textContent = value;
+  const numInput = document.getElementById('timeline-year-display');
+  if (numInput) numInput.value = value;
+}
+
+// Called when the player types in the year input — keeps the range slider in sync
+function syncTimelineFromInput(value) {
+  const slider = document.getElementById('timeline-input');
+  if (slider) slider.value = value;
+}
+
+// Called when the player leaves the year input — clamps to valid range
+function clampTimelineInput() {
+  const numInput = document.getElementById('timeline-year-display');
+  const slider   = document.getElementById('timeline-input');
+  if (!numInput || !slider) return;
+  const v = Math.max(parseInt(slider.min), Math.min(parseInt(slider.max), parseInt(numInput.value) || parseInt(slider.value)));
+  numInput.value = v;
+  slider.value   = v;
 }
 
 // Called when the player clicks "Lock In Year"
 function submitTimeline() {
-  const input = document.getElementById('timeline-input');
-  const btn   = document.getElementById('timeline-submit-btn');
-  const value = parseInt(input.value, 10);
-  input.disabled = true;
-  btn.disabled   = true;
-  btn.textContent = 'Locked in!';
+  clampTimelineInput(); // ensure year input and slider agree before reading
+  const slider   = document.getElementById('timeline-input');
+  const numInput = document.getElementById('timeline-year-display');
+  const btn      = document.getElementById('timeline-submit-btn');
+  const value    = parseInt(slider.value, 10);
+  slider.disabled   = true;
+  if (numInput) numInput.disabled = true;
+  btn.disabled      = true;
+  btn.textContent   = 'Locked in!';
   document.getElementById('speed-bonus-display').classList.add('hidden');
   socket.emit('submit-answer', { answerValue: value });
 }
@@ -679,6 +729,95 @@ function showLeaderboardMap(mapData) {
   });
 }
 
+// Renders the post-question timeline reveal on the leaderboard screen.
+// Shows a gold star at the correct year, then animates each player's guess
+// onto the same axis, labelled with their nickname.
+function showLeaderboardTimeline(timelineData) {
+  const wrap = document.getElementById('leaderboard-timeline');
+  wrap.innerHTML = '';
+  wrap.classList.remove('hidden');
+
+  const { correctValue, unit, playerGuesses } = timelineData;
+  const fmt = v => unit ? `${v.toLocaleString()} ${unit}` : String(v);
+
+  // Calculate the visible axis range with a bit of padding on each side
+  const allValues = [correctValue, ...playerGuesses.map(g => g.value)];
+  const rawMin = Math.min(...allValues);
+  const rawMax = Math.max(...allValues);
+  const span   = Math.max(rawMax - rawMin, 20); // minimum span of 20 to avoid a collapsed axis
+  const pad    = Math.max(5, Math.round(span * 0.12));
+  const visMin = rawMin - pad;
+  const visMax = rawMax + pad;
+  const visSpan = visMax - visMin;
+
+  // Convert a value to a left-percentage on the axis
+  const pct = v => Math.max(1, Math.min(99, ((v - visMin) / visSpan) * 100));
+
+  // Header label
+  const header = document.createElement('div');
+  header.className   = 'tl-reveal-header';
+  header.textContent = 'Where did everyone guess?';
+  wrap.appendChild(header);
+
+  // The track holds the axis line, tick marks, and all pins
+  const track = document.createElement('div');
+  track.className = 'tl-track';
+  wrap.appendChild(track);
+
+  const axisLine = document.createElement('div');
+  axisLine.className = 'tl-axis-line';
+  track.appendChild(axisLine);
+
+  // 6 evenly-spaced tick marks + a year-label row below the track
+  const labelsRow = document.createElement('div');
+  labelsRow.className = 'tl-year-labels';
+  wrap.appendChild(labelsRow);
+
+  for (let i = 0; i <= 5; i++) {
+    const v = Math.round(visMin + (i / 5) * visSpan);
+    const p = pct(v);
+
+    const tick = document.createElement('div');
+    tick.className  = 'tl-tick-mark';
+    tick.style.left = p + '%';
+    track.appendChild(tick);
+
+    const lbl = document.createElement('span');
+    lbl.className  = 'tl-tick-label';
+    lbl.style.left = p + '%';
+    lbl.textContent = v;
+    labelsRow.appendChild(lbl);
+  }
+
+  // Correct answer pin — appears first with a short delay
+  setTimeout(() => {
+    const pin = document.createElement('div');
+    pin.className  = 'tl-pin-wrap tl-correct-pin';
+    pin.style.left = pct(correctValue) + '%';
+    pin.innerHTML  = `
+      <div class="tl-pin-name">Correct</div>
+      <div class="tl-pin-value">${fmt(correctValue)}</div>
+      <div class="tl-pin-dot">★</div>`;
+    track.appendChild(pin);
+  }, 250);
+
+  // Player pins — animate in one by one
+  playerGuesses.forEach((guess, i) => {
+    const isMe    = guess.nickname === myNickname;
+    const initial = guess.nickname.charAt(0).toUpperCase();
+    setTimeout(() => {
+      const pin = document.createElement('div');
+      pin.className  = 'tl-pin-wrap tl-player-pin' + (isMe ? ' tl-me-pin' : '');
+      pin.style.left = pct(guess.value) + '%';
+      pin.innerHTML  = `
+        <div class="tl-pin-name">${guess.nickname}${isMe ? ' ←' : ''}</div>
+        <div class="tl-pin-value">${fmt(guess.value)}</div>
+        <div class="tl-pin-dot">${initial}</div>`;
+      track.appendChild(pin);
+    }, 550 + i * 350);
+  });
+}
+
 // ── Answer result (player only) ───────────────────────────────────────────────
 socket.on('answer-result', (data) => {
   stopTimer(); // also hides speed bonus pill
@@ -795,26 +934,32 @@ function showBreakdownCard(baseLabel, basePoints, speedBonus) {
 }
 
 // ── Leaderboard ───────────────────────────────────────────────────────────────
-socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, isLastQuestion, mapData }) => {
+socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, isLastQuestion, mapData, timelineData }) => {
   stopTimer();
   clearTimeout(resultTimeout);
   soundLeaderboard();
-  // Clean up the question-time map if there was one
   if (leafletMap) { leafletMap.remove(); leafletMap = null; mapPin = null; }
 
-  // Show or hide the map reveal section
-  const lbMapWrap = document.getElementById('leaderboard-map');
+  // Reset all special reveal sections first
+  const lbMapWrap      = document.getElementById('leaderboard-map');
+  const lbTimelineWrap = document.getElementById('leaderboard-timeline');
+  const correctReveal  = document.getElementById('correct-reveal');
+  lbMapWrap.classList.add('hidden');      lbMapWrap.innerHTML      = '';
+  lbTimelineWrap.classList.add('hidden'); lbTimelineWrap.innerHTML = '';
+  correctReveal.classList.add('hidden');
+
+  showScreen('screen-leaderboard');
+
   if (mapData) {
-    // The correct-answer text becomes redundant — the map shows it visually
-    document.getElementById('correct-reveal').classList.add('hidden');
-    showScreen('screen-leaderboard');
     showLeaderboardMap(mapData);
+  } else if (timelineData) {
+    showLeaderboardTimeline(timelineData);
+    // Still show the text "correct answer" label since it's useful alongside the visual
+    correctReveal.textContent = `✓ Correct: ${correctAnswer}`;
+    correctReveal.classList.remove('hidden');
   } else {
-    lbMapWrap.classList.add('hidden');
-    lbMapWrap.innerHTML = '';
-    document.getElementById('correct-reveal').textContent = `✓ Correct answer: ${correctAnswer}`;
-    document.getElementById('correct-reveal').classList.remove('hidden');
-    showScreen('screen-leaderboard');
+    correctReveal.textContent = `✓ Correct answer: ${correctAnswer}`;
+    correctReveal.classList.remove('hidden');
   }
 
   renderLeaderboard(document.getElementById('leaderboard-list'), leaderboard);

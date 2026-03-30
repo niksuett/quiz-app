@@ -109,6 +109,18 @@ quiz-app/
 ## Known issues & planned improvements
 *(Discovered during testing. Add new ones here as they come up.)*
 
+### Completed
+
+**Geography scoring curve** — replaced `exp(-dist/95)` with `exp(-(dist/50)^0.6)` in `server.js`. Same city now scores ~68pts instead of ~94pts; being in the right region still earns 10–37pts. See `submit-answer` handler, map branch.
+
+**Per-type result & leaderboard durations** — in `server.js`, early-advance delay (when all players answer before time runs out) is now MC/flags=3s, estimation/timeline=4s, map=5s. Leaderboard autoplay pause is now MC/flags=5s, estimation/timeline=8s, map=10s.
+
+**Slider/timeline text input** — in `client.js`, the big value display for estimation and timeline questions is now an editable `<input type="number">`. Typing syncs the slider thumb; dragging syncs the number input. Values clamp on submit. New helpers: `syncSliderFromInput`, `clampSliderInput`, `syncTimelineFromInput`, `clampTimelineInput`.
+
+**Visual timeline on leaderboard** — after timeline questions, the leaderboard screen shows a horizontal axis with a gold star at the correct year and animated player-pin dots at each player's guess, labelled with name and year. Server sends `timelineData` (correct value + all player guesses) alongside the leaderboard payload. Rendered by `showLeaderboardTimeline()` in `client.js`. Container `#leaderboard-timeline` in `index.html`; styles in `style.css` under `/* ─── Timeline leaderboard reveal */`.
+
+---
+
 ### Not yet done
 
 **1. Slider & timeline initial position is always the midpoint**
@@ -117,6 +129,69 @@ quiz-app/
 
 **2. Admin map picker for geography questions**
 - Adding a map question requires typing lat/lng manually. An inline Leaflet map in the admin form where you click to set the correct location would be much easier.
+
+**3. Add text input option for slider/estimation/timeline questions** ✅ DONE
+- Players can only drag the slider; there's no way to type an exact number.
+- Fix: add a synced number `<input>` field next to the slider — typing updates the thumb position, dragging updates the text field.
+- Applies to: Estimation, Timeline question types.
+
+**4. Result screen duration is too short for complex question types** ✅ DONE
+- After an answer is revealed, all question types use the same pause duration. Players don't have enough time to read score breakdowns or compare answers on the leaderboard for estimation/map questions.
+- Fix: introduce per-type pause durations (in server.js):
+  - MC / Flags: ~3 seconds (current is fine)
+  - Estimation / Timeline: ~6 seconds (players want to compare guesses)
+  - Geography: ~8–10 seconds (map reveal with player pins is the most engaging moment)
+
+**6. Visual timeline for answer reveal on timeline questions** ✅ DONE
+- Currently the result screen just shows "Your guess: 1847 | Correct: 1851" as text. This is dry and makes comparing against other players uninteresting.
+- Fix: render a horizontal timeline bar on the answer/leaderboard screen showing:
+  - A labelled marker for the correct year
+  - Each player's guess as a small pin/dot on the same axis, labelled with their nickname
+  - The current player's pin highlighted (distinct colour or size)
+  - The visible range of the axis should span from the earliest to latest guess, with some padding, so all markers are readable
+- This turns answer comparison into something visual and scannable — especially satisfying when guesses cluster around the right answer or are wildly spread out.
+- Scope: affects the answer result screen and the leaderboard screen for timeline questions. The timeline axis can be a simple CSS/SVG bar; no external library needed.
+
+**5. Geography scoring curve is unbalanced** ✅ DONE
+- Current formula `exp(-dist/95)` is too forgiving at close range: being in the same city as a specific landmark (e.g. putting the pin anywhere in Rio for Christ the Redeemer, ~6km away) scores ~94 pts — nearly as good as the exact location.
+- At long distances the curve drops off too fast, leaving nothing for being in the right country/region.
+- Fix: switch to a stretched exponential: `100 * exp(-(dist/50)^0.6)`
+  - 0 km (exact): 100 pts
+  - 5 km (walking distance): ~78 pts
+  - 10 km (across the city): ~68 pts
+  - 50 km (nearby city): ~37 pts
+  - 200 km (right region): ~10 pts
+  - 500 km (right country): ~2 pts
+- This punishes "close enough" city-level guesses more while preserving a long, gentle tail for wider-area guesses.
+
+---
+
+## Game focus & category expansion plan
+*(Strategic direction for future content work)*
+
+**Core identity: Geography + History.** These question types (map pin-drop, timeline, estimation) are the most engaging and differentiating. All category growth should prioritise them.
+
+### Geography — split into 3 subcategories (target: 30 questions each)
+| Subcategory | Focus |
+|-------------|-------|
+| Natural Wonders | Mountains, rivers, lakes, national parks, coastlines |
+| Built World | Monuments, bridges, stadiums, famous buildings, ruins |
+| Cities & Capitals | Urban centres worldwide, not just capitals |
+
+### History / Timeline — expand significantly (target: 60+ questions)
+- Cover all eras: ancient, medieval, early modern, modern, recent
+- Keep the year-slider mechanic; vary question framing (inventions, battles, discoveries, births)
+
+### New question type ideas
+| Type | Description | Complexity |
+|------|-------------|------------|
+| **Where in History** (map) | Pin-drop for historical locations — battle sites, ancient ruins, where a discovery happened. Combines geography + history in one question. | Medium — reuses map mechanic, needs new category |
+| **Silhouette** (MC) | Show a country or region outline, players name it. New MC subtype. | Low — image + 4 buttons |
+| **Historical Photo** (timeline) | Show an old photo of a place or event, guess the year. Reuses timeline slider. | Low — timeline variant with image |
+| **Sequence** (ordering) | Put 4 historical events in chronological order by dragging. Entirely new interaction. | High — new UI component needed |
+
+### Supplemental categories — keep but don't grow
+Facts, Science, Sports, Entertainment, Flags are supporting acts. Cap question counts; focus on quality over quantity for these.
 
 ---
 

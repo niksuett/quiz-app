@@ -216,7 +216,10 @@ io.on('connection', (socket) => {
       // Precision exponential decay: 90% at 10km, 59% at 50km, 12% at 200km.
       // Exact pin = full points; neighbouring city ≈ half; wrong region ≈ nothing.
       const dist        = haversineKm(answerLat, answerLng, question.correctLat, question.correctLng);
-      const proximity   = Math.exp(-dist / 95);
+      // Stretched-exponential curve: steeper near 0 (same city ≠ same landmark),
+      // but a longer gentle tail (right region still earns points).
+      // ~5km→78pts, ~10km→68pts, ~50km→37pts, ~200km→10pts, ~500km→2pts
+      const proximity   = Math.exp(-Math.pow(dist / 50, 0.6));
       const speedCap    = Math.round(MAX_SPEED_BONUS * 0.3); // 30% of normal cap — accuracy over speed
       const speedBonus  = Math.round((remaining / game.currentTimeLimit) * speedCap * proximity);
       const basePoints  = Math.round(proximity * POINTS_FOR_CORRECT);
@@ -271,10 +274,14 @@ io.on('connection', (socket) => {
       total:    game.players.length,
     });
 
-    // If everyone has answered, move on early
+    // If everyone has answered, move on early.
+    // Give more time on complex types so players can read their result screen.
     if (answeredCount === game.players.length) {
+      const earlyPause = game.currentQuestionType === 'map'                                          ? 5000
+                       : (game.currentQuestionType === 'slider' || game.currentQuestionType === 'timeline') ? 4000
+                       : 3000;
       clearTimeout(game.timer);
-      game.timer = setTimeout(() => showLeaderboard(game), 3000);
+      game.timer = setTimeout(() => showLeaderboard(game), earlyPause);
     }
   });
 
@@ -330,7 +337,8 @@ function sendNextQuestion(game) {
   const speedBonusCap = (qType === 'slider' || qType === 'timeline' || qType === 'map')
                       ? Math.round(MAX_SPEED_BONUS * 0.3)
                       : MAX_SPEED_BONUS;
-  game.currentTimeLimit = timeLimit;
+  game.currentTimeLimit    = timeLimit;
+  game.currentQuestionType = qType;
 
   io.to(game.id).emit('new-question', {
     questionNumber: game.currentIndex + 1,
@@ -375,17 +383,32 @@ function showLeaderboard(game) {
     locationName: q.locationName,
   } : null;
 
+  // For timeline questions, collect every player's guess for the visual timeline reveal
+  const timelineData = q.type === 'timeline' ? {
+    correctValue:  q.correct,
+    unit:          q.unit || '',
+    playerGuesses: game.players
+                     .filter(p => p.lastAnswer && p.lastAnswer.type === 'timeline')
+                     .map(p => ({ nickname: p.nickname, value: p.lastAnswer.value, diff: p.lastAnswer.diff })),
+  } : null;
+
   io.to(game.id).emit('show-leaderboard', {
     leaderboard:    buildLeaderboard(game),
     correctAnswer,
     questionType:   q.type || 'text',
     isLastQuestion: isLast,
     mapData,
+    timelineData,
   });
+
+  // Longer leaderboard pause for question types where comparing answers is more interesting
+  const leaderboardPause = q.type === 'map'                                    ? 10
+                         : (q.type === 'slider' || q.type === 'timeline')      ? 8
+                         : LEADERBOARD_PAUSE; // 5s for MC / flags
 
   if (game.autoplay) {
     // Auto-advance after the pause
-    game.timer = setTimeout(() => sendNextQuestion(game), LEADERBOARD_PAUSE * 1000);
+    game.timer = setTimeout(() => sendNextQuestion(game), leaderboardPause * 1000);
   } else {
     // Wait for the host to click "Next Question"
     io.to(game.hostId).emit('waiting-for-host');
