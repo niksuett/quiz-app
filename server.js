@@ -353,6 +353,8 @@ function sendNextQuestion(game) {
     max:  q.max,
     step: q.step || 1,
     unit: q.unit,
+    // Optional image (used by timeline questions with a photo)
+    imageUrl: q.imageUrl || null,
   });
 
   game.timer = setTimeout(() => showLeaderboard(game), timeLimit * 1000);

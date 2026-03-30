@@ -2134,5 +2134,38 @@
     "correctLat": 48.8533,
     "correctLng": 2.3692,
     "locationName": "Place de la Bastille, Paris"
+  },
+  {
+    "category": "timeline",
+    "type": "timeline",
+    "question": "When did humans first walk on the Moon?",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Aldrin_Apollo_11_original.jpg/480px-Aldrin_Apollo_11_original.jpg",
+    "correct": 1969,
+    "min": 1950,
+    "max": 1990,
+    "step": 1,
+    "unit": ""
+  },
+  {
+    "category": "timeline",
+    "type": "timeline",
+    "question": "When did the Titanic sink?",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/RMS_Titanic_3.jpg/480px-RMS_Titanic_3.jpg",
+    "correct": 1912,
+    "min": 1890,
+    "max": 1940,
+    "step": 1,
+    "unit": ""
+  },
+  {
+    "category": "timeline",
+    "type": "timeline",
+    "question": "When did the Wright Brothers make their first powered flight?",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/First_flight2.jpg/480px-First_flight2.jpg",
+    "correct": 1903,
+    "min": 1870,
+    "max": 1930,
+    "step": 1,
+    "unit": ""
   }
 ]

@@ -34,16 +34,19 @@ quiz-app/
 7. Repeat until rounds complete → final leaderboard
 
 ## Question categories
-| Category | Type | Count | Notes |
-|----------|------|-------|-------|
-| Facts | Multiple choice | 20 | General knowledge |
-| Science | Multiple choice | 20 | |
-| Sports | Multiple choice | 20 | |
-| Entertainment | Multiple choice | 20 | |
-| Flags | Flag image + MC | 30 | Shows real flag image from flagcdn.com |
-| Estimation | Slider | 23 | Drag to guess a number; scored by proximity |
-| Timeline | Year slider | 25 | Drag to guess a year; scored by proximity |
-| Geography | Map pin-drop | 30 | Click on Leaflet map; scored by distance |
+| Category | `category` value | Type | Count | Notes |
+|----------|-----------------|------|-------|-------|
+| Facts | `facts` | Multiple choice | 20 | General knowledge |
+| Science | `science` | Multiple choice | 20 | |
+| Sports | `sports` | Multiple choice | 20 | |
+| Entertainment | `entertainment` | Multiple choice | 20 | |
+| Flags | `flags` | Flag image + MC | 30 | Shows real flag image from flagcdn.com |
+| Estimation | `estimation` | Slider | 23 | Drag to guess a number; scored by proximity |
+| Timeline | `timeline` | Year slider | 25 | Drag to guess a year; scored by proximity |
+| Natural Wonders | `geo-natural` | Map pin-drop | 10 | Mountains, lakes, waterfalls, etc. |
+| Built World | `geo-built` | Map pin-drop | 22 | Monuments, temples, famous buildings |
+| Cities | `geo-cities` | Map pin-drop | 12 | Urban centres worldwide |
+| Where in History | `geo-history` | Map pin-drop | 8 | Battle sites, historical events, ruins |
 
 ## Answer mechanics
 | Type | How it works |
@@ -119,38 +122,25 @@ quiz-app/
 
 **Visual timeline on leaderboard** — after timeline questions, the leaderboard shows a horizontal axis with a gold star at the correct year and animated player-pin dots at each player's guess. Rendered by `showLeaderboardTimeline()` in `client.js`.
 
+**Geography split into 4 subcategories** — old `geography` category retired. All 30 existing questions migrated to `geo-built` / `geo-natural` / `geo-cities`. New `geo-history` category added. 22 new questions added across all four. Config screen now shows 4 separate cards. Total questions: 188 → 210.
+
+**Slider/timeline randomised start position** — thumb no longer starts at the midpoint. Starts at a random position anywhere in the inner 80% of the range so the initial position doesn't hint at the answer. Applied to both `slider` and `timeline` types in `client.js`.
+
+**Historical photo support on timeline questions** — any question in `questions.json` can now include an optional `imageUrl` field. When present, the question screen shows the photo above the question text (works for any question type, not just timeline). Server passes `imageUrl` through in `new-question`; client renders `<img class="question-photo">` + caption. 3 example photo-timeline questions added (Moon landing, Titanic, Wright Brothers).
+
 ---
 
 ### Not yet done
 
-**1. Slider & timeline initial position is always the midpoint**
-- The slider thumb starts at the centre of the range. Since ranges are designed to contain the answer, midpoint guessing still provides a hint.
-- Fix: randomise starting thumb position within the range (±20% from midpoint) so it doesn't signal anything.
+**1. Slider & timeline initial position is always the midpoint** ✅ DONE
 
 **2. Admin map picker for geography questions**
 - Adding a map question requires typing lat/lng manually. An inline Leaflet map in the admin form where you click to set the correct location would be much easier.
 
-**3. Split Geography into 3 subcategories (target: 30 questions each)**
-- The single "geography" category should become three separate selectable categories so hosts can control what they get.
-
-| Subcategory | `category` value in questions.json | Focus |
-|-------------|-------------------------------------|-------|
-| Natural Wonders | `geo-natural` | Mountains, rivers, lakes, national parks, coastlines |
-| Built World | `geo-built` | Monuments, bridges, stadiums, famous buildings, ruins |
-| Cities & Capitals | `geo-cities` | Urban centres worldwide |
-
-- Requires: renaming/adding questions in `questions.json`, adding the 3 new category cards to `screen-host-config` in `index.html`, and updating any category filtering logic in `server.js` (currently just `q.category`).
-- The existing `geography` category can remain as a catch-all or be retired once questions are migrated.
-
-**4. Expand Timeline / History (target: 60+ questions)**
+**3. Expand Timeline / History (target: 60+ questions)**
 - Current count is 25. Cover all eras: ancient, medieval, early modern, modern, recent.
 - Vary question framing: inventions, battles, discoveries, births, treaties, first achievements.
 - Pure content work — no code changes needed.
-
-**5. Add "Where in History" map category**
-- A new map pin-drop category for historical sites: battle sites, ancient ruins, where a discovery or event happened.
-- Reuses the existing map mechanic entirely — only needs new questions with `category: "geo-history"` and a new category card in the config screen.
-- This is the most natural way to merge geography and history into one question type.
 
 **6. New question type: Silhouette (MC)**
 - Show a country or region outline silhouette as an image; players pick the name from 4 buttons.

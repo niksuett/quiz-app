@@ -355,7 +355,7 @@ socket.on('join-success', ({ gameId, nickname }) => {
 socket.on('join-error', (msg) => showError('join-error', msg));
 
 // ── New question ──────────────────────────────────────────────────────────────
-socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, speedBonusCap, type, min, max, step, unit }) => {
+socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, speedBonusCap, type, min, max, step, unit, imageUrl }) => {
   currentSpeedCap = speedBonusCap ?? MAX_SPEED_BONUS;
   stopTimer();
   clearTimeout(resultTimeout);
@@ -373,6 +373,11 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
     qText.innerHTML =
       `<span class="flag-prompt">Which country does this flag belong to?</span>` +
       `<img src="https://flagcdn.com/w320/${question}.png" class="flag-image" alt="Flag">`;
+  } else if (imageUrl) {
+    // Timeline (or any type) with an attached historical photo
+    qText.innerHTML =
+      `<img src="${imageUrl}" class="question-photo" alt="Historical photo">` +
+      `<span class="question-photo-caption">${question}</span>`;
   } else {
     qText.textContent = question;
   }
@@ -385,7 +390,10 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
   if (type === 'timeline') {
     // ── Timeline question UI ────────────────────────────────────────────────
     grid.classList.add('slider-mode');
-    const midYear = Math.round((min + max) / 2);
+    // Random start: anywhere in the inner 80% of the range so the initial
+    // thumb position doesn't hint at the answer
+    const margin  = Math.round((max - min) * 0.1);
+    const midYear = Math.round(min + margin + Math.random() * (max - min - 2 * margin));
 
     // Build 5 evenly-spaced year labels for the tick row
     const ticks = Array.from({ length: 5 }, (_, i) =>
@@ -420,7 +428,10 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
   } else if (type === 'slider') {
     // ── Slider question UI ──────────────────────────────────────────────────
     grid.classList.add('slider-mode');
-    const midPoint = Math.round((min + max) / 2);
+    // Random start: anywhere in the inner 80% of the range
+    const margin   = (max - min) * 0.1;
+    const rawStart = min + margin + Math.random() * (max - min - 2 * margin);
+    const midPoint = Math.round(rawStart / (step || 1)) * (step || 1);
     grid.innerHTML = `
       <div class="slider-wrap">
         <div class="slider-value-row">

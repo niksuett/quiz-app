@@ -276,6 +276,25 @@ body {
   box-shadow: 0 8px 32px rgba(0,0,0,.6);
 }
 
+/* ─── Historical photo on question screen ───────────────────────────────── */
+.question-photo {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 0 auto 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.65);
+}
+.question-photo-caption {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #d4d4d8;
+}
+
 /* ─── Slider ──────────────────────────────────────────────────────────────── */
 .answers-grid.slider-mode { grid-template-columns: 1fr; }
 
