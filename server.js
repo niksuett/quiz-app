@@ -385,12 +385,12 @@ function showLeaderboard(game) {
     locationName: q.locationName,
   } : null;
 
-  // For timeline questions, collect every player's guess for the visual timeline reveal
-  const timelineData = q.type === 'timeline' ? {
+  // For timeline and slider questions, collect every player's guess for the visual scale reveal
+  const timelineData = (q.type === 'timeline' || q.type === 'slider') ? {
     correctValue:  q.correct,
     unit:          q.unit || '',
     playerGuesses: game.players
-                     .filter(p => p.lastAnswer && p.lastAnswer.type === 'timeline')
+                     .filter(p => p.lastAnswer && (p.lastAnswer.type === 'timeline' || p.lastAnswer.type === 'slider'))
                      .map(p => ({ nickname: p.nickname, value: p.lastAnswer.value, diff: p.lastAnswer.diff })),
   } : null;
 

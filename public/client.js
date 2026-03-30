@@ -727,7 +727,7 @@ function showLeaderboardMap(mapData) {
         // After the last pin lands, zoom to fit everything
         if (i === mapData.playerPins.length - 1) {
           setTimeout(() => {
-            leaderboardMap.fitBounds(allLatLngs, { padding: [50, 50], maxZoom: 10 });
+            leaderboardMap.fitBounds(allLatLngs, { padding: [50, 50] });
           }, 400);
         }
       }, 600 + i * 400);
@@ -740,10 +740,11 @@ function showLeaderboardMap(mapData) {
   });
 }
 
-// Renders the post-question timeline reveal on the leaderboard screen.
-// Shows a gold star at the correct year, then animates each player's guess
+// Renders the post-question scale reveal on the leaderboard screen.
+// Used for both timeline and estimation (slider) questions.
+// Shows a gold star at the correct value, then animates each player's guess
 // onto the same axis, labelled with their nickname.
-function showLeaderboardTimeline(timelineData) {
+function showLeaderboardScale(timelineData) {
   const wrap = document.getElementById('leaderboard-timeline');
   wrap.innerHTML = '';
   wrap.classList.remove('hidden');
@@ -964,7 +965,7 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, isLas
   if (mapData) {
     showLeaderboardMap(mapData);
   } else if (timelineData) {
-    showLeaderboardTimeline(timelineData);
+    showLeaderboardScale(timelineData);
     // Still show the text "correct answer" label since it's useful alongside the visual
     correctReveal.textContent = `✓ Correct: ${correctAnswer}`;
     correctReveal.classList.remove('hidden');

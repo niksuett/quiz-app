@@ -142,9 +142,7 @@ quiz-app/
 - Vary question framing: inventions, battles, discoveries, births, treaties, first achievements.
 - Pure content work — no code changes needed. Defer to a dedicated question-writing session.
 
-**4. Map leaderboard zoom too shallow for close guesses**
-- When all players guessed within a few km of each other, `maxZoom: 10` in `fitBounds` keeps the view far out and the pins overlap uselessly.
-- Fix: remove the `maxZoom` cap from the `fitBounds` call in `showLeaderboardMap()` in `client.js` so Leaflet zooms as far in as the spread of pins requires.
+**4. Map leaderboard zoom too shallow for close guesses** ✅ DONE
 
 **5. Landmark coordinates and locationName accuracy audit**
 - The coordinates for geo-* questions are placed at the landmark itself (e.g. 48.8584, 2.2945 is the Eiffel Tower, not just Paris), which is correct.
@@ -158,13 +156,9 @@ quiz-app/
   2. **Floor for geography:** consider a minimum score (e.g. 5–10 pts) for any non-zero answer on map questions, so being on the right continent isn't a complete zero.
 - Rank bonus should be shown in the score breakdown on the result screen and in the leaderboard gain badge.
 
-**7. Visual scale reveal for estimation questions**
-- After estimation (slider) questions, show the same horizontal axis + player-pin reveal that timeline questions already have (`showLeaderboardTimeline()` in `client.js`).
-- The function already handles units and arbitrary numeric ranges, so it should work for estimation with minimal changes.
-- Changes needed:
-  1. Server: also build and send `timelineData` for `slider` questions in `showLeaderboard()` (currently only built for `timeline` type).
-  2. Client: `showLeaderboardTimeline()` can be reused as-is; just make sure the `show-leaderboard` handler triggers it for `slider` type too.
-  3. Rename `showLeaderboardTimeline` → `showLeaderboardScale` (or keep the name and just extend the condition) to reflect that it handles both types.
+**7. Visual scale reveal for estimation questions** ✅ DONE
+- Server now sends `timelineData` for both `timeline` and `slider` question types.
+- `showLeaderboardTimeline()` renamed to `showLeaderboardScale()` in `client.js`.
 
 **8. New question type: Silhouette (MC)**
 - Show a country or region outline silhouette as an image; players pick the name from 4 buttons.
