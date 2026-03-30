@@ -621,13 +621,9 @@ function submitTimeline() {
 // Creates the Leaflet map inside #map-container and listens for clicks
 function initLeafletMap() {
   leafletMap = L.map('map-container', { zoomControl: true }).setView([20, 0], 2);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap contributors © CARTO',
-    maxZoom: 18,
-  }).addTo(leafletMap);
-  // Faint label overlay — shows continent/country names at low opacity for orientation
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-    maxZoom: 18, opacity: 0.25,
+    maxZoom: 19,
   }).addTo(leafletMap);
 
   // Custom red dot icon for the player's pin
@@ -680,11 +676,8 @@ function showLeaderboardMap(mapData) {
       attributionControl: false,
     }).setView([mapData.correctLat, mapData.correctLng], 4);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18,
-    }).addTo(leaderboardMap);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18, opacity: 0.35,
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
     }).addTo(leaderboardMap);
 
     // ── Correct location: gold star marker ──────────────────────────────────
