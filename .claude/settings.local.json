@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(timeout 3 node server.js)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(node:*)",
+      "Bash(curl -s http://localhost:3000/admin/questions)",
+      "Bash(node -e \"require\\(''''./C:/Users/niksu/projects/quiz-app/server.js''''\\)\")"
+    ]
+  }
+}

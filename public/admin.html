@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizBlast — Question Editor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #07070f;
+      color: #e4e4e7;
+      min-height: 100vh;
+      padding: 0 0 80px;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: rgba(255,255,255,.035);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .topbar-logo { font-size: 1.1rem; font-weight: 700; color: #a5b4fc; letter-spacing: .02em; }
+    .topbar-title { font-size: 1rem; color: #71717a; }
+    .topbar-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    .save-status { font-size: .8rem; color: #52525b; transition: color .3s; }
+    .save-status.ok  { color: #4ade80; }
+    .save-status.err { color: #f87171; }
+
+    /* ── Layout ── */
+    .layout { display: flex; height: calc(100vh - 53px); }
+
+    /* ── Sidebar (categories) ── */
+    .sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255,255,255,.07);
+      padding: 16px 0;
+      overflow-y: auto;
+    }
+    .sidebar h3 {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: #52525b;
+      padding: 0 16px 8px;
+    }
+    .cat-btn {
+      width: 100%;
+      text-align: left;
+      padding: 9px 16px;
+      background: none;
+      border: none;
+      color: #a1a1aa;
+      cursor: pointer;
+      font-size: .88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background .15s, color .15s;
+    }
+    .cat-btn:hover  { background: rgba(255,255,255,.04); color: #e4e4e7; }
+    .cat-btn.active { background: rgba(99,102,241,.12); color: #a5b4fc; border-right: 2px solid #6366f1; }
+    .cat-count { font-size: .75rem; background: rgba(255,255,255,.07); padding: 1px 7px; border-radius: 999px; }
+
+    /* ── Main panel ── */
+    .main { flex: 1; overflow-y: auto; padding: 24px; }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .panel-header h2 { font-size: 1.1rem; font-weight: 600; }
+    .btn-add {
+      margin-left: auto;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-add:hover { opacity: .85; }
+
+    /* ── Question list ── */
+    .q-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .q-row {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color .15s;
+    }
+    .q-row:hover { border-color: rgba(255,255,255,.14); }
+
+    .q-type-badge {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 3px 8px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+    .badge-text     { background: rgba(99,102,241,.2);  color: #a5b4fc; }
+    .badge-flag     { background: rgba(14,165,233,.2);  color: #7dd3fc; }
+    .badge-slider   { background: rgba(234,179,8,.2);   color: #fde047; }
+    .badge-timeline { background: rgba(249,115,22,.2);  color: #fdba74; }
+    .badge-map      { background: rgba(34,197,94,.2);   color: #86efac; }
+
+    .q-text { flex: 1; font-size: .88rem; color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .q-detail { font-size: .75rem; color: #52525b; flex-shrink: 0; }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid rgba(255,255,255,.1);
+      color: #71717a;
+      border-radius: 7px;
+      width: 30px; height: 30px;
+      cursor: pointer;
+      font-size: .85rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .btn-icon:hover         { background: rgba(255,255,255,.06); color: #e4e4e7; border-color: rgba(255,255,255,.2); }
+    .btn-icon.delete:hover  { background: rgba(239,68,68,.12); color: #f87171; border-color: rgba(239,68,68,.3); }
+
+    /* ── Form drawer ── */
+    .form-drawer {
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .form-drawer h3 { font-size: .95rem; font-weight: 600; margin-bottom: 16px; color: #a5b4fc; }
+
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 160px; }
+    .form-group label { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: #71717a; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 7px;
+      color: #e4e4e7;
+      padding: 8px 10px;
+      font-size: .88rem;
+      font-family: inherit;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+    .form-group select option { background: #18181b; }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+
+    .answers-grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .answer-wrap { position: relative; }
+    .answer-wrap input { padding-right: 36px; }
+    .correct-radio {
+      position: absolute;
+      right: 8px; top: 50%; transform: translateY(-50%);
+      accent-color: #4ade80;
+      width: 16px; height: 16px;
+      cursor: pointer;
+    }
+
+    .form-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .btn-save-q {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-cancel-q {
+      background: rgba(255,255,255,.05);
+      color: #a1a1aa;
+      border: 1px solid rgba(255,255,255,.1);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: .88rem;
+      cursor: pointer;
+    }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #52525b; font-size: .9rem; }
+
+    /* ── Global save button ── */
+    .global-save {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(99,102,241,.4);
+      transition: opacity .15s, transform .1s;
+    }
+    .global-save:hover  { opacity: .9; transform: translateY(-1px); }
+    .global-save:active { transform: translateY(0); }
+
+    /* ── Flag preview ── */
+    .flag-preview { height: 36px; border-radius: 4px; border: 1px solid rgba(255,255,255,.1); vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">⚡ QuizBlast</span>
+  <span class="topbar-title">/ Question Editor</span>
+  <div class="topbar-right">
+    <span class="save-status" id="save-status"></span>
+    <a href="/" style="color:#71717a; font-size:.8rem; text-decoration:none;">← Back to game</a>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <h3>Categories</h3>
+    <button class="cat-btn active" data-cat="all" onclick="selectCat('all')">
+      All <span class="cat-count" id="count-all">0</span>
+    </button>
+    <button class="cat-btn" data-cat="facts" onclick="selectCat('facts')">
+      📚 Facts <span class="cat-count" id="count-facts">0</span>
+    </button>
+    <button class="cat-btn" data-cat="science" onclick="selectCat('science')">
+      🔬 Science <span class="cat-count" id="count-science">0</span>
+    </button>
+    <button class="cat-btn" data-cat="sports" onclick="selectCat('sports')">
+      ⚽ Sports <span class="cat-count" id="count-sports">0</span>
+    </button>
+    <button class="cat-btn" data-cat="entertainment" onclick="selectCat('entertainment')">
+      🎬 Entertainment <span class="cat-count" id="count-entertainment">0</span>
+    </button>
+    <button class="cat-btn" data-cat="flags" onclick="selectCat('flags')">
+      🏳️ Flags <span class="cat-count" id="count-flags">0</span>
+    </button>
+    <button class="cat-btn" data-cat="estimation" onclick="selectCat('estimation')">
+      📏 Estimation <span class="cat-count" id="count-estimation">0</span>
+    </button>
+    <button class="cat-btn" data-cat="timeline" onclick="selectCat('timeline')">
+      📅 Timeline <span class="cat-count" id="count-timeline">0</span>
+    </button>
+    <button class="cat-btn" data-cat="geography" onclick="selectCat('geography')">
+      🌍 Geography <span class="cat-count" id="count-geography">0</span>
+    </button>
+  </nav>
+
+  <main class="main" id="main-panel">
+    <div class="panel-header">
+      <h2 id="panel-title">All Questions</h2>
+      <button class="btn-add" onclick="openAddForm()">+ Add Question</button>
+    </div>
+    <div id="form-area"></div>
+    <div class="q-list" id="q-list"></div>
+  </main>
+</div>
+
+<button class="global-save" onclick="saveToServer()">Save All Changes</button>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let questions = [];
+let currentCat = 'all';
+let editingIndex = null; // index in `questions` array, or null for "add new"
+
+const CATEGORIES = ['facts','science','sports','entertainment','flags','estimation','timeline','geography'];
+
+const TYPE_FOR_CAT = {
+  facts: 'text', science: 'text', sports: 'text', entertainment: 'text',
+  flags: 'flag', estimation: 'slider', timeline: 'timeline', geography: 'map'
+};
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+async function boot() {
+  const res = await fetch('/admin/questions');
+  questions = await res.json();
+  updateCounts();
+  renderList();
+}
+boot();
+
+// ── Category filter ───────────────────────────────────────────────────────────
+function selectCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  const labels = {
+    all: 'All Questions', facts: '📚 Facts', science: '🔬 Science',
+    sports: '⚽ Sports', entertainment: '🎬 Entertainment', flags: '🏳️ Flags',
+    estimation: '📏 Estimation', timeline: '📅 Timeline', geography: '🌍 Geography'
+  };
+  document.getElementById('panel-title').textContent = labels[cat] || cat;
+  closeForm();
+  renderList();
+}
+
+function updateCounts() {
+  const total = questions.length;
+  document.getElementById('count-all').textContent = total;
+  CATEGORIES.forEach(cat => {
+    const el = document.getElementById('count-' + cat);
+    if (el) el.textContent = questions.filter(q => q.category === cat).length;
+  });
+}
+
+// ── Render question list ──────────────────────────────────────────────────────
+function renderList() {
+  const list = document.getElementById('q-list');
+  const filtered = currentCat === 'all' ? questions : questions.filter(q => q.category === currentCat);
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">No questions yet. Click "+ Add Question" to create one.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map((q, filteredIdx) => {
+    const realIdx = questions.indexOf(q);
+    const type = q.type || 'text';
+    const badge = `<span class="q-type-badge badge-${type}">${type}</span>`;
+    let text = '';
+    let detail = '';
+
+    if (type === 'flag') {
+      text = `<img src="https://flagcdn.com/32x24/${q.question}.png" class="flag-preview" alt="${q.question}"> &nbsp;${q.answers[q.correct]}`;
+      detail = q.question.toUpperCase();
+    } else if (type === 'map') {
+      text = q.question;
+      detail = q.locationName;
+    } else if (type === 'slider' || type === 'timeline') {
+      text = q.question;
+      detail = `${q.min} – ${q.max} ${q.unit || ''}  ✓ ${q.correct}`;
+    } else {
+      text = q.question;
+      detail = `✓ ${q.answers[q.correct]}`;
+    }
+
+    return `
+      <div class="q-row" id="qrow-${realIdx}">
+        ${badge}
+        <span class="q-text" title="${escHtml(q.question)}">${escHtml(typeof text === 'string' ? text : q.question)}</span>
+        <span class="q-detail">${escHtml(detail)}</span>
+        <button class="btn-icon" onclick="openEditForm(${realIdx})" title="Edit">✏️</button>
+        <button class="btn-icon delete" onclick="deleteQuestion(${realIdx})" title="Delete">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Form open / close ─────────────────────────────────────────────────────────
+function openAddForm() {
+  editingIndex = null;
+  const defaultCat = currentCat === 'all' ? 'facts' : currentCat;
+  renderForm({ category: defaultCat, type: TYPE_FOR_CAT[defaultCat] }, 'Add Question');
+}
+
+function openEditForm(idx) {
+  editingIndex = idx;
+  renderForm(questions[idx], 'Edit Question');
+  document.getElementById('form-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeForm() {
+  document.getElementById('form-area').innerHTML = '';
+  editingIndex = null;
+}
+
+// ── Build the form HTML depending on question type ────────────────────────────
+function renderForm(q, title) {
+  const cat  = q.category || 'facts';
+  const type = q.type || 'text';
+
+  const catOptions = CATEGORIES.map(c =>
+    `<option value="${c}" ${c === cat ? 'selected' : ''}>${c}</option>`
+  ).join('');
+
+  const typeOptions = [
+    ['text','Multiple choice (text)'],['flag','Flag'],
+    ['slider','Estimation (slider)'],['timeline','Timeline'],['map','Map pin-drop']
+  ].map(([v,l]) => `<option value="${v}" ${v === type ? 'selected' : ''}>${l}</option>`).join('');
+
+  let typeFields = '';
+
+  if (type === 'text' || type === 'flag') {
+    if (type === 'flag') {
+      typeFields = `
+        <div class="form-row">
+          <div class="form-group" style="flex:1">
+            <label>ISO Country Code (e.g. fr, de, jp)</label>
+            <input id="f-question" value="${escHtml(q.question || '')}" placeholder="e.g. fr"
+              oninput="updateFlagPreview(this.value)">
+          </div>
+          <div class="form-group" style="flex:0 0 auto; justify-content:flex-end;">
+            <label>Preview</label>
+            <img id="flag-prev" src="https://flagcdn.com/64x48/${q.question || 'xx'}.png"
+              class="flag-preview" style="height:48px;" alt="">
+          </div>
+        </div>`;
+    } else {
+      typeFields = `
+        <div class="form-row">
+          <div class="form-group">
+            <label>Question Text</label>
+            <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
+          </div>
+        </div>`;
+    }
+
+    const ans = q.answers || ['','','',''];
+    const cor = q.correct ?? 0;
+    typeFields += `
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Answers &nbsp;<small style="color:#52525b">(click the circle on the right to mark the correct one)</small></label>
+        <div class="answers-grid-form">
+          ${ans.map((a, i) => `
+            <div class="answer-wrap">
+              <input id="f-ans-${i}" value="${escHtml(a)}" placeholder="Option ${i+1}">
+              <input type="radio" class="correct-radio" name="correct" value="${i}" ${i === cor ? 'checked' : ''}>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+  } else if (type === 'slider' || type === 'timeline') {
+    const label = type === 'timeline' ? 'Year' : 'Value';
+    typeFields = `
+      <div class="form-row">
+        <div class="form-group">
+          <label>Question Text</label>
+          <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Min ${label}</label>
+          <input id="f-min" type="number" value="${q.min ?? ''}">
+        </div>
+        <div class="form-group">
+          <label>Max ${label}</label>
+          <input id="f-max" type="number" value="${q.max ?? ''}">
+        </div>
+        <div class="form-group">
+          <label>Step</label>
+          <input id="f-step" type="number" value="${q.step ?? 1}">
+        </div>
+        <div class="form-group">
+          <label>Correct ${label}</label>
+          <input id="f-correct" type="number" value="${q.correct ?? ''}">
+        </div>
+        ${type === 'slider' ? `<div class="form-group">
+          <label>Unit (e.g. km, %, million)</label>
+          <input id="f-unit" value="${escHtml(q.unit || '')}">
+        </div>` : `<input type="hidden" id="f-unit" value="">`}
+      </div>`;
+
+  } else if (type === 'map') {
+    typeFields = `
+      <div class="form-row">
+        <div class="form-group">
+          <label>Question Text</label>
+          <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Correct Latitude</label>
+          <input id="f-lat" type="number" step="0.0001" value="${q.correctLat ?? ''}">
+        </div>
+        <div class="form-group">
+          <label>Correct Longitude</label>
+          <input id="f-lng" type="number" step="0.0001" value="${q.correctLng ?? ''}">
+        </div>
+        <div class="form-group">
+          <label>Location Name (shown after reveal)</label>
+          <input id="f-location" value="${escHtml(q.locationName || '')}">
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('form-area').innerHTML = `
+    <div class="form-drawer">
+      <h3>${title}</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="f-category" onchange="onCatChange(this.value)">${catOptions}</select>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="f-type" onchange="onTypeChange(this.value)">${typeOptions}</select>
+        </div>
+      </div>
+      <div id="type-fields">${typeFields}</div>
+      <div class="form-actions">
+        <button class="btn-save-q" onclick="saveQuestion()">Save Question</button>
+        <button class="btn-cancel-q" onclick="closeForm()">Cancel</button>
+      </div>
+    </div>`;
+}
+
+function onCatChange(cat) {
+  const defaultType = TYPE_FOR_CAT[cat] || 'text';
+  document.getElementById('f-type').value = defaultType;
+  onTypeChange(defaultType);
+}
+
+function onTypeChange(type) {
+  const cat = document.getElementById('f-category').value;
+  const partial = { category: cat, type,
+    question: document.getElementById('f-question')?.value || '',
+    answers: [0,1,2,3].map(i => document.getElementById('f-ans-'+i)?.value || ''),
+    correct: Number(document.querySelector('input[name=correct]:checked')?.value ?? 0),
+  };
+  renderForm(partial, editingIndex !== null ? 'Edit Question' : 'Add Question');
+}
+
+function updateFlagPreview(code) {
+  const img = document.getElementById('flag-prev');
+  if (img) img.src = `https://flagcdn.com/64x48/${code.toLowerCase()}.png`;
+}
+
+// ── Collect form data ─────────────────────────────────────────────────────────
+function collectForm() {
+  const cat  = document.getElementById('f-category').value;
+  const type = document.getElementById('f-type').value;
+  const q    = { category: cat };
+
+  if (type !== 'text') q.type = type;
+
+  if (type === 'flag') {
+    q.question = document.getElementById('f-question').value.trim().toLowerCase();
+    q.answers  = [0,1,2,3].map(i => document.getElementById('f-ans-'+i).value.trim());
+    q.correct  = Number(document.querySelector('input[name=correct]:checked')?.value ?? 0);
+  } else if (type === 'text') {
+    q.question = document.getElementById('f-question').value.trim();
+    q.answers  = [0,1,2,3].map(i => document.getElementById('f-ans-'+i).value.trim());
+    q.correct  = Number(document.querySelector('input[name=correct]:checked')?.value ?? 0);
+  } else if (type === 'slider' || type === 'timeline') {
+    q.question = document.getElementById('f-question').value.trim();
+    q.min      = Number(document.getElementById('f-min').value);
+    q.max      = Number(document.getElementById('f-max').value);
+    q.step     = Number(document.getElementById('f-step').value) || 1;
+    q.correct  = Number(document.getElementById('f-correct').value);
+    q.unit     = document.getElementById('f-unit')?.value?.trim() || '';
+  } else if (type === 'map') {
+    q.question     = document.getElementById('f-question').value.trim();
+    q.correctLat   = Number(document.getElementById('f-lat').value);
+    q.correctLng   = Number(document.getElementById('f-lng').value);
+    q.locationName = document.getElementById('f-location').value.trim();
+  }
+
+  return q;
+}
+
+function validateQuestion(q) {
+  if (!q.question) return 'Question text / code is required.';
+  if (q.type === 'text' || q.type === 'flag') {
+    if (q.answers.some(a => !a)) return 'All 4 answer options must be filled in.';
+  }
+  if ((q.type === 'slider' || q.type === 'timeline') && q.min >= q.max) return 'Min must be less than max.';
+  if (q.type === 'map' && (isNaN(q.correctLat) || isNaN(q.correctLng))) return 'Latitude and longitude are required.';
+  return null;
+}
+
+// ── Save / delete ─────────────────────────────────────────────────────────────
+function saveQuestion() {
+  const q = collectForm();
+  const err = validateQuestion(q);
+  if (err) { alert(err); return; }
+
+  if (editingIndex !== null) {
+    questions[editingIndex] = q;
+  } else {
+    questions.push(q);
+  }
+
+  updateCounts();
+  closeForm();
+  renderList();
+  setStatus('Unsaved changes — click "Save All Changes"', '');
+}
+
+function deleteQuestion(idx) {
+  const q = questions[idx];
+  const label = q.type === 'flag' ? q.question.toUpperCase() : q.question;
+  if (!confirm(`Delete this question?\n\n"${label}"`)) return;
+  questions.splice(idx, 1);
+  updateCounts();
+  renderList();
+  setStatus('Unsaved changes — click "Save All Changes"', '');
+}
+
+// ── Server sync ───────────────────────────────────────────────────────────────
+async function saveToServer() {
+  setStatus('Saving…', '');
+  try {
+    const res = await fetch('/admin/questions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questions),
+    });
+    const data = await res.json();
+    if (data.ok) setStatus(`Saved — ${data.count} questions`, 'ok');
+    else setStatus('Save failed: ' + JSON.stringify(data), 'err');
+  } catch (e) {
+    setStatus('Save failed: ' + e.message, 'err');
+  }
+}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('save-status');
+  el.textContent = msg;
+  el.className = 'save-status ' + cls;
+}
+</script>
+</body>
+</html>
