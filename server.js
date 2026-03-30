@@ -418,7 +418,9 @@ function showLeaderboard(game) {
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-const PORT = 3000;
+// process.env.PORT is set by Railway (and most hosting platforms) at deploy time.
+// Falls back to 3000 for local development.
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log('\n✅ Quiz app is running!');
   console.log(`   Open your browser and go to: http://localhost:${PORT}`);

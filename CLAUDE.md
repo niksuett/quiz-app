@@ -138,21 +138,48 @@ quiz-app/
 - Adding a map question requires typing lat/lng manually. An inline Leaflet map in the admin form where you click to set the correct location would be much easier.
 
 **3. Expand Timeline / History (target: 60+ questions)**
-- Current count is 25. Cover all eras: ancient, medieval, early modern, modern, recent.
+- Current count is 25 (+ 3 photo questions). Cover all eras: ancient, medieval, early modern, modern, recent.
 - Vary question framing: inventions, battles, discoveries, births, treaties, first achievements.
-- Pure content work — no code changes needed.
+- Pure content work — no code changes needed. Defer to a dedicated question-writing session.
 
-**6. New question type: Silhouette (MC)**
+**4. Map leaderboard zoom too shallow for close guesses**
+- When all players guessed within a few km of each other, `maxZoom: 10` in `fitBounds` keeps the view far out and the pins overlap uselessly.
+- Fix: remove the `maxZoom` cap from the `fitBounds` call in `showLeaderboardMap()` in `client.js` so Leaflet zooms as far in as the spread of pins requires.
+
+**5. Landmark coordinates and locationName accuracy audit**
+- The coordinates for geo-* questions are placed at the landmark itself (e.g. 48.8584, 2.2945 is the Eiffel Tower, not just Paris), which is correct.
+- However, the `locationName` field often just says "Rome, Italy" instead of "Colosseum, Rome, Italy", making the answer reveal less informative.
+- Fix: audit all geo-* questions and update `locationName` to name the specific landmark/site, not just the city.
+
+**6. Scoring balance: MC too dominant, geography needs a rank-based bonus**
+- MC questions reward 100–150 pts per correct answer. Geography questions reward very few points unless you're nearly exact, so a player with the best geography knowledge in the group may not place well.
+- Two-part fix:
+  1. **Rank bonus:** after each map/slider/timeline question, award the closest guesser +30pts, 2nd closest +20pts, 3rd +10pts (everyone else nothing). This is calculated server-side after all answers are in, before the leaderboard is shown.
+  2. **Floor for geography:** consider a minimum score (e.g. 5–10 pts) for any non-zero answer on map questions, so being on the right continent isn't a complete zero.
+- Rank bonus should be shown in the score breakdown on the result screen and in the leaderboard gain badge.
+
+**7. New question type: Silhouette (MC)**
 - Show a country or region outline silhouette as an image; players pick the name from 4 buttons.
 - Low complexity — reuses the flag question mechanic (image + 4 MC buttons). Needs silhouette images hosted or generated.
-
-**7. New question type: Historical Photo (timeline variant)**
-- Show a black-and-white photo of a place or event; players guess the year with the timeline slider.
-- Low complexity — reuses the timeline mechanic, just adds an image above the question text (same pattern as flag questions).
 
 **8. New question type: Sequence (ordering)**
 - Put 4 historical events in chronological order by dragging them.
 - High complexity — requires a new drag-to-reorder UI component, new scoring logic, and new question format in `questions.json`.
+
+**9. Map tile aesthetics** *(decide direction before implementing)*
+- The current setup (CartoDB dark no-labels + faint label overlay) is a stopgap. The user wants natural map features: elevation/terrain, water bodies, rivers, borders, built-up areas — but no or minimal labels to avoid giving away answers.
+- **Quickest way to experiment:** swap the tile URL directly in the browser console while the game is running — no server restart needed. Try these candidates:
+  - **Stadia Alidade Smooth Dark** (current-ish): minimal, no labels variant available
+  - **Stamen Terrain** (`https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg`): elevation + rivers + land cover, but has labels
+  - **CartoDB Voyager No Labels** (`https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png`): light, has roads + water, no labels — good candidate
+  - **OpenTopoMap** (`https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png`): topographic contours, natural features
+  - **Stadia Stamen Watercolor** (`https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg`): artistic, rivers visible, no labels — very different vibe
+- **Recommendation:** explore this in a separate Claude session focused purely on aesthetics. Once a tile URL + opacity combo is chosen, it's a 2-line code change.
+
+**10. Full visual redesign: lighter, more sophisticated theme** *(decide direction before implementing)*
+- Current dark theme looks too much like a generic mobile app. User wants a lighter design that reflects the geography/history focus — more "grown-up", less tech-startup.
+- This is a large undertaking (most of `style.css` would change, possibly font choices, layout, card styles, color palette).
+- **Recommendation:** decide on the design direction in a separate Claude session. Bring back: a color palette (2–3 main colors + accent), a font pairing idea, and adjectives describing the feel (e.g. "aged paper + ink", "explorer's atlas", "clean academic"). Then implement here.
 
 ### Supplemental categories — keep but don't grow
 Facts, Science, Sports, Entertainment, Flags are supporting acts. Focus on quality over quantity; don't expand these.
