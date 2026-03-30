@@ -158,7 +158,15 @@ quiz-app/
   2. **Floor for geography:** consider a minimum score (e.g. 5–10 pts) for any non-zero answer on map questions, so being on the right continent isn't a complete zero.
 - Rank bonus should be shown in the score breakdown on the result screen and in the leaderboard gain badge.
 
-**7. New question type: Silhouette (MC)**
+**7. Visual scale reveal for estimation questions**
+- After estimation (slider) questions, show the same horizontal axis + player-pin reveal that timeline questions already have (`showLeaderboardTimeline()` in `client.js`).
+- The function already handles units and arbitrary numeric ranges, so it should work for estimation with minimal changes.
+- Changes needed:
+  1. Server: also build and send `timelineData` for `slider` questions in `showLeaderboard()` (currently only built for `timeline` type).
+  2. Client: `showLeaderboardTimeline()` can be reused as-is; just make sure the `show-leaderboard` handler triggers it for `slider` type too.
+  3. Rename `showLeaderboardTimeline` → `showLeaderboardScale` (or keep the name and just extend the condition) to reflect that it handles both types.
+
+**8. New question type: Silhouette (MC)**
 - Show a country or region outline silhouette as an image; players pick the name from 4 buttons.
 - Low complexity — reuses the flag question mechanic (image + 4 MC buttons). Needs silhouette images hosted or generated.
 
