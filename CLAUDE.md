@@ -47,6 +47,7 @@ quiz-app/
 | Built World | `geo-built` | Map pin-drop | 22 | Monuments, temples, famous buildings |
 | Cities | `geo-cities` | Map pin-drop | 12 | Urban centres worldwide |
 | Where in History | `geo-history` | Map pin-drop | 8 | Battle sites, historical events, ruins |
+| Sequence | `sequence` | Drag-to-order | 10 | 4 items in correct order; scored by positions correct |
 
 ## Answer mechanics
 | Type | How it works |
@@ -56,6 +57,7 @@ quiz-app/
 | Slider | Draggable bar between a numeric range, scored by proximity |
 | Timeline | Draggable marker on a year axis, scored by proximity |
 | Map pin drop | Click/tap on a map, scored by haversine distance (exponential decay) |
+| Sequence | Drag 4 items into the correct order; scored by how many are in the right position (0–4) |
 
 ## Scoring rules
 
@@ -65,6 +67,7 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 - Rank points by position: 1st=10, 2nd=8, 3rd=6, 4th=4, 5th=2, 6th+=1
 - **MC/Flag:** all correct players get flat 10 pts (no speed differentiation); wrong = 0
 - **Proximity (slider, timeline, map):** ranked by closeness (lowest error/distance = 1st)
+- **Sequence:** ranked by correctCount descending (most positions correct = 1st)
 - Players who didn't answer = 0 pts
 
 ### Option B — Accuracy + Rank
@@ -73,6 +76,7 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 - **Proximity:** accuracy score via `round(6 × accuracyFraction)` + rank bonus by closeness
   - Slider/timeline: `accuracyFraction = max(0, 1 − error/(range×0.5))`
   - Map: `accuracyFraction = exp(−(dist/50)^0.6)` stretched exponential
+- **Sequence:** `accuracyFraction = correctCount / 4`; rank bonus by rank among players
 
 ### Result screen behaviour
 - **Option A, MC correct:** shows flat "10 pts" immediately
@@ -82,6 +86,7 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 
 ## Timer limits per question type
 - MC / Flags: **15 seconds**
+- Sequence: **30 seconds**
 - Estimation / Timeline: **20 seconds**
 - Geography map pin: **35 seconds**
 
@@ -149,6 +154,8 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 
 **Visual redesign: Parchment & Ink theme** — full redesign of `style.css` and `index.html`. Warm parchment/ink/gold palette. Three-font system: Cinzel (headings/labels), EB Garamond (decorative/italic), Lora (body/questions). Two-column home screen (ink left, parchment right). Two-column result screen (ink left with icon, parchment right with score). Answer buttons are white parchment cards with a colored left border per slot.
 
+**New question type: Sequence** — drag 4 items into the correct chronological/logical order. Pointer-events drag (works on mobile and desktop). Scored by number of items in correct position (0–4), ranked like proximity questions. CSS counter auto-numbers items live as they are reordered. Leaderboard shows a correct-order numbered list + per-player 2×2 grid (green = correct position, red = wrong). 10 questions added covering space, WWII, science, inventions, ancient structures, revolutions, pandemics, human rights, Roman emperors, and music milestones. 30-second timer.
+
 **Scoring system rebalance** — replaced the old speed-bonus-heavy system with two selectable rank-based systems (host picks at game setup):
 - **Rank** (Option A): closest answer wins most; all MC correct = same points; 10/8/6/4/2/1 pts by rank; no speed differentiation.
 - **Accuracy + Rank** (Option B): 0–6 pts for accuracy; +4/3/2/1/0 rank bonus; max 10 pts per question. MC ranked by speed, proximity ranked by closeness.
@@ -173,9 +180,9 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 - Show a country/region outline silhouette; players pick the name from 4 buttons.
 - Low complexity — reuses the flag question mechanic (image + 4 MC buttons).
 
-**5. New question type: Sequence (ordering)**
-- Put 4 historical events in chronological order by dragging them.
-- High complexity — new drag-to-reorder UI, new scoring logic, new question format.
+**5. Admin sequence question editor**
+- Sequence questions currently must be added directly to `questions.json`. The admin UI at `/admin.html` has no form for the `sequence` type yet.
+- Fix: add a sequence tab/form to admin.html with fields for question text and 4 ordered items.
 
 ### Supplemental categories — keep but don't grow
 Facts, Science, Sports, Entertainment, Flags are supporting acts. Focus on quality over quantity; don't expand these.

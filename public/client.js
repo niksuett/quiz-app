@@ -215,6 +215,9 @@ function formatAnswerStat(ans) {
     const diff = ans.diff === 0 ? 'exact!' : `off by ${ans.diff.toLocaleString()}${u}`;
     return `${ans.value.toLocaleString()}${u} — ${diff}`;
   }
+  if (ans.type === 'sequence') {
+    return `${ans.correctCount} / ${ans.correctOrder.length} in correct position`;
+  }
   // MC / flag
   if (ans.isCorrect) return `✓ ${ans.answerText}`;
   return `✗ ${ans.answerText}  →  ${ans.correctText}`;
@@ -247,7 +250,9 @@ function formatRoundInfo(entry, questionType, scoringSystem) {
   // For proximity-based types, add "closest" qualifier to the rank
   const isProximity = (questionType === 'slider' || questionType === 'timeline' || questionType === 'map');
   const rankLabel   = rankStr
-    ? (isProximity ? `${rankStr} closest` : `${rankStr} place`)
+    ? questionType === 'sequence' ? `${rankStr} · best order`
+    : isProximity                 ? `${rankStr} closest`
+    :                               `${rankStr} place`
     : null;
 
   return rankLabel ? `${rankLabel} · +${pts} pts` : `+${pts} pts`;
@@ -418,7 +423,7 @@ socket.on('join-success', ({ gameId, nickname }) => {
 socket.on('join-error', (msg) => showError('join-error', msg));
 
 // ── New question ──────────────────────────────────────────────────────────────
-socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, type, min, max, step, unit, imageUrl, scoringSystem }) => {
+socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, type, min, max, step, unit, imageUrl, items, scoringSystem }) => {
   currentScoringSystem = scoringSystem || 'rank';
   stopTimer();
   clearTimeout(resultTimeout);
@@ -545,6 +550,33 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
       grid.innerHTML = `
         <div class="map-wrap">
           <div class="map-placeholder">🗺️ Players are pinning their guesses on the map…</div>
+        </div>`;
+    }
+    document.getElementById('host-label').classList.add('hidden');
+    document.getElementById('answer-progress')
+      .classList[myRole === 'host' ? 'remove' : 'add']('hidden');
+    if (myRole === 'host')
+      document.getElementById('progress-text').textContent = `0 / ? answered`;
+
+  } else if (type === 'sequence') {
+    // ── Sequence drag-to-order UI ───────────────────────────────────────────
+    grid.classList.add('slider-mode');
+    if (myRole !== 'host') {
+      const itemsHtml = (items || []).map(text =>
+        `<li class="seq-item" data-text="${text.replace(/"/g, '&quot;')}">${text}</li>`
+      ).join('');
+      grid.innerHTML = `
+        <div class="seq-wrap">
+          <p class="seq-instruction">Drag items into the correct order — earliest / first at the top</p>
+          <ol class="seq-list" id="seq-list">${itemsHtml}</ol>
+          <button class="btn btn-red slider-submit-btn" id="seq-submit-btn"
+                  onclick="submitSequence()">Lock In Order</button>
+        </div>`;
+      initSequenceDrag();
+    } else {
+      grid.innerHTML = `
+        <div class="seq-wrap">
+          <div class="map-placeholder">🔢 Players are ordering the sequence…</div>
         </div>`;
     }
     document.getElementById('host-label').classList.add('hidden');
@@ -714,6 +746,77 @@ function submitMapAnswer() {
   socket.emit('submit-answer', { answerLat: pendingMapCoords.lat, answerLng: pendingMapCoords.lng });
 }
 
+// ── Sequence drag-to-order ────────────────────────────────────────────────────
+
+// Wires up pointer-based drag-to-reorder on the sequence list.
+// Works with both mouse (desktop) and touch (mobile) via the Pointer Events API.
+function initSequenceDrag() {
+  const list = document.getElementById('seq-list');
+  if (!list) return;
+
+  let dragging = null; // the <li> currently being dragged
+
+  list.addEventListener('pointerdown', e => {
+    const item = e.target.closest('.seq-item');
+    if (!item || item.classList.contains('seq-locked')) return;
+    e.preventDefault();
+
+    // setPointerCapture redirects all future pointer events for this ID to item,
+    // so pointermove/pointerup fire on item even when the pointer moves off it.
+    item.setPointerCapture(e.pointerId);
+    item.classList.add('seq-grabbed');
+    dragging = item;
+
+    const onMove = ev => {
+      if (!dragging) return;
+      const y        = ev.clientY;
+      const siblings = [...list.querySelectorAll('.seq-item:not(.seq-grabbed)')];
+
+      // Find the first sibling whose midpoint is below the pointer
+      let target = null;
+      for (const sib of siblings) {
+        const r = sib.getBoundingClientRect();
+        if (y < r.top + r.height / 2) { target = sib; break; }
+      }
+
+      // Only update DOM when position would actually change (avoids jitter)
+      if (target !== null && dragging.nextElementSibling !== target) {
+        list.insertBefore(dragging, target);
+      } else if (target === null && dragging.nextElementSibling !== null) {
+        list.appendChild(dragging);
+      }
+    };
+
+    const onEnd = () => {
+      if (dragging) {
+        dragging.classList.remove('seq-grabbed');
+        dragging = null;
+      }
+      item.removeEventListener('pointermove', onMove);
+    };
+
+    item.addEventListener('pointermove', onMove);
+    item.addEventListener('pointerup',     onEnd, { once: true });
+    item.addEventListener('pointercancel', onEnd, { once: true });
+  });
+}
+
+// Called when the player clicks "Lock In Order"
+function submitSequence() {
+  const list = document.getElementById('seq-list');
+  const btn  = document.getElementById('seq-submit-btn');
+  if (!list || !btn) return;
+
+  // Read the current DOM order — each item's text is in data-text
+  const order = [...list.querySelectorAll('.seq-item')].map(li => li.dataset.text);
+
+  list.querySelectorAll('.seq-item').forEach(li => li.classList.add('seq-locked'));
+  btn.disabled    = true;
+  btn.textContent = 'Locked in!';
+  document.getElementById('speed-bonus-display').classList.add('hidden');
+  socket.emit('submit-answer', { answerSequence: order });
+}
+
 // Renders the post-question map reveal on the leaderboard screen.
 // Shows a gold star at the correct location, then animates each player's
 // pin in one by one, with a dashed line back to the correct spot.
@@ -878,6 +981,60 @@ function showLeaderboardScale(timelineData) {
   });
 }
 
+// Renders the post-question sequence reveal on the leaderboard screen.
+// Shows the correct order as a numbered list, then each player's answers
+// in a 2-column grid (green = correct position, red tint = wrong).
+function showLeaderboardSequence(seqData) {
+  const wrap = document.getElementById('leaderboard-sequence');
+  wrap.innerHTML = '';
+  wrap.classList.remove('hidden');
+
+  const { correctOrder, playerAnswers } = seqData;
+
+  // Header
+  const header = document.createElement('div');
+  header.className   = 'tl-reveal-header';
+  header.textContent = 'Correct order';
+  wrap.appendChild(header);
+
+  // Correct order — numbered list
+  const correctList = document.createElement('ol');
+  correctList.className = 'seq-reveal-list';
+  correctOrder.forEach(text => {
+    const li = document.createElement('li');
+    li.className   = 'seq-reveal-item seq-reveal-correct';
+    li.textContent = text;
+    correctList.appendChild(li);
+  });
+  wrap.appendChild(correctList);
+
+  // Per-player blocks — stagger in one by one
+  playerAnswers.forEach((pa, pi) => {
+    setTimeout(() => {
+      const block = document.createElement('div');
+      block.className = 'seq-reveal-player' + (pa.nickname === myNickname ? ' seq-reveal-me' : '');
+
+      const nameRow = document.createElement('div');
+      nameRow.className   = 'seq-reveal-name';
+      nameRow.textContent = `${pa.nickname} — ${pa.correctCount}/${correctOrder.length}`;
+      block.appendChild(nameRow);
+
+      const grid = document.createElement('div');
+      grid.className = 'seq-reveal-grid';
+      correctOrder.forEach((correctText, i) => {
+        const playerText = pa.playerOrder[i] || '—';
+        const isMatch    = playerText === correctText;
+        const cell       = document.createElement('div');
+        cell.className   = 'seq-reveal-cell ' + (isMatch ? 'seq-cell-match' : 'seq-cell-miss');
+        cell.textContent = playerText;
+        grid.appendChild(cell);
+      });
+      block.appendChild(grid);
+      wrap.appendChild(block);
+    }, 350 + pi * 280);
+  });
+}
+
 // ── Answer result (player only) ───────────────────────────────────────────────
 socket.on('answer-result', (data) => {
   stopTimer();
@@ -887,6 +1044,10 @@ socket.on('answer-result', (data) => {
     resultTimeout = setTimeout(() => showResultScreen(data), 800);
 
   } else if (data.type === 'map') {
+    data.soundCorrect ? soundCorrect() : soundWrong();
+    resultTimeout = setTimeout(() => showResultScreen(data), 800);
+
+  } else if (data.type === 'sequence') {
     data.soundCorrect ? soundCorrect() : soundWrong();
     resultTimeout = setTimeout(() => showResultScreen(data), 800);
 
@@ -1013,6 +1174,51 @@ function showResultScreen(data) {
       pendingLine.classList.remove('hidden');
     }
 
+  } else if (data.type === 'sequence') {
+    const n = data.correctCount;
+    const t = data.totalItems;
+
+    if (n === t) {
+      icon.textContent = '🎯'; icon.style.color = 'var(--correct)';
+      heading.textContent = 'Perfect order!';
+    } else if (n >= 3) {
+      icon.textContent = '✓'; icon.style.color = 'var(--correct)';
+      heading.textContent = 'Almost perfect!';
+    } else if (n >= 2) {
+      icon.textContent = '~'; icon.style.color = 'var(--gold)';
+      heading.textContent = 'Halfway there';
+    } else if (n === 1) {
+      icon.textContent = '~'; icon.style.color = 'var(--gold-muted)';
+      heading.textContent = 'One correct';
+    } else {
+      icon.textContent = '✗'; icon.style.color = 'var(--wrong)';
+      heading.textContent = 'Wrong order';
+    }
+
+    // Show player's order vs correct, row by row
+    const rows = data.correctOrder.map((correctText, i) => {
+      const playerText = data.playerOrder[i] || '—';
+      const isMatch    = playerText === correctText;
+      return `
+        <div class="seq-compare-row ${isMatch ? 'seq-match' : 'seq-mismatch'}">
+          <span class="seq-pos">${i + 1}</span>
+          <span class="seq-player-item">${playerText}</span>
+          <span class="seq-tick">${isMatch ? '✓' : '✗'}</span>
+        </div>`;
+    }).join('');
+    compareEl.innerHTML = `
+      <div class="seq-compare">
+        <div class="seq-compare-header">${n} / ${t} in correct position</div>
+        ${rows}
+      </div>`;
+    compareEl.classList.remove('hidden');
+
+    if (data.scoringSystem === 'accuracy-rank') {
+      showBreakdownCard(`${n}/${t} correct`, data.accuracyPts, true);
+    } else {
+      pendingLine.classList.remove('hidden');
+    }
+
   } else {
     // Multiple choice / flag
     if (data.isCorrect) {
@@ -1071,9 +1277,10 @@ const CATEGORY_LABELS = {
   flags: 'Flags', estimation: 'Estimation', timeline: 'Timeline',
   'geo-natural': 'Natural Wonders', 'geo-built': 'Built World',
   'geo-cities': 'Cities', 'geo-history': 'Where in History',
+  sequence: 'Sequence',
 };
 
-socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, questionNumber, totalQuestions, questionCategory, isLastQuestion, mapData, timelineData, scoringSystem }) => {
+socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, questionNumber, totalQuestions, questionCategory, isLastQuestion, mapData, timelineData, sequenceData, scoringSystem }) => {
   stopTimer();
   clearTimeout(resultTimeout);
   soundLeaderboard();
@@ -1082,9 +1289,11 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, quest
   // Reset all special reveal sections first
   const lbMapWrap      = document.getElementById('leaderboard-map');
   const lbTimelineWrap = document.getElementById('leaderboard-timeline');
+  const lbSequenceWrap = document.getElementById('leaderboard-sequence');
   const correctReveal  = document.getElementById('correct-reveal');
   lbMapWrap.classList.add('hidden');      lbMapWrap.innerHTML      = '';
   lbTimelineWrap.classList.add('hidden'); lbTimelineWrap.innerHTML = '';
+  lbSequenceWrap.classList.add('hidden'); lbSequenceWrap.innerHTML = '';
   correctReveal.classList.add('hidden');
 
   // Update leaderboard header with round number and category
@@ -1105,6 +1314,11 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, quest
   } else if (timelineData) {
     showLeaderboardScale(timelineData);
     correctReveal.innerHTML = crHtml;
+    correctReveal.classList.remove('hidden');
+  } else if (sequenceData) {
+    showLeaderboardSequence(sequenceData);
+    // Don't show the long correctAnswer string — the sequence reveal itself is the answer
+    correctReveal.innerHTML = `<span class="cr-tag">${CATEGORY_LABELS[questionCategory] || questionCategory}</span><span class="cr-answer">Correct order shown above</span>`;
     correctReveal.classList.remove('hidden');
   } else {
     correctReveal.innerHTML = crHtml;

@@ -1283,6 +1283,195 @@ h3 {
   letter-spacing: .03em;
 }
 
+/* ─── Sequence drag-to-order — question screen ───────────────────────────── */
+.seq-wrap {
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-top: 2px solid var(--gold);
+  border-radius: 3px;
+  padding: 18px 18px 22px;
+  width: 100%;
+  text-align: center;
+}
+.seq-instruction {
+  font-family: var(--font-cinzel);
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--aged);
+  margin-bottom: 14px;
+}
+/* CSS counter auto-numbers each item without JS */
+.seq-list {
+  list-style: none;
+  counter-reset: seq-pos;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 0;
+  touch-action: none; /* prevent scroll stealing on mobile */
+}
+.seq-item {
+  counter-increment: seq-pos;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-left: 3px solid var(--gold-muted);
+  border-radius: 3px;
+  padding: 12px 16px;
+  cursor: grab;
+  font-family: var(--font-lora);
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  user-select: none;
+  touch-action: none;
+  transition: box-shadow .12s, border-color .12s, background .12s;
+}
+.seq-item::before {
+  content: counter(seq-pos);
+  font-family: var(--font-cinzel);
+  font-size: .72rem;
+  font-weight: 900;
+  color: var(--gold-muted);
+  min-width: 18px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.seq-item:hover:not(.seq-locked):not(.seq-grabbed) {
+  border-left-color: var(--gold);
+  box-shadow: 0 3px 10px rgba(0,0,0,.1);
+}
+.seq-grabbed {
+  cursor: grabbing;
+  background: rgba(212,160,53,.07);
+  border-left-color: var(--gold-bright);
+  box-shadow: 0 8px 28px rgba(0,0,0,.28), 0 0 0 2px var(--gold);
+  position: relative;
+  z-index: 10;
+}
+.seq-locked { cursor: default; opacity: .72; }
+
+/* ─── Sequence — result screen compare rows ──────────────────────────────── */
+/* These sit on the dark ink background of result-left, so colours are        */
+/* light-on-dark (same convention as .compare-cell).                          */
+.seq-compare { width: 100%; margin-top: 10px; }
+.seq-compare-header {
+  font-family: var(--font-cinzel);
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: rgba(200,180,140,.55);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.seq-compare-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  border-radius: 2px;
+  margin-bottom: 3px;
+  font-family: var(--font-lora);
+  font-size: .78rem;
+  color: var(--parchment);
+}
+.seq-compare-row.seq-match    { background: rgba(42,110,69,.22);  }
+.seq-compare-row.seq-mismatch { background: rgba(122,31,31,.18);  }
+.seq-pos {
+  font-family: var(--font-cinzel);
+  font-size: .62rem;
+  font-weight: 900;
+  color: rgba(200,180,140,.5);
+  min-width: 14px;
+  flex-shrink: 0;
+}
+.seq-player-item { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seq-tick { font-size: .72rem; flex-shrink: 0; }
+.seq-compare-row.seq-match    .seq-tick { color: var(--correct); }
+.seq-compare-row.seq-mismatch .seq-tick { color: var(--wrong); opacity: .6; }
+
+/* ─── Sequence — leaderboard reveal ─────────────────────────────────────── */
+.leaderboard-sequence-wrap {
+  margin-bottom: 18px;
+  padding: 16px 16px 14px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: 2px solid var(--gold);
+  border-radius: 3px;
+}
+.seq-reveal-list {
+  list-style: none;
+  counter-reset: seq-pos;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 14px;
+  padding: 0;
+}
+.seq-reveal-item {
+  counter-increment: seq-pos;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 2px;
+  font-family: var(--font-lora);
+  font-size: .85rem;
+  font-weight: 600;
+}
+.seq-reveal-item::before {
+  content: counter(seq-pos);
+  font-family: var(--font-cinzel);
+  font-size: .68rem;
+  font-weight: 900;
+  color: var(--gold-muted);
+  min-width: 16px;
+  flex-shrink: 0;
+}
+.seq-reveal-correct {
+  background: rgba(42,110,69,.1);
+  border-left: 3px solid var(--correct);
+  color: var(--correct);
+}
+.seq-reveal-player {
+  margin-bottom: 10px;
+  animation: tlPinAppear .3s ease both;
+}
+.seq-reveal-me .seq-reveal-name { color: var(--lapis); }
+.seq-reveal-name {
+  font-family: var(--font-cinzel);
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--aged);
+  margin-bottom: 4px;
+}
+.seq-reveal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+.seq-reveal-cell {
+  padding: 5px 9px;
+  border-radius: 2px;
+  font-family: var(--font-lora);
+  font-size: .75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.seq-cell-match { background: rgba(42,110,69,.1);  color: var(--correct); border-left: 2px solid var(--correct); }
+.seq-cell-miss  { background: rgba(122,31,31,.07); color: var(--aged);    border-left: 2px solid var(--parchment-dark); }
+
 /* ─── Utility ─────────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 

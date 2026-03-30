@@ -2167,5 +2167,115 @@
     "max": 1930,
     "step": 1,
     "unit": ""
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these space milestones in chronological order (earliest first)",
+    "items": [
+      "Sputnik 1 launched — first satellite in orbit (1957)",
+      "Yuri Gagarin becomes first human in space (1961)",
+      "Neil Armstrong walks on the Moon (1969)",
+      "Voyager 1 enters interstellar space (2012)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these World War II events in chronological order",
+    "items": [
+      "Germany invades Poland — World War II begins (1939)",
+      "Japan attacks Pearl Harbor (1941)",
+      "D-Day landings at Normandy (1944)",
+      "Germany surrenders, ending the war in Europe (1945)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these scientific discoveries from earliest to latest",
+    "items": [
+      "Isaac Newton publishes his laws of motion (1687)",
+      "Charles Darwin publishes On the Origin of Species (1859)",
+      "Marie Curie discovers radium (1898)",
+      "Watson and Crick describe DNA’s double helix (1953)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these inventions from earliest to most recent",
+    "items": [
+      "Gutenberg’s printing press (~1440)",
+      "Steam engine patented by James Watt (1769)",
+      "Alexander Graham Bell patents the telephone (1876)",
+      "Tim Berners-Lee proposes the World Wide Web (1989)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these ancient structures in the order they were completed (earliest first)",
+    "items": [
+      "Great Pyramid of Giza (~2560 BC)",
+      "Parthenon in Athens (~432 BC)",
+      "Colosseum in Rome (80 AD)",
+      "Angkor Wat in Cambodia (~1150 AD)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these revolutions in chronological order (earliest first)",
+    "items": [
+      "American Declaration of Independence (1776)",
+      "French Revolution begins — storming of the Bastille (1789)",
+      "Haitian Revolution — independence declared (1804)",
+      "Russian Revolution — Bolsheviks seize power (1917)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these pandemics in chronological order (earliest first)",
+    "items": [
+      "Black Death peaks in Europe (1347)",
+      "Great Plague of London (1665)",
+      "Spanish Flu pandemic (1918)",
+      "COVID-19 declared a global pandemic (2020)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these human rights milestones from earliest to latest",
+    "items": [
+      "Magna Carta signed (1215)",
+      "Slavery abolished in the British Empire (1833)",
+      "Women granted the right to vote in the UK (1918)",
+      "UN Universal Declaration of Human Rights adopted (1948)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these Roman emperors in the order they ruled (earliest first)",
+    "items": [
+      "Augustus — first Roman emperor (27 BC)",
+      "Nero — infamous for persecution of Christians (54 AD)",
+      "Hadrian — built Hadrian’s Wall (117 AD)",
+      "Constantine I — first Christian emperor (306 AD)"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these music milestones from earliest to latest",
+    "items": [
+      "The Beatles appear on The Ed Sullivan Show (1964)",
+      "Woodstock music festival (1969)",
+      "Michael Jackson releases Thriller (1982)",
+      "Spotify launches globally (2008)"
+    ]
   }
 ]

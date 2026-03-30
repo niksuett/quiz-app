@@ -36,6 +36,16 @@ app.post('/admin/questions', (req, res) => {
 
 let ALL_QUESTIONS = loadQuestions();
 
+// ── Fisher-Yates shuffle (returns a new array, never mutates the original) ────
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // ── Haversine distance ────────────────────────────────────────────────────────
 function haversineKm(lat1, lng1, lat2, lng2) {
   const R     = 6371;
@@ -144,6 +154,32 @@ function applyRoundScores(game, question) {
     });
     game.players
       .filter(p => !p.lastAnswer || p.lastAnswer.type !== qType)
+      .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
+
+  } else if (qType === 'sequence') {
+    // ── Sequence: rank by correctCount descending (most correct positions = best) ─
+    const answered = game.players
+      .filter(p => p.lastAnswer && p.lastAnswer.type === 'sequence')
+      .sort((a, b) => b.lastAnswer.correctCount - a.lastAnswer.correctCount);
+
+    answered.forEach((p, rank) => {
+      let pts;
+      if (system === 'rank') {
+        pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
+      } else {
+        const accPts = Math.round(ACC_BASE_MAX * (p.accuracyRaw || 0));
+        const bonus  = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
+        pts = accPts + bonus;
+      }
+      p.roundPoints = pts;
+      p.roundRank   = rank + 1;
+      p.score      += pts;
+      p.stats.roundsAnswered++;
+      if (rank === 0) p.stats.roundsFirst++;
+      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
+    });
+    game.players
+      .filter(p => !p.lastAnswer || p.lastAnswer.type !== 'sequence')
       .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
 
   } else {
@@ -279,7 +315,7 @@ io.on('connection', (socket) => {
   // ── PLAYER submits an answer ───────────────────────────────────────────────
   // NOTE: Scoring is NOT applied here. We store raw answer data (accuracy, timing)
   // and defer all point calculations to showLeaderboard(), once all answers are in.
-  socket.on('submit-answer', ({ answerIndex, answerValue, answerLat, answerLng }) => {
+  socket.on('submit-answer', ({ answerIndex, answerValue, answerLat, answerLng, answerSequence }) => {
     const game = games[socket.gameId];
     if (!game || game.state !== 'question') return;
 
@@ -348,6 +384,37 @@ io.on('connection', (socket) => {
         rankBonusPending: true,
       });
 
+    } else if (qType === 'sequence') {
+      // Sequence — compare submitted order against correct order by position
+      const correctOrder  = question.items;
+      const playerOrder   = answerSequence || [];
+      const correctCount  = playerOrder.filter((item, i) => item === correctOrder[i]).length;
+      const accuracyRaw   = correctCount / correctOrder.length;
+
+      player.accuracyRaw = accuracyRaw;
+      player.lastAnswer  = {
+        type:         'sequence',
+        playerOrder,
+        correctCount,
+        correctOrder,
+      };
+
+      const accuracyPts = game.scoringSystem === 'accuracy-rank'
+        ? Math.round(ACC_BASE_MAX * accuracyRaw)
+        : null;
+
+      socket.emit('answer-result', {
+        type:             'sequence',
+        soundCorrect:     correctCount >= Math.ceil(correctOrder.length / 2),
+        scoringSystem:    game.scoringSystem,
+        correctCount,
+        totalItems:       correctOrder.length,
+        correctOrder,
+        playerOrder,
+        accuracyPts,
+        rankBonusPending: true,
+      });
+
     } else {
       // Multiple choice / flag — binary correct / wrong
       const isCorrect = (answerIndex === question.correct);
@@ -391,6 +458,7 @@ io.on('connection', (socket) => {
     if (answeredCount === game.players.length) {
       const earlyPause = game.currentQuestionType === 'map'                                                    ? 5000
                        : (game.currentQuestionType === 'slider' || game.currentQuestionType === 'timeline')    ? 4000
+                       : game.currentQuestionType === 'sequence'                                               ? 4000
                        : 3000;
       clearTimeout(game.timer);
       game.timer = setTimeout(() => showLeaderboard(game), earlyPause);
@@ -452,6 +520,7 @@ function sendNextQuestion(game) {
   const qType = q.type || 'text';
   const timeLimit = qType === 'map'                              ? 35
                   : (qType === 'slider' || qType === 'timeline') ? 20
+                  : qType === 'sequence'                         ? 30
                   : 15;
 
   game.currentTimeLimit    = timeLimit;
@@ -472,6 +541,8 @@ function sendNextQuestion(game) {
     unit: q.unit,
     // Optional photo:
     imageUrl: q.imageUrl || null,
+    // Sequence: items shuffled so correct order isn't obvious
+    items: qType === 'sequence' ? shuffleArray(q.items) : undefined,
   });
 
   game.timer = setTimeout(() => showLeaderboard(game), timeLimit * 1000);
@@ -488,11 +559,13 @@ function showLeaderboard(game) {
   // Apply rank-based scores now that all answers are in
   applyRoundScores(game, q);
 
-  const correctAnswer = (q.type === 'slider' || q.type === 'timeline')
-    ? (q.unit ? `${q.correct.toLocaleString()} ${q.unit}` : `${q.correct}`)
-    : q.type === 'map'
-      ? q.locationName
-      : q.answers[q.correct];
+  const correctAnswer = q.type === 'sequence'
+    ? q.items.map((item, i) => `${i + 1}. ${item}`).join(' → ')
+    : (q.type === 'slider' || q.type === 'timeline')
+      ? (q.unit ? `${q.correct.toLocaleString()} ${q.unit}` : `${q.correct}`)
+      : q.type === 'map'
+        ? q.locationName
+        : q.answers[q.correct];
 
   const mapData = q.type === 'map' ? {
     playerPins:   game.players
@@ -501,6 +574,17 @@ function showLeaderboard(game) {
     correctLat:   q.correctLat,
     correctLng:   q.correctLng,
     locationName: q.locationName,
+  } : null;
+
+  const sequenceData = q.type === 'sequence' ? {
+    correctOrder:  q.items,
+    playerAnswers: game.players
+      .filter(p => p.lastAnswer && p.lastAnswer.type === 'sequence')
+      .map(p => ({
+        nickname:     p.nickname,
+        playerOrder:  p.lastAnswer.playerOrder,
+        correctCount: p.lastAnswer.correctCount,
+      })),
   } : null;
 
   const timelineData = (q.type === 'timeline' || q.type === 'slider') ? {
@@ -521,11 +605,13 @@ function showLeaderboard(game) {
     isLastQuestion:   isLast,
     mapData,
     timelineData,
+    sequenceData,
     scoringSystem:    game.scoringSystem,
   });
 
   const leaderboardPause = q.type === 'map'                               ? 10
                          : (q.type === 'slider' || q.type === 'timeline') ? 8
+                         : q.type === 'sequence'                          ? 8
                          : LEADERBOARD_PAUSE;
 
   if (game.autoplay) {
