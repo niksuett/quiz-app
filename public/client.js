@@ -7,10 +7,9 @@ const socket = io();
 // ── State ─────────────────────────────────────────────────────────────────────
 let myRole          = null;
 let myNickname      = null;
-let timerInterval   = null;
-let resultTimeout   = null;
-const MAX_SPEED_BONUS = 50;  // must match MAX_SPEED_BONUS in server.js
-let currentSpeedCap  = 50;  // updated per-question from server
+let timerInterval      = null;
+let resultTimeout      = null;
+let currentScoringSystem = 'rank'; // 'rank' | 'accuracy-rank' — set per-question from server
 
 let leafletMap       = null;  // Leaflet map instance (during question)
 let mapPin           = null;  // the marker the player drops
@@ -115,7 +114,7 @@ function animateCount(el, target, duration = 700) {
 
 // Builds and animates the leaderboard list, with staggered slide-ins
 // and score count-up for each entry.
-function renderLeaderboard(listEl, entries) {
+function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
   listEl.innerHTML = '';
   entries.forEach((entry, i) => {
     const li = document.createElement('li');
@@ -131,11 +130,16 @@ function renderLeaderboard(listEl, entries) {
     statSpan.className   = 'lb-stat';
     statSpan.textContent = formatAnswerStat(entry.lastAnswer);
 
+    // Permanent round-points line: shows rank + pts earned this round
+    const roundInfoSpan = document.createElement('span');
+    roundInfoSpan.className   = 'lb-round-info';
+    roundInfoSpan.textContent = formatRoundInfo(entry, questionType, scoringSystem);
+
     const nameCol = document.createElement('div');
     nameCol.className = 'lb-name-col';
-    nameCol.append(nameSpan, statSpan);
+    nameCol.append(nameSpan, statSpan, roundInfoSpan);
 
-    // Score area: current score + gain badge
+    // Score area: previous total + animated gain badge → counts up to new total
     const scoreWrap = document.createElement('div');
     scoreWrap.className = 'lb-score-wrap';
 
@@ -153,17 +157,51 @@ function renderLeaderboard(listEl, entries) {
     li.append(nameCol, scoreWrap);
     listEl.append(li);
 
-    // Step 1: show previous score immediately (already set above)
-    // Step 2: pop in the gain badge
     const slideDelay = i * 90 + 300;
     if (entry.roundPoints > 0) {
       setTimeout(() => gainSpan.classList.add('lb-gain-pop'), slideDelay + 400);
-      // Step 3: count up to new total, fade badge out
       setTimeout(() => {
         gainSpan.classList.add('lb-gain-fade');
         animateCount(scoreSpan, entry.score);
       }, slideDelay + 1100);
     }
+  });
+}
+
+// Builds the final-results leaderboard with per-player game stats instead of
+// round-by-round details (since the game is over, rank info is less relevant).
+function renderFinalLeaderboard(listEl, entries) {
+  listEl.innerHTML = '';
+  entries.forEach((entry, i) => {
+    const li = document.createElement('li');
+    li.style.animationDelay = `${i * 0.09}s`;
+    li.classList.add('lb-animate');
+    if (entry.nickname === myNickname) li.classList.add('me');
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className   = 'lb-name';
+    nameSpan.textContent = entry.nickname;
+
+    const stats = entry.stats || {};
+    const parts = [];
+    if (stats.roundsAnswered) parts.push(`${stats.roundsAnswered} answered`);
+    if (stats.roundsFirst)    parts.push(`${stats.roundsFirst}× 1st place`);
+    if (stats.bestRound)      parts.push(`best round: +${stats.bestRound} pts`);
+
+    const statSpan = document.createElement('span');
+    statSpan.className   = 'lb-stat';
+    statSpan.textContent = parts.join(' · ') || '';
+
+    const nameCol = document.createElement('div');
+    nameCol.className = 'lb-name-col';
+    nameCol.append(nameSpan, statSpan);
+
+    const scoreSpan = document.createElement('span');
+    scoreSpan.className   = 'lb-score';
+    scoreSpan.textContent = (entry.score || 0).toLocaleString();
+
+    li.append(nameCol, scoreSpan);
+    listEl.append(li);
   });
 }
 
@@ -180,6 +218,39 @@ function formatAnswerStat(ans) {
   // MC / flag
   if (ans.isCorrect) return `✓ ${ans.answerText}`;
   return `✗ ${ans.answerText}  →  ${ans.correctText}`;
+}
+
+// Converts a number to its ordinal string: 1 → "1st", 2 → "2nd", etc.
+function ordinalStr(n) {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+// Returns a one-line summary of how many points a player earned this round
+// and why (e.g. "1st closest · +10 pts" or "Incorrect · 0 pts").
+function formatRoundInfo(entry, questionType, scoringSystem) {
+  const pts  = entry.roundPoints || 0;
+  const rank = entry.roundRank;
+
+  if (!entry.lastAnswer) return 'No answer · 0 pts';
+
+  // Wrong MC / flag answer (isCorrect is only set on MC/flag types)
+  if ('isCorrect' in entry.lastAnswer && !entry.lastAnswer.isCorrect) {
+    return 'Incorrect · 0 pts';
+  }
+
+  if (pts === 0) return '0 pts this round';
+
+  const rankStr = rank ? ordinalStr(rank) : null;
+
+  // For proximity-based types, add "closest" qualifier to the rank
+  const isProximity = (questionType === 'slider' || questionType === 'timeline' || questionType === 'map');
+  const rankLabel   = rankStr
+    ? (isProximity ? `${rankStr} closest` : `${rankStr} place`)
+    : null;
+
+  return rankLabel ? `${rankLabel} · +${pts} pts` : `+${pts} pts`;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -216,8 +287,10 @@ function createGame() {
                            .map(cb => cb.value);
   if (categories.length === 0)
     return showError('config-error', 'Please select at least one category.');
-  const autoplay = document.getElementById('autoplay-toggle').checked;
-  socket.emit('create-game', { rounds, categories, autoplay });
+  const autoplay       = document.getElementById('autoplay-toggle').checked;
+  const activeScoringBtn = document.querySelector('.scoring-btn.active');
+  const scoringSystem  = activeScoringBtn ? activeScoringBtn.dataset.scoring : 'rank';
+  socket.emit('create-game', { rounds, categories, autoplay, scoringSystem });
 }
 
 function startGame() {
@@ -239,6 +312,13 @@ function nextQuestion() {
 document.querySelectorAll('.round-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.scoring-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.scoring-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
 });
@@ -287,30 +367,13 @@ function updateTimer(remaining, total) {
   fill.style.width = pct + '%';
   text.textContent = remaining;
 
-  const color = remaining > total * 0.5  ? '#34d399'
-              : remaining > total * 0.25 ? '#fbbf24'
-              :                            '#f87171';
+  const color = remaining > total * 0.5  ? 'var(--gold-bright)'
+              : remaining > total * 0.25 ? '#e07020'
+              :                            'var(--wrong)';
   fill.style.backgroundColor = color;
   text.style.color            = color;
 
-  // Update live speed bonus pill (player-only)
-  const pill      = document.getElementById('speed-bonus-display');
-  const bonusText = document.getElementById('speed-bonus-value');
-  if (pill && !pill.classList.contains('hidden') && bonusText) {
-    const bonus = Math.round((remaining / total) * currentSpeedCap);
-    bonusText.textContent = `+${bonus}`;
-    // Colour shifts green → amber → red as it drains
-    if (bonus > 350) {
-      pill.style.color = '#34d399'; pill.style.borderColor = 'rgba(52,211,153,.3)';
-      pill.style.background = 'rgba(52,211,153,.08)';
-    } else if (bonus > 150) {
-      pill.style.color = '#fbbf24'; pill.style.borderColor = 'rgba(251,191,36,.25)';
-      pill.style.background = 'rgba(234,179,8,.08)';
-    } else {
-      pill.style.color = '#f87171'; pill.style.borderColor = 'rgba(248,113,113,.25)';
-      pill.style.background = 'rgba(239,68,68,.07)';
-    }
-  }
+  // Speed bonus pill is unused in rank-based scoring — kept hidden by new-question handler
 }
 
 function stopTimer() {
@@ -355,8 +418,8 @@ socket.on('join-success', ({ gameId, nickname }) => {
 socket.on('join-error', (msg) => showError('join-error', msg));
 
 // ── New question ──────────────────────────────────────────────────────────────
-socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, speedBonusCap, type, min, max, step, unit, imageUrl }) => {
-  currentSpeedCap = speedBonusCap ?? MAX_SPEED_BONUS;
+socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, type, min, max, step, unit, imageUrl, scoringSystem }) => {
+  currentScoringSystem = scoringSystem || 'rank';
   stopTimer();
   clearTimeout(resultTimeout);
   soundQuestionStart();
@@ -520,17 +583,9 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
   showScreen('screen-question');
   startTimer(timeLimit);
 
-  // Show the live speed bonus pill for players; keep it hidden for the host
+  // Speed bonus pill is not used in rank-based scoring — always keep hidden
   const pill = document.getElementById('speed-bonus-display');
-  if (pill) {
-    if (myRole !== 'host') {
-      pill.style.cssText = ''; // reset any inline colour overrides from the last question
-      pill.classList.remove('hidden');
-      document.getElementById('speed-bonus-value').textContent = `+${currentSpeedCap}`;
-    } else {
-      pill.classList.add('hidden');
-    }
-  }
+  if (pill) pill.classList.add('hidden');
 });
 
 // ── Answer progress (host only) ───────────────────────────────────────────────
@@ -825,14 +880,14 @@ function showLeaderboardScale(timelineData) {
 
 // ── Answer result (player only) ───────────────────────────────────────────────
 socket.on('answer-result', (data) => {
-  stopTimer(); // also hides speed bonus pill
+  stopTimer();
 
   if (data.type === 'slider' || data.type === 'timeline') {
-    data.pointsEarned > 0 ? soundCorrect() : soundWrong();
+    data.soundCorrect ? soundCorrect() : soundWrong();
     resultTimeout = setTimeout(() => showResultScreen(data), 800);
 
   } else if (data.type === 'map') {
-    data.pointsEarned > 0 ? soundCorrect() : soundWrong();
+    data.soundCorrect ? soundCorrect() : soundWrong();
     resultTimeout = setTimeout(() => showResultScreen(data), 800);
 
   } else {
@@ -847,77 +902,132 @@ socket.on('answer-result', (data) => {
   }
 });
 
-// Renders the answer result screen with the score breakdown card.
+// Renders the answer result screen.
 function showResultScreen(data) {
-  const icon      = document.getElementById('result-icon');
-  const heading   = document.getElementById('result-heading');
-  const subtitle  = document.getElementById('result-subtitle');
-  const breakdown = document.getElementById('score-breakdown');
-  const zeroLine  = document.getElementById('score-zero');
+  const icon        = document.getElementById('result-icon');
+  const heading     = document.getElementById('result-heading');
+  const subtitle    = document.getElementById('result-subtitle');
+  const breakdown   = document.getElementById('score-breakdown');
+  const zeroLine    = document.getElementById('score-zero');
+  const flatLine    = document.getElementById('score-flat');
+  const pendingLine = document.getElementById('score-pending');
 
   // Reset all optional elements
   subtitle.classList.add('hidden');
   breakdown.classList.add('hidden');
   zeroLine.classList.add('hidden');
+  flatLine.classList.add('hidden');
+  pendingLine.classList.add('hidden');
+  const compareEl = document.getElementById('answer-compare');
+  compareEl.innerHTML = '';
+  compareEl.classList.add('hidden');
 
   if (data.type === 'slider' || data.type === 'timeline') {
-    const fmt = v => data.unit ? `${v.toLocaleString()} ${data.unit}` : String(v);
+    const fmt = v => data.unit ? `${v.toLocaleString()} ${data.unit}` : v.toLocaleString();
     const pct = data.accuracyPct;
 
     if (pct >= 95) {
-      icon.textContent = '🎯'; icon.style.color = '#34d399';
+      icon.textContent = '🎯'; icon.style.color = 'var(--correct)';
       heading.textContent = 'Perfect!';
     } else if (pct >= 70) {
       icon.textContent = data.type === 'timeline' ? '📅' : '📏';
-      icon.style.color = '#fbbf24';
+      icon.style.color = 'var(--gold)';
       heading.textContent = 'Very close!';
     } else if (pct >= 30) {
       icon.textContent = data.type === 'timeline' ? '📅' : '📏';
-      icon.style.color = '#fb923c';
+      icon.style.color = 'var(--gold-muted)';
       heading.textContent = 'Not quite…';
     } else {
-      icon.textContent = '✗'; icon.style.color = '#f87171';
+      icon.textContent = '✗'; icon.style.color = 'var(--wrong)';
       heading.textContent = 'Way off!';
     }
 
-    subtitle.textContent = `Your guess: ${fmt(data.yourAnswer)}  ·  Correct: ${fmt(data.correctValue)}`;
-    subtitle.classList.remove('hidden');
-    showBreakdownCard(`${pct}% accuracy`, data.basePoints, data.speedBonus);
+    // Structured compare boxes: Your guess | Correct answer
+    const u = data.unit ? ` ${data.unit}` : '';
+    const diff = data.yourAnswer === data.correctValue
+      ? 'Exact!'
+      : `Off by ${Math.abs(data.yourAnswer - data.correctValue).toLocaleString()}${u}`;
+    compareEl.innerHTML = `
+      <div class="compare-grid">
+        <div class="compare-cell">
+          <span class="compare-label">Your guess</span>
+          <span class="compare-value">${fmt(data.yourAnswer)}</span>
+        </div>
+        <div class="compare-cell compare-correct">
+          <span class="compare-label">Correct answer</span>
+          <span class="compare-value">${fmt(data.correctValue)}</span>
+        </div>
+      </div>
+      <div class="compare-diff">${diff}</div>`;
+    compareEl.classList.remove('hidden');
+
+    if (data.scoringSystem === 'accuracy-rank') {
+      showBreakdownCard('Accuracy', data.accuracyPts, true);
+    } else {
+      pendingLine.classList.remove('hidden');
+    }
 
   } else if (data.type === 'map') {
     const km = data.distanceKm;
+    let tier;
     if (km < 10) {
-      icon.textContent = '🎯'; icon.style.color = '#34d399';
+      icon.textContent = '🎯'; icon.style.color = 'var(--correct)';
       heading.textContent = 'Pinpoint!';
+      tier = 'Pinpoint accuracy';
     } else if (km < 50) {
-      icon.textContent = '📍'; icon.style.color = '#34d399';
+      icon.textContent = '📍'; icon.style.color = 'var(--correct)';
       heading.textContent = 'Very close!';
+      tier = 'Very close';
     } else if (km < 200) {
-      icon.textContent = '📍'; icon.style.color = '#fbbf24';
+      icon.textContent = '📍'; icon.style.color = 'var(--gold)';
       heading.textContent = 'In the area';
+      tier = 'In the area';
     } else if (km < 500) {
-      icon.textContent = '📍'; icon.style.color = '#fb923c';
+      icon.textContent = '📍'; icon.style.color = 'var(--gold-muted)';
       heading.textContent = 'Not quite…';
+      tier = 'Not quite';
     } else {
-      icon.textContent = '✗'; icon.style.color = '#f87171';
+      icon.textContent = '✗'; icon.style.color = 'var(--wrong)';
       heading.textContent = 'Way off!';
+      tier = 'Way off';
     }
 
-    subtitle.textContent = `${km.toLocaleString()} km from ${data.locationName}`;
-    subtitle.classList.remove('hidden');
-    showBreakdownCard(`${data.accuracyPct}% accuracy`, data.basePoints, data.speedBonus);
+    // Structured compare boxes: Distance | Correct location
+    compareEl.innerHTML = `
+      <div class="compare-grid">
+        <div class="compare-cell">
+          <span class="compare-label">Distance</span>
+          <span class="compare-value">${km.toLocaleString()} km</span>
+          <span class="compare-diff">${tier}</span>
+        </div>
+        <div class="compare-cell compare-correct">
+          <span class="compare-label">Correct location</span>
+          <span class="compare-value compare-value-sm">${data.locationName}</span>
+        </div>
+      </div>`;
+    compareEl.classList.remove('hidden');
+
+    if (data.scoringSystem === 'accuracy-rank') {
+      showBreakdownCard('Accuracy', data.accuracyPts, true);
+    } else {
+      pendingLine.classList.remove('hidden');
+    }
 
   } else {
-    // Multiple choice
+    // Multiple choice / flag
     if (data.isCorrect) {
-      const tier = data.speedBonus > 40 ? '⚡ Lightning Fast!'
-                 : data.speedBonus > 20 ? 'Quick Thinking!'
-                 :                         'Correct!';
-      icon.textContent = '✓'; icon.style.color = '#34d399';
-      heading.textContent = tier;
-      showBreakdownCard('Correct answer', data.basePoints, data.speedBonus);
+      icon.textContent = '✓'; icon.style.color = 'var(--correct)';
+      heading.textContent = 'Correct!';
+      if (data.scoringSystem === 'accuracy-rank') {
+        // Show accuracy base now; speed-rank bonus comes on leaderboard
+        showBreakdownCard('Correct answer', data.immediatePoints, true);
+      } else {
+        // Option A: flat points for all correct players — can show immediately
+        flatLine.textContent = `${data.immediatePoints} pts`;
+        flatLine.classList.remove('hidden');
+      }
     } else {
-      icon.textContent = '✗'; icon.style.color = '#f87171';
+      icon.textContent = '✗'; icon.style.color = 'var(--wrong)';
       heading.textContent = 'Incorrect';
       subtitle.textContent = `Correct answer: ${data.correctText}`;
       subtitle.classList.remove('hidden');
@@ -930,16 +1040,40 @@ function showResultScreen(data) {
 }
 
 // Fills in and reveals the score breakdown card.
-function showBreakdownCard(baseLabel, basePoints, speedBonus) {
+// rankBonusPending=true means rank bonus will be added on the leaderboard.
+function showBreakdownCard(baseLabel, basePoints, rankBonusPending) {
   document.getElementById('score-base-label').textContent = baseLabel;
-  document.getElementById('score-base-pts').textContent   = basePoints.toLocaleString();
-  document.getElementById('score-speed-pts').textContent  = `+${speedBonus.toLocaleString()}`;
-  document.getElementById('score-total-pts').textContent  = `+${(basePoints + speedBonus).toLocaleString()}`;
+  document.getElementById('score-base-pts').textContent   = String(basePoints);
+
+  const speedRow   = document.getElementById('score-speed-row');
+  const divider    = document.querySelector('.score-divider');
+  const totalRow   = document.querySelector('.score-row-total');
+
+  if (rankBonusPending) {
+    document.getElementById('score-speed-label').textContent = 'Rank bonus';
+    document.getElementById('score-speed-pts').textContent   = '+ on leaderboard';
+    document.getElementById('score-total-pts').textContent   = `${basePoints}+`;
+    speedRow.classList.remove('hidden');
+    divider.classList.remove('hidden');
+    totalRow.classList.remove('hidden');
+  } else {
+    speedRow.classList.add('hidden');
+    divider.classList.add('hidden');
+    totalRow.classList.add('hidden');
+  }
+
   document.getElementById('score-breakdown').classList.remove('hidden');
 }
 
 // ── Leaderboard ───────────────────────────────────────────────────────────────
-socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, isLastQuestion, mapData, timelineData }) => {
+const CATEGORY_LABELS = {
+  facts: 'Facts', science: 'Science', sports: 'Sports', entertainment: 'Entertainment',
+  flags: 'Flags', estimation: 'Estimation', timeline: 'Timeline',
+  'geo-natural': 'Natural Wonders', 'geo-built': 'Built World',
+  'geo-cities': 'Cities', 'geo-history': 'Where in History',
+};
+
+socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, questionNumber, totalQuestions, questionCategory, isLastQuestion, mapData, timelineData, scoringSystem }) => {
   stopTimer();
   clearTimeout(resultTimeout);
   soundLeaderboard();
@@ -953,21 +1087,31 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, isLas
   lbTimelineWrap.classList.add('hidden'); lbTimelineWrap.innerHTML = '';
   correctReveal.classList.add('hidden');
 
+  // Update leaderboard header with round number and category
+  const catLabel = CATEGORY_LABELS[questionCategory] || questionCategory;
+  document.querySelector('#screen-leaderboard h2').textContent =
+    `Round ${questionNumber} of ${totalQuestions}`;
+
   showScreen('screen-leaderboard');
+
+  // Build a structured correct-reveal with category tag
+  const crHtml = `<span class="cr-tag">${catLabel}</span><span class="cr-answer">✓ ${correctAnswer}</span>`;
 
   if (mapData) {
     showLeaderboardMap(mapData);
+    // Map already shows the correct location; still show text label
+    correctReveal.innerHTML = crHtml;
+    correctReveal.classList.remove('hidden');
   } else if (timelineData) {
     showLeaderboardScale(timelineData);
-    // Still show the text "correct answer" label since it's useful alongside the visual
-    correctReveal.textContent = `✓ Correct: ${correctAnswer}`;
+    correctReveal.innerHTML = crHtml;
     correctReveal.classList.remove('hidden');
   } else {
-    correctReveal.textContent = `✓ Correct answer: ${correctAnswer}`;
+    correctReveal.innerHTML = crHtml;
     correctReveal.classList.remove('hidden');
   }
 
-  renderLeaderboard(document.getElementById('leaderboard-list'), leaderboard);
+  renderLeaderboard(document.getElementById('leaderboard-list'), leaderboard, questionType, scoringSystem);
 
   document.getElementById('next-hint').textContent =
     isLastQuestion ? 'Final results coming up…' : 'Next question in a moment…';
@@ -989,7 +1133,7 @@ socket.on('game-over', ({ leaderboard }) => {
   if (leafletMap)     { leafletMap.remove();     leafletMap = null;     mapPin = null; }
   if (leaderboardMap) { leaderboardMap.remove(); leaderboardMap = null; }
 
-  renderLeaderboard(document.getElementById('final-leaderboard'), leaderboard);
+  renderFinalLeaderboard(document.getElementById('final-leaderboard'), leaderboard);
   showScreen('screen-game-over');
 });
 

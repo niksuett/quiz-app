@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuizBlast ⚡</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
@@ -13,22 +16,27 @@
        SCREEN 1: HOME
   ════════════════════════════════════════════════════════════════════════════ -->
   <div id="screen-home" class="screen active">
-    <div class="card center-card">
-      <svg class="home-globe" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="80" cy="80" r="72" stroke="rgba(100,160,255,0.22)" stroke-width="1.5"/>
-        <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(100,160,255,0.13)" stroke-width="1"/>
-        <ellipse cx="80" cy="80" rx="72" ry="17" stroke="rgba(100,160,255,0.08)" stroke-width="1"/>
-        <line x1="80" y1="8" x2="80" y2="152" stroke="rgba(100,160,255,0.13)" stroke-width="1"/>
-        <ellipse cx="80" cy="80" rx="34" ry="72" stroke="rgba(100,160,255,0.08)" stroke-width="1"/>
-        <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(100,160,255,0.28)" stroke-width="1" stroke-dasharray="5 5" class="globe-spin"/>
-        <circle cx="80" cy="8"   r="3" fill="rgba(100,160,255,0.55)"/>
-        <circle cx="80" cy="152" r="2" fill="rgba(100,160,255,0.25)"/>
-        <circle cx="80" cy="80"  r="4" fill="rgba(100,160,255,0.15)" stroke="rgba(100,160,255,0.4)" stroke-width="1"/>
-      </svg>
-      <div class="logo">⚡ QuizBlast</div>
-      <p class="subtitle">History · Science · Geography · Culture</p>
-      <button class="btn btn-red"  onclick="hostGame()">Host a Game</button>
-      <button class="btn btn-blue" onclick="showScreen('screen-join')">Join a Game</button>
+    <div class="home-split">
+      <div class="home-left">
+        <svg class="home-globe" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="80" cy="80" r="72" stroke="rgba(212,160,53,.28)" stroke-width="1.5"/>
+          <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(212,160,53,.18)" stroke-width="1"/>
+          <ellipse cx="80" cy="80" rx="72" ry="17" stroke="rgba(212,160,53,.10)" stroke-width="1"/>
+          <line x1="80" y1="8" x2="80" y2="152" stroke="rgba(212,160,53,.15)" stroke-width="1"/>
+          <ellipse cx="80" cy="80" rx="34" ry="72" stroke="rgba(212,160,53,.10)" stroke-width="1"/>
+          <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(212,160,53,.45)" stroke-width="1" stroke-dasharray="5 5" class="globe-spin"/>
+          <circle cx="80" cy="8"   r="3" fill="rgba(212,160,53,.65)"/>
+          <circle cx="80" cy="152" r="2" fill="rgba(212,160,53,.35)"/>
+          <circle cx="80" cy="80"  r="4" fill="rgba(212,160,53,.18)" stroke="rgba(212,160,53,.5)" stroke-width="1"/>
+        </svg>
+        <div class="logo">QuizBlast</div>
+        <p class="subtitle">History · Science · Geography · Culture</p>
+      </div>
+      <div class="home-right">
+        <p class="home-right-prompt">Ready to play?</p>
+        <button class="btn btn-red"  onclick="hostGame()">Host a Game</button>
+        <button class="btn btn-blue" onclick="showScreen('screen-join')">Join a Game</button>
+      </div>
     </div>
   </div>
 
@@ -125,6 +133,21 @@
         </div>
       </div>
 
+      <!-- Scoring System -->
+      <div class="config-section">
+        <h3>Scoring</h3>
+        <div class="scoring-selector">
+          <button class="scoring-btn active" data-scoring="rank">
+            <span class="scoring-name">Rank</span>
+            <span class="scoring-desc">Closest answer wins most · Everyone correct gets equal points · Max 10 pts</span>
+          </button>
+          <button class="scoring-btn" data-scoring="accuracy-rank">
+            <span class="scoring-name">Accuracy + Rank</span>
+            <span class="scoring-desc">Points for how close you were · Rank bonus on top · Max 10 pts</span>
+          </button>
+        </div>
+      </div>
+
       <button class="btn btn-red"   onclick="createGame()">Create Game →</button>
       <div id="config-error" class="error-msg hidden"></div>
       <button class="btn btn-ghost" onclick="showScreen('screen-home')">← Back</button>
@@ -171,7 +194,7 @@
       <div class="big-emoji">🎉</div>
       <h2>You're in!</h2>
       <p>Playing as <strong id="lobby-nickname"></strong></p>
-      <p style="margin-top:6px; color:#52525b;">Game: <strong id="lobby-game-id"></strong></p>
+      <p style="margin-top:6px; color:var(--aged);">Game: <strong id="lobby-game-id"></strong></p>
       <p class="waiting-text">Waiting for the host to start the game…</p>
     </div>
   </div>
@@ -215,32 +238,42 @@
        SCREEN 7: ANSWER RESULT
   ════════════════════════════════════════════════════════════════════════════ -->
   <div id="screen-answer-result" class="screen">
-    <div class="card center-card">
-      <div id="result-icon" class="result-icon">✓</div>
-      <h2  id="result-heading">Correct!</h2>
-      <p   id="result-subtitle" class="result-subtitle hidden"></p>
-
-      <!-- Score breakdown — shown for every answered question -->
-      <div id="score-breakdown" class="score-breakdown hidden">
-        <div class="score-row">
-          <span class="score-label" id="score-base-label">Base score</span>
-          <span class="score-value" id="score-base-pts">1,000</span>
-        </div>
-        <div class="score-row">
-          <span class="score-label">⚡ Speed bonus</span>
-          <span class="score-value score-speed" id="score-speed-pts">+342</span>
-        </div>
-        <div class="score-divider"></div>
-        <div class="score-row score-row-total">
-          <span class="score-label">Total earned</span>
-          <span class="score-value score-total" id="score-total-pts">+1,342</span>
-        </div>
+    <div class="result-split">
+      <div class="result-left">
+        <div id="result-icon" class="result-icon">✓</div>
+        <h2  id="result-heading">Correct!</h2>
+        <p   id="result-subtitle" class="result-subtitle hidden"></p>
+        <div id="answer-compare" class="answer-compare hidden"></div>
       </div>
+      <div class="result-right">
+        <!-- Score breakdown — shown for every answered question -->
+        <div id="score-breakdown" class="score-breakdown hidden">
+          <div class="score-row">
+            <span class="score-label" id="score-base-label">Base score</span>
+            <span class="score-value" id="score-base-pts">6</span>
+          </div>
+          <div class="score-row" id="score-speed-row">
+            <span class="score-label" id="score-speed-label">Rank bonus</span>
+            <span class="score-value score-speed" id="score-speed-pts">+ on leaderboard</span>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-row score-row-total">
+            <span class="score-label">So far</span>
+            <span class="score-value score-total" id="score-total-pts">6+</span>
+          </div>
+        </div>
 
-      <!-- Shown for wrong answers instead of breakdown -->
-      <p id="score-zero" class="score-zero hidden">0 points</p>
+        <!-- Option A correct MC: flat points (no breakdown) -->
+        <p id="score-flat" class="score-flat hidden">10 pts</p>
 
-      <p class="result-coming-up">Leaderboard coming up…</p>
+        <!-- Option A proximity: rank pending -->
+        <p id="score-pending" class="score-pending hidden">Rank points — see leaderboard</p>
+
+        <!-- Wrong answers -->
+        <p id="score-zero" class="score-zero hidden">0 points</p>
+
+        <p class="result-coming-up">Leaderboard coming up…</p>
+      </div>
     </div>
   </div>
 

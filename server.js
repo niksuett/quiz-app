@@ -16,8 +16,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Question bank ─────────────────────────────────────────────────────────────
-// Questions live in questions.json so they can be edited without touching code.
-
 const QUESTIONS_FILE = path.join(__dirname, 'questions.json');
 
 function loadQuestions() {
@@ -38,8 +36,7 @@ app.post('/admin/questions', (req, res) => {
 
 let ALL_QUESTIONS = loadQuestions();
 
-// ── Haversine distance formula ────────────────────────────────────────────────
-// Calculates the straight-line distance in km between two lat/lng points on Earth
+// ── Haversine distance ────────────────────────────────────────────────────────
 function haversineKm(lat1, lng1, lat2, lng2) {
   const R     = 6371;
   const toRad = deg => deg * Math.PI / 180;
@@ -51,10 +48,23 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 }
 
 // ── Game settings ─────────────────────────────────────────────────────────────
-const QUESTION_TIME      = 20;   // seconds players have to answer
-const LEADERBOARD_PAUSE  = 5;    // seconds leaderboard shows before next question (autoplay)
-const POINTS_FOR_CORRECT = 100; // base points for a correct answer
-const MAX_SPEED_BONUS    = 50;  // extra points for answering quickly
+const LEADERBOARD_PAUSE = 5; // seconds leaderboard auto-advances (for MC/flag)
+
+// ── Scoring constants ─────────────────────────────────────────────────────────
+//
+// Option A — "Rank": pure rank-based
+//   MC/Flag  : correct = RANK_POINTS[0] flat (everyone correct = same), wrong = 0
+//   Proximity: ranked by closeness, points by position in RANK_POINTS
+//
+// Option B — "Accuracy + Rank": accuracy base + rank bonus
+//   MC/Flag  : correct = ACC_BASE_MAX + speed-rank bonus (ACC_RANK_BONUS[rank]), wrong = 0
+//   Proximity: accuracy score (0–ACC_BASE_MAX) + closeness-rank bonus (ACC_RANK_BONUS[rank])
+//
+// Both options have a max of ACC_BASE_MAX + ACC_RANK_BONUS[0] = 10 pts per question.
+
+const RANK_POINTS    = [10, 8, 6, 4, 2, 1]; // by rank position (0 = 1st place)
+const ACC_BASE_MAX   = 6;                    // max accuracy points in Option B
+const ACC_RANK_BONUS = [4, 3, 2, 1, 0];     // rank bonus by position (0 = 1st place)
 
 // ── Active games ──────────────────────────────────────────────────────────────
 const games = {};
@@ -68,8 +78,110 @@ function generateGameId() {
 
 function buildLeaderboard(game) {
   return game.players
-    .map(p => ({ nickname: p.nickname, score: p.score, roundPoints: p.roundPoints || 0, lastAnswer: p.lastAnswer || null }))
+    .map(p => ({
+      nickname:    p.nickname,
+      score:       p.score,
+      roundPoints: p.roundPoints || 0,
+      roundRank:   p.roundRank   || null,
+      lastAnswer:  p.lastAnswer  || null,
+      stats:       p.stats       || null,
+    }))
     .sort((a, b) => b.score - a.score);
+}
+
+// ── Rank-based scoring — called at leaderboard time ───────────────────────────
+// Calculates roundPoints for every player and adds them to player.score.
+// Must be called AFTER all answers are stored on player objects.
+function applyRoundScores(game, question) {
+  const qType  = question.type || 'text';
+  const system = game.scoringSystem; // 'rank' | 'accuracy-rank'
+
+  if (qType === 'map') {
+    // ── Map: rank by distance ascending (closest = best) ──────────────────────
+    const answered = game.players
+      .filter(p => p.mapAnswer)
+      .sort((a, b) => a.mapAnswer.distanceKm - b.mapAnswer.distanceKm);
+
+    answered.forEach((p, rank) => {
+      let pts;
+      if (system === 'rank') {
+        pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
+      } else {
+        const accPts = Math.round(ACC_BASE_MAX * (p.accuracyRaw || 0));
+        const bonus  = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
+        pts = accPts + bonus;
+      }
+      p.roundPoints = pts;
+      p.roundRank   = rank + 1; // 1-based
+      p.score      += pts;
+      p.stats.roundsAnswered++;
+      if (rank === 0) p.stats.roundsFirst++;
+      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
+    });
+    game.players.filter(p => !p.mapAnswer).forEach(p => { p.roundPoints = 0; p.roundRank = null; });
+
+  } else if (qType === 'slider' || qType === 'timeline') {
+    // ── Proximity: rank by absolute error ascending (closest = best) ──────────
+    const answered = game.players
+      .filter(p => p.lastAnswer && p.lastAnswer.type === qType && p.lastAnswer.diff !== undefined)
+      .sort((a, b) => a.lastAnswer.diff - b.lastAnswer.diff);
+
+    answered.forEach((p, rank) => {
+      let pts;
+      if (system === 'rank') {
+        pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
+      } else {
+        const accPts = Math.round(ACC_BASE_MAX * (p.accuracyRaw || 0));
+        const bonus  = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
+        pts = accPts + bonus;
+      }
+      p.roundPoints = pts;
+      p.roundRank   = rank + 1;
+      p.score      += pts;
+      p.stats.roundsAnswered++;
+      if (rank === 0) p.stats.roundsFirst++;
+      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
+    });
+    game.players
+      .filter(p => !p.lastAnswer || p.lastAnswer.type !== qType)
+      .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
+
+  } else {
+    // ── MC / Flag ─────────────────────────────────────────────────────────────
+    const correct = game.players
+      .filter(p => p.lastAnswer && p.lastAnswer.isCorrect)
+      .sort((a, b) => (a.answerTime || 999) - (b.answerTime || 999)); // fastest first
+    const wrong   = game.players.filter(p => !p.lastAnswer || !p.lastAnswer.isCorrect);
+
+    if (system === 'rank') {
+      // All correct players get the same flat points — no speed differentiation
+      correct.forEach(p => {
+        p.roundPoints = RANK_POINTS[0];
+        p.roundRank   = 1; // everyone correct is equally "1st" in pure rank mode
+        p.score      += RANK_POINTS[0];
+        p.stats.roundsAnswered++;
+        p.stats.roundsFirst++;
+        if (RANK_POINTS[0] > p.stats.bestRound) p.stats.bestRound = RANK_POINTS[0];
+      });
+    } else {
+      // Accuracy-rank: correct = ACC_BASE_MAX base + speed-rank bonus
+      correct.forEach((p, rank) => {
+        const bonus = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
+        const pts   = ACC_BASE_MAX + bonus;
+        p.roundPoints = pts;
+        p.roundRank   = rank + 1;
+        p.score      += pts;
+        p.stats.roundsAnswered++;
+        if (rank === 0) p.stats.roundsFirst++;
+        if (pts > p.stats.bestRound) p.stats.bestRound = pts;
+      });
+    }
+    wrong.forEach(p => {
+      p.roundPoints = 0; p.roundRank = null;
+      // Count as answered if they submitted a wrong answer (vs. not answering at all)
+      if (p.lastAnswer) p.stats.roundsAnswered++;
+    });
+  }
 }
 
 // ── Socket.io ─────────────────────────────────────────────────────────────────
@@ -77,19 +189,17 @@ io.on('connection', (socket) => {
   console.log('Browser connected:', socket.id);
 
   // ── HOST creates a game ────────────────────────────────────────────────────
-  // Receives the config the host chose on the setup screen
-  socket.on('create-game', ({ rounds, categories, autoplay } = {}) => {
-    rounds     = rounds     || '5';
-    categories = categories || ['facts'];
-    autoplay   = autoplay !== false; // default true
+  socket.on('create-game', ({ rounds, categories, autoplay, scoringSystem } = {}) => {
+    rounds        = rounds        || '5';
+    categories    = categories    || ['facts'];
+    autoplay      = autoplay      !== false; // default true
+    scoringSystem = scoringSystem || 'rank'; // 'rank' | 'accuracy-rank'
 
     let gameId;
     do { gameId = generateGameId(); } while (games[gameId]);
 
-    // Reload questions from disk so admin edits take effect without restarting
     ALL_QUESTIONS = loadQuestions();
 
-    // Filter question bank to only the chosen categories, then shuffle
     const pool = ALL_QUESTIONS
       .filter(q => categories.includes(q.category))
       .sort(() => Math.random() - 0.5);
@@ -98,10 +208,9 @@ io.on('connection', (socket) => {
       return socket.emit('create-error', 'No questions found for the selected categories.');
     }
 
-    // How many questions to actually use
     const numRounds = rounds === 'infinite'
-      ? pool.length                                    // use everything available
-      : Math.min(parseInt(rounds, 10), pool.length);  // respect the cap
+      ? pool.length
+      : Math.min(parseInt(rounds, 10), pool.length);
 
     const questions = pool.slice(0, numRounds);
 
@@ -113,6 +222,7 @@ io.on('connection', (socket) => {
       currentIndex:      -1,
       state:             'lobby',
       autoplay,
+      scoringSystem,
       timer:             null,
       questionStartTime: null,
     };
@@ -122,7 +232,7 @@ io.on('connection', (socket) => {
     socket.join(gameId);
 
     socket.emit('game-created', { gameId });
-    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay}`);
+    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | scoring: ${scoringSystem}`);
   });
 
   // ── PLAYER joins ───────────────────────────────────────────────────────────
@@ -142,7 +252,10 @@ io.on('connection', (socket) => {
     if (game.players.find(p => p.nickname.toLowerCase() === nickname.toLowerCase()))
       return socket.emit('join-error', 'That nickname is already taken. Try another.');
 
-    game.players.push({ id: socket.id, nickname, score: 0, answered: false });
+    game.players.push({
+      id: socket.id, nickname, score: 0, answered: false,
+      stats: { roundsAnswered: 0, roundsFirst: 0, bestRound: 0 },
+    });
     socket.gameId = gameId;
     socket.role   = 'player';
     socket.join(gameId);
@@ -164,6 +277,8 @@ io.on('connection', (socket) => {
   });
 
   // ── PLAYER submits an answer ───────────────────────────────────────────────
+  // NOTE: Scoring is NOT applied here. We store raw answer data (accuracy, timing)
+  // and defer all point calculations to showLeaderboard(), once all answers are in.
   socket.on('submit-answer', ({ answerIndex, answerValue, answerLat, answerLng }) => {
     const game = games[socket.gameId];
     if (!game || game.state !== 'question') return;
@@ -172,120 +287,117 @@ io.on('connection', (socket) => {
     if (!player || player.answered) return;
 
     player.answered   = true;
-    player.lastAnswer = null; // will be set below per type
+    player.lastAnswer = null;
+    player.accuracyRaw = null;
 
-    const question  = game.questions[game.currentIndex];
-    const elapsed   = (Date.now() - game.questionStartTime) / 1000;
-    const remaining = Math.max(0, game.currentTimeLimit - elapsed);
-    const qType     = question.type || 'text';
-    let   pointsEarned = 0;
+    const question = game.questions[game.currentIndex];
+    const elapsed  = (Date.now() - game.questionStartTime) / 1000;
+    const qType    = question.type || 'text';
+
+    player.answerTime = elapsed; // needed for MC speed-rank in accuracy-rank mode
 
     if (qType === 'slider' || qType === 'timeline') {
-      // Proximity scoring: full points if exact, scales to 0 at ±half-range away.
-      // Speed bonus capped lower for estimation — accuracy matters more than speed here.
-      const range       = question.max - question.min;
-      const error       = Math.abs(answerValue - question.correct);
-      const proximity   = Math.max(0, 1 - (error / (range * 0.5)));
-      const speedCap    = Math.round(MAX_SPEED_BONUS * 0.3); // 30% of normal cap
-      const speedBonus  = Math.round((remaining / game.currentTimeLimit) * speedCap * proximity);
-      const basePoints  = Math.round(proximity * POINTS_FOR_CORRECT);
-      pointsEarned        = basePoints + speedBonus;
-      player.score       += pointsEarned;
-      player.roundPoints  = pointsEarned;
+      const range      = question.max - question.min;
+      const error      = Math.abs(answerValue - question.correct);
+      const accuracyRaw = Math.max(0, 1 - (error / (range * 0.5)));
 
-      player.lastAnswer = {
+      player.accuracyRaw = accuracyRaw;
+      player.lastAnswer  = {
         type:    qType,
         value:   answerValue,
         correct: question.correct,
-        diff:    Math.abs(answerValue - question.correct),
+        diff:    error,
         unit:    question.unit || '',
       };
 
+      const accuracyPts = game.scoringSystem === 'accuracy-rank'
+        ? Math.round(ACC_BASE_MAX * accuracyRaw)
+        : null; // Option A: rank determines all points, unknown until leaderboard
+
       socket.emit('answer-result', {
-        type:        qType,
-        pointsEarned,
-        basePoints,
-        speedBonus,
-        accuracyPct: Math.round(proximity * 100),
-        yourAnswer:  answerValue,
-        correctValue:question.correct,
-        unit:        question.unit,
+        type:          qType,
+        soundCorrect:  accuracyRaw > 0,
+        scoringSystem: game.scoringSystem,
+        accuracyPct:   Math.round(accuracyRaw * 100),
+        yourAnswer:    answerValue,
+        correctValue:  question.correct,
+        unit:          question.unit,
+        accuracyPts,               // null for Option A; 0–6 for Option B
+        rankBonusPending: true,    // always: rank bonus added on leaderboard
       });
 
     } else if (qType === 'map') {
-      // Precision exponential decay: 90% at 10km, 59% at 50km, 12% at 200km.
-      // Exact pin = full points; neighbouring city ≈ half; wrong region ≈ nothing.
-      const dist        = haversineKm(answerLat, answerLng, question.correctLat, question.correctLng);
-      // Stretched-exponential curve: steeper near 0 (same city ≠ same landmark),
-      // but a longer gentle tail (right region still earns points).
-      // ~5km→78pts, ~10km→68pts, ~50km→37pts, ~200km→10pts, ~500km→2pts
-      const proximity   = Math.exp(-Math.pow(dist / 50, 0.6));
-      const speedCap    = Math.round(MAX_SPEED_BONUS * 0.3); // 30% of normal cap — accuracy over speed
-      const speedBonus  = Math.round((remaining / game.currentTimeLimit) * speedCap * proximity);
-      const basePoints  = Math.round(proximity * POINTS_FOR_CORRECT);
-      pointsEarned      = basePoints + speedBonus;
-      player.score     += pointsEarned;
-      // Store the guess so we can show it on the leaderboard map reveal
+      const dist       = haversineKm(answerLat, answerLng, question.correctLat, question.correctLng);
+      const accuracyRaw = Math.exp(-Math.pow(dist / 50, 0.6));
+
+      player.accuracyRaw = accuracyRaw;
       player.mapAnswer   = { lat: answerLat, lng: answerLng, distanceKm: Math.round(dist) };
       player.lastAnswer  = { type: 'map', distanceKm: Math.round(dist) };
-      player.roundPoints = pointsEarned;
+
+      const accuracyPts = game.scoringSystem === 'accuracy-rank'
+        ? Math.round(ACC_BASE_MAX * accuracyRaw)
+        : null;
 
       socket.emit('answer-result', {
-        type:        'map',
-        pointsEarned,
-        basePoints,
-        speedBonus,
-        accuracyPct: Math.round(proximity * 100),
-        distanceKm:  Math.round(dist),
-        locationName:question.locationName,
+        type:          'map',
+        soundCorrect:  dist < 2000,
+        scoringSystem: game.scoringSystem,
+        distanceKm:    Math.round(dist),
+        locationName:  question.locationName,
+        accuracyPts,
+        rankBonusPending: true,
       });
 
     } else {
-      // Multiple choice (text or flag): exact match only
-      const isCorrect  = (answerIndex === question.correct);
-      const speedBonus = Math.round((remaining / game.currentTimeLimit) * MAX_SPEED_BONUS);
-      if (isCorrect) {
-        pointsEarned = POINTS_FOR_CORRECT + speedBonus;
-        player.score += pointsEarned;
-      }
-      player.roundPoints = pointsEarned;
-      player.lastAnswer  = {
+      // Multiple choice / flag — binary correct / wrong
+      const isCorrect = (answerIndex === question.correct);
+
+      player.lastAnswer = {
         type:        qType,
         isCorrect,
         answerText:  (question.answers || [])[answerIndex] || '—',
         correctText: (question.answers || [])[question.correct] || '—',
       };
+
+      // For Option A: flat RANK_POINTS[0] for correct, 0 for wrong — can show immediately
+      // For Option B: ACC_BASE_MAX for correct (+ rank bonus later), 0 for wrong — can show base immediately
+      const immediatePoints = isCorrect
+        ? (game.scoringSystem === 'rank' ? RANK_POINTS[0] : ACC_BASE_MAX)
+        : 0;
+
       socket.emit('answer-result', {
-        type:        qType,
+        type:              qType,
+        soundCorrect:      isCorrect,
+        scoringSystem:     game.scoringSystem,
         isCorrect,
-        pointsEarned,
-        basePoints:  isCorrect ? POINTS_FOR_CORRECT : 0,
-        speedBonus:  isCorrect ? speedBonus : 0,
-        correctIndex:question.correct,
-        correctText: (question.answers || [])[question.correct] || '—',
-        yourText:    (question.answers || [])[answerIndex]      || '—',
+        correctIndex:      question.correct,
+        correctText:       (question.answers || [])[question.correct] || '—',
+        yourText:          (question.answers || [])[answerIndex]      || '—',
+        immediatePoints,
+        // Rank bonus is pending for accuracy-rank mode (ranked by speed);
+        // in rank mode everyone correct gets the same flat amount, no pending bonus.
+        rankBonusPending:  game.scoringSystem === 'accuracy-rank' && isCorrect,
       });
     }
 
-    // Tell the host how many players have answered so far
+    // Tell host how many players have answered
     const answeredCount = game.players.filter(p => p.answered).length;
     io.to(game.hostId).emit('answer-progress', {
       answered: answeredCount,
       total:    game.players.length,
     });
 
-    // If everyone has answered, move on early.
-    // Give more time on complex types so players can read their result screen.
+    // All answered → advance early
     if (answeredCount === game.players.length) {
-      const earlyPause = game.currentQuestionType === 'map'                                          ? 5000
-                       : (game.currentQuestionType === 'slider' || game.currentQuestionType === 'timeline') ? 4000
+      const earlyPause = game.currentQuestionType === 'map'                                                    ? 5000
+                       : (game.currentQuestionType === 'slider' || game.currentQuestionType === 'timeline')    ? 4000
                        : 3000;
       clearTimeout(game.timer);
       game.timer = setTimeout(() => showLeaderboard(game), earlyPause);
     }
   });
 
-  // ── HOST manually advances to next question (when autoplay is off) ─────────
+  // ── HOST manually advances (autoplay off) ──────────────────────────────────
   socket.on('next-question', () => {
     const game = games[socket.gameId];
     if (!game || socket.role !== 'host') return;
@@ -327,33 +439,38 @@ function sendNextQuestion(game) {
 
   game.state             = 'question';
   game.questionStartTime = Date.now();
-  game.players.forEach(p => { p.answered = false; delete p.mapAnswer; delete p.lastAnswer; delete p.roundPoints; });
+  game.players.forEach(p => {
+    p.answered    = false;
+    p.answerTime  = null;
+    p.accuracyRaw = null;
+    delete p.mapAnswer;
+    delete p.lastAnswer;
+    delete p.roundPoints;
+  });
 
-  const q = game.questions[game.currentIndex];
+  const q     = game.questions[game.currentIndex];
   const qType = q.type || 'text';
-  const timeLimit    = qType === 'map'                              ? 35
-                     : (qType === 'slider' || qType === 'timeline') ? 20
-                     : 15; // text, flag
-  const speedBonusCap = (qType === 'slider' || qType === 'timeline' || qType === 'map')
-                      ? Math.round(MAX_SPEED_BONUS * 0.3)
-                      : MAX_SPEED_BONUS;
+  const timeLimit = qType === 'map'                              ? 35
+                  : (qType === 'slider' || qType === 'timeline') ? 20
+                  : 15;
+
   game.currentTimeLimit    = timeLimit;
   game.currentQuestionType = qType;
 
   io.to(game.id).emit('new-question', {
     questionNumber: game.currentIndex + 1,
     totalQuestions: game.questions.length,
-    question:  q.question,
-    answers:   q.answers,
+    question:       q.question,
+    answers:        q.answers,
     timeLimit,
-    speedBonusCap,
-    type:      qType,
-    // Slider-only fields (undefined for other types):
+    type:           qType,
+    scoringSystem:  game.scoringSystem,
+    // Slider/timeline fields:
     min:  q.min,
     max:  q.max,
     step: q.step || 1,
     unit: q.unit,
-    // Optional image (used by timeline questions with a photo)
+    // Optional photo:
     imageUrl: q.imageUrl || null,
   });
 
@@ -368,14 +485,15 @@ function showLeaderboard(game) {
   const q      = game.questions[game.currentIndex];
   const isLast = (game.currentIndex === game.questions.length - 1);
 
-  // Build the "correct answer" string depending on question type
+  // Apply rank-based scores now that all answers are in
+  applyRoundScores(game, q);
+
   const correctAnswer = (q.type === 'slider' || q.type === 'timeline')
     ? (q.unit ? `${q.correct.toLocaleString()} ${q.unit}` : `${q.correct}`)
     : q.type === 'map'
       ? q.locationName
       : q.answers[q.correct];
 
-  // For map questions, collect every player's pin so the reveal can show them all
   const mapData = q.type === 'map' ? {
     playerPins:   game.players
                     .filter(p => p.mapAnswer)
@@ -385,7 +503,6 @@ function showLeaderboard(game) {
     locationName: q.locationName,
   } : null;
 
-  // For timeline and slider questions, collect every player's guess for the visual scale reveal
   const timelineData = (q.type === 'timeline' || q.type === 'slider') ? {
     correctValue:  q.correct,
     unit:          q.unit || '',
@@ -395,31 +512,30 @@ function showLeaderboard(game) {
   } : null;
 
   io.to(game.id).emit('show-leaderboard', {
-    leaderboard:    buildLeaderboard(game),
+    leaderboard:      buildLeaderboard(game),
     correctAnswer,
-    questionType:   q.type || 'text',
-    isLastQuestion: isLast,
+    questionType:     q.type || 'text',
+    questionNumber:   game.currentIndex + 1,
+    totalQuestions:   game.questions.length,
+    questionCategory: q.category || '',
+    isLastQuestion:   isLast,
     mapData,
     timelineData,
+    scoringSystem:    game.scoringSystem,
   });
 
-  // Longer leaderboard pause for question types where comparing answers is more interesting
-  const leaderboardPause = q.type === 'map'                                    ? 10
-                         : (q.type === 'slider' || q.type === 'timeline')      ? 8
-                         : LEADERBOARD_PAUSE; // 5s for MC / flags
+  const leaderboardPause = q.type === 'map'                               ? 10
+                         : (q.type === 'slider' || q.type === 'timeline') ? 8
+                         : LEADERBOARD_PAUSE;
 
   if (game.autoplay) {
-    // Auto-advance after the pause
     game.timer = setTimeout(() => sendNextQuestion(game), leaderboardPause * 1000);
   } else {
-    // Wait for the host to click "Next Question"
     io.to(game.hostId).emit('waiting-for-host');
   }
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-// process.env.PORT is set by Railway (and most hosting platforms) at deploy time.
-// Falls back to 3000 for local development.
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log('\n✅ Quiz app is running!');
