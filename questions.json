@@ -2173,21 +2173,21 @@
     "category": "sequence",
     "question": "Put these space milestones in chronological order (earliest first)",
     "items": [
-      "Sputnik 1 launched — first satellite in orbit (1957)",
-      "Yuri Gagarin becomes first human in space (1961)",
-      "Neil Armstrong walks on the Moon (1969)",
-      "Voyager 1 enters interstellar space (2012)"
+      "Sputnik 1 — first artificial satellite reaches orbit",
+      "Yuri Gagarin becomes the first human in space",
+      "Neil Armstrong walks on the Moon",
+      "Voyager 1 enters interstellar space"
     ]
   },
   {
     "type": "sequence",
     "category": "sequence",
-    "question": "Put these World War II events in chronological order",
+    "question": "Put these World War II events in chronological order (earliest first)",
     "items": [
-      "Germany invades Poland — World War II begins (1939)",
-      "Japan attacks Pearl Harbor (1941)",
-      "D-Day landings at Normandy (1944)",
-      "Germany surrenders, ending the war in Europe (1945)"
+      "Germany invades Poland, starting World War II",
+      "Japan attacks Pearl Harbor",
+      "D-Day landings at Normandy",
+      "Germany surrenders, ending the war in Europe"
     ]
   },
   {
@@ -2195,10 +2195,10 @@
     "category": "sequence",
     "question": "Order these scientific discoveries from earliest to latest",
     "items": [
-      "Isaac Newton publishes his laws of motion (1687)",
-      "Charles Darwin publishes On the Origin of Species (1859)",
-      "Marie Curie discovers radium (1898)",
-      "Watson and Crick describe DNA’s double helix (1953)"
+      "Isaac Newton publishes his laws of motion",
+      "Charles Darwin publishes On the Origin of Species",
+      "Marie Curie discovers radium",
+      "Watson and Crick describe the structure of DNA"
     ]
   },
   {
@@ -2206,10 +2206,10 @@
     "category": "sequence",
     "question": "Order these inventions from earliest to most recent",
     "items": [
-      "Gutenberg’s printing press (~1440)",
-      "Steam engine patented by James Watt (1769)",
-      "Alexander Graham Bell patents the telephone (1876)",
-      "Tim Berners-Lee proposes the World Wide Web (1989)"
+      "Gutenberg invents the printing press",
+      "James Watt patents the steam engine",
+      "Alexander Graham Bell patents the telephone",
+      "Tim Berners-Lee proposes the World Wide Web"
     ]
   },
   {
@@ -2217,10 +2217,10 @@
     "category": "sequence",
     "question": "Put these ancient structures in the order they were completed (earliest first)",
     "items": [
-      "Great Pyramid of Giza (~2560 BC)",
-      "Parthenon in Athens (~432 BC)",
-      "Colosseum in Rome (80 AD)",
-      "Angkor Wat in Cambodia (~1150 AD)"
+      "Great Pyramid of Giza",
+      "Parthenon in Athens",
+      "Colosseum in Rome",
+      "Angkor Wat in Cambodia"
     ]
   },
   {
@@ -2228,10 +2228,10 @@
     "category": "sequence",
     "question": "Put these revolutions in chronological order (earliest first)",
     "items": [
-      "American Declaration of Independence (1776)",
-      "French Revolution begins — storming of the Bastille (1789)",
-      "Haitian Revolution — independence declared (1804)",
-      "Russian Revolution — Bolsheviks seize power (1917)"
+      "American Declaration of Independence signed",
+      "Storming of the Bastille — French Revolution begins",
+      "Haiti declares independence",
+      "Bolsheviks seize power in the Russian Revolution"
     ]
   },
   {
@@ -2239,10 +2239,10 @@
     "category": "sequence",
     "question": "Put these pandemics in chronological order (earliest first)",
     "items": [
-      "Black Death peaks in Europe (1347)",
-      "Great Plague of London (1665)",
-      "Spanish Flu pandemic (1918)",
-      "COVID-19 declared a global pandemic (2020)"
+      "Black Death kills a third of Europe’s population",
+      "Great Plague of London",
+      "Spanish Flu sweeps the globe",
+      "COVID-19 declared a global pandemic"
     ]
   },
   {
@@ -2250,21 +2250,21 @@
     "category": "sequence",
     "question": "Order these human rights milestones from earliest to latest",
     "items": [
-      "Magna Carta signed (1215)",
-      "Slavery abolished in the British Empire (1833)",
-      "Women granted the right to vote in the UK (1918)",
-      "UN Universal Declaration of Human Rights adopted (1948)"
+      "Magna Carta signed by King John",
+      "Slavery abolished throughout the British Empire",
+      "Women granted the right to vote in the UK",
+      "UN Universal Declaration of Human Rights adopted"
     ]
   },
   {
     "type": "sequence",
     "category": "sequence",
-    "question": "Put these Roman emperors in the order they ruled (earliest first)",
+    "question": "Put these Roman emperors in the order they began their rule (earliest first)",
     "items": [
-      "Augustus — first Roman emperor (27 BC)",
-      "Nero — infamous for persecution of Christians (54 AD)",
-      "Hadrian — built Hadrian’s Wall (117 AD)",
-      "Constantine I — first Christian emperor (306 AD)"
+      "Augustus — first Roman emperor",
+      "Nero — infamous for the Great Fire of Rome",
+      "Hadrian — builder of the famous wall in Britain",
+      "Constantine I — first Christian emperor"
     ]
   },
   {
@@ -2272,10 +2272,120 @@
     "category": "sequence",
     "question": "Order these music milestones from earliest to latest",
     "items": [
-      "The Beatles appear on The Ed Sullivan Show (1964)",
-      "Woodstock music festival (1969)",
-      "Michael Jackson releases Thriller (1982)",
-      "Spotify launches globally (2008)"
+      "The Beatles appear on The Ed Sullivan Show",
+      "Woodstock music festival",
+      "Michael Jackson releases Thriller",
+      "Spotify launches globally"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these planets from closest to the Sun to furthest",
+    "items": [
+      "Mercury",
+      "Venus",
+      "Earth",
+      "Mars"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these mountains from tallest to shortest",
+    "items": [
+      "Mount Everest",
+      "K2",
+      "Kangchenjunga",
+      "Lhotse"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these US presidents in the order they held office (earliest first)",
+    "items": [
+      "George Washington",
+      "Abraham Lincoln",
+      "Franklin D. Roosevelt",
+      "John F. Kennedy"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these voyages of exploration from earliest to latest",
+    "items": [
+      "Columbus makes first contact with the Americas",
+      "Vasco da Gama becomes first to reach India by sea around Africa",
+      "Magellan’s crew completes the first circumnavigation of the globe",
+      "James Cook charts the eastern coast of Australia"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these famous paintings from earliest to latest",
+    "items": [
+      "Leonardo da Vinci paints the Mona Lisa",
+      "Michelangelo completes the Sistine Chapel ceiling",
+      "Rembrandt paints The Night Watch",
+      "Van Gogh paints The Starry Night"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these literary works in the order they were published (earliest first)",
+    "items": [
+      "Shakespeare writes Hamlet",
+      "Milton publishes Paradise Lost",
+      "Jane Austen publishes Pride and Prejudice",
+      "George Orwell publishes Nineteen Eighty-Four"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these animals from shortest to longest average lifespan",
+    "items": [
+      "Domestic dog",
+      "Horse",
+      "African elephant",
+      "Giant tortoise"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Order these oceans from largest to smallest",
+    "items": [
+      "Pacific Ocean",
+      "Atlantic Ocean",
+      "Indian Ocean",
+      "Arctic Ocean"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these French rulers in chronological order (earliest first)",
+    "items": [
+      "Charlemagne crowned Holy Roman Emperor",
+      "Joan of Arc leads French forces against the English",
+      "Louis XIV rules as the Sun King",
+      "Napoleon Bonaparte crowns himself Emperor"
+    ]
+  },
+  {
+    "type": "sequence",
+    "category": "sequence",
+    "question": "Put these communication technologies in the order they were invented (earliest first)",
+    "items": [
+      "Telegraph",
+      "Telephone",
+      "Radio",
+      "Television"
     ]
   }
 ]
