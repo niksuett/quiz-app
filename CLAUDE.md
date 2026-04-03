@@ -163,28 +163,23 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 - **Accuracy + Rank** (Option B): 0–6 pts for accuracy; +4/3/2/1/0 rank bonus; max 10 pts per question. MC ranked by speed, proximity ranked by closeness.
 - Scoring is deferred to leaderboard time (server calculates rank after all answers are in). Result screen shows accuracy feedback; leaderboard shows final rank points. Speed bonus pill removed.
 
+**Landmark locationName accuracy audit** — updated 26 geo question `locationName` fields to include the specific landmark name (e.g. "Paris, France" → "Eiffel Tower, Paris") so the answer reveal is informative rather than just showing the city.
+
+**Admin sequence question editor** — added Sequence as a fully editable type in `/admin.html`: four numbered item fields in correct order, collect/validate logic, pink badge. Also fixed the Geography sidebar to show the 4 real subcategories (geo-built, geo-natural, geo-cities, geo-history) with correct question counts.
+
+**Admin map picker for geography questions** — the map question form in `/admin.html` now embeds a live Leaflet map (Voyager No Labels tiles). Click anywhere on the map to place a draggable pin; coordinates auto-fill the Lat/Lng inputs. Typing coordinates manually also moves the pin. No more hand-typing lat/lng to add geo questions.
+
 ---
 
 ### Not yet done
 
-**1. Admin map picker for geography questions**
-- Adding a map question requires typing lat/lng manually. An inline Leaflet map in the admin form where you click to set the correct location would be much easier.
-
-**2. Landmark locationName accuracy audit**
-- Coordinates are already precise (on the landmark itself), but `locationName` often just says "Rome, Italy" instead of "Colosseum, Rome" — making the answer reveal less informative.
-- Fix: go through all geo-* questions in `questions.json` and update `locationName` to name the specific landmark/site.
-
-**3. Expand Timeline / History (target: 60+ questions)**
+**1. Expand Timeline / History (target: 60+ questions)**
 - Current count is 25 (+ 3 photo questions). Cover all eras: ancient, medieval, early modern, modern, recent.
 - Pure content work — defer to a dedicated question-writing session.
 
-**4. New question type: Silhouette (MC)**
+**2. New question type: Silhouette (MC)**
 - Show a country/region outline silhouette; players pick the name from 4 buttons.
 - Low complexity — reuses the flag question mechanic (image + 4 MC buttons).
-
-**5. Admin sequence question editor**
-- Sequence questions currently must be added directly to `questions.json`. The admin UI at `/admin.html` has no form for the `sequence` type yet.
-- Fix: add a sequence tab/form to admin.html with fields for question text and 4 ordered items.
 
 ### Supplemental categories — keep but don't grow
 Facts, Science, Sports, Entertainment, Flags are supporting acts. Focus on quality over quantity; don't expand these.

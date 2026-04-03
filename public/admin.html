@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuizBlast — Question Editor</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -229,6 +231,20 @@
 
     /* ── Flag preview ── */
     .flag-preview { height: 36px; border-radius: 4px; border: 1px solid rgba(255,255,255,.1); vertical-align: middle; }
+
+    /* ── Admin map picker ── */
+    #admin-map {
+      height: 320px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      margin-top: 10px;
+      cursor: crosshair;
+    }
+    .map-hint {
+      font-size: .75rem;
+      color: #52525b;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -516,16 +532,21 @@ function renderForm(q, title) {
       <div class="form-row">
         <div class="form-group">
           <label>Correct Latitude</label>
-          <input id="f-lat" type="number" step="0.0001" value="${q.correctLat ?? ''}">
+          <input id="f-lat" type="number" step="0.000001" value="${q.correctLat ?? ''}" oninput="syncMarkerFromInputs()">
         </div>
         <div class="form-group">
           <label>Correct Longitude</label>
-          <input id="f-lng" type="number" step="0.0001" value="${q.correctLng ?? ''}">
+          <input id="f-lng" type="number" step="0.000001" value="${q.correctLng ?? ''}" oninput="syncMarkerFromInputs()">
         </div>
         <div class="form-group">
           <label>Location Name (shown after reveal)</label>
           <input id="f-location" value="${escHtml(q.locationName || '')}">
         </div>
+      </div>
+      <div class="form-group">
+        <label>Click the map to set the pin location</label>
+        <div id="admin-map"></div>
+        <p class="map-hint">Click anywhere to place the marker. You can also drag the marker or type coordinates above.</p>
       </div>`;
   } else if (type === 'sequence') {
     const items = q.items || ['', '', '', ''];
@@ -565,6 +586,10 @@ function renderForm(q, title) {
         <button class="btn-cancel-q" onclick="closeForm()">Cancel</button>
       </div>
     </div>`;
+
+  if (type === 'map') {
+    initAdminMap(q.correctLat, q.correctLng);
+  }
 }
 
 function onCatChange(cat) {
@@ -685,6 +710,72 @@ function setStatus(msg, cls) {
   const el = document.getElementById('save-status');
   el.textContent = msg;
   el.className = 'save-status ' + cls;
+}
+
+// ── Admin map picker ──────────────────────────────────────────────────────────
+let _adminMap = null;
+let _adminMarker = null;
+
+function initAdminMap(lat, lng) {
+  // Destroy any existing map instance so Leaflet doesn't complain
+  if (_adminMap) { _adminMap.remove(); _adminMap = null; _adminMarker = null; }
+
+  const hasCoords = lat != null && lng != null && !isNaN(lat) && !isNaN(lng);
+  const center = hasCoords ? [lat, lng] : [20, 0];
+  const zoom   = hasCoords ? 6 : 2;
+
+  _adminMap = L.map('admin-map', { zoomControl: true }).setView(center, zoom);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors, © CARTO',
+    maxZoom: 19
+  }).addTo(_adminMap);
+
+  if (hasCoords) {
+    _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
+    _adminMarker.on('dragend', () => {
+      const pos = _adminMarker.getLatLng();
+      setLatLngInputs(pos.lat, pos.lng);
+    });
+  }
+
+  _adminMap.on('click', e => {
+    const { lat, lng } = e.latlng;
+    if (_adminMarker) {
+      _adminMarker.setLatLng([lat, lng]);
+    } else {
+      _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
+      _adminMarker.on('dragend', () => {
+        const pos = _adminMarker.getLatLng();
+        setLatLngInputs(pos.lat, pos.lng);
+      });
+    }
+    setLatLngInputs(lat, lng);
+  });
+}
+
+function setLatLngInputs(lat, lng) {
+  const latEl = document.getElementById('f-lat');
+  const lngEl = document.getElementById('f-lng');
+  if (latEl) latEl.value = Math.round(lat * 10000) / 10000;
+  if (lngEl) lngEl.value = Math.round(lng * 10000) / 10000;
+}
+
+function syncMarkerFromInputs() {
+  if (!_adminMap) return;
+  const lat = parseFloat(document.getElementById('f-lat').value);
+  const lng = parseFloat(document.getElementById('f-lng').value);
+  if (isNaN(lat) || isNaN(lng)) return;
+  if (_adminMarker) {
+    _adminMarker.setLatLng([lat, lng]);
+  } else {
+    _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
+    _adminMarker.on('dragend', () => {
+      const pos = _adminMarker.getLatLng();
+      setLatLngInputs(pos.lat, pos.lng);
+    });
+  }
+  _adminMap.panTo([lat, lng]);
 }
 </script>
 </body>
