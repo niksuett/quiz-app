@@ -124,6 +124,7 @@
     .badge-slider   { background: rgba(234,179,8,.2);   color: #fde047; }
     .badge-timeline { background: rgba(249,115,22,.2);  color: #fdba74; }
     .badge-map      { background: rgba(34,197,94,.2);   color: #86efac; }
+    .badge-sequence { background: rgba(236,72,153,.2);  color: #f9a8d4; }
 
     .q-text { flex: 1; font-size: .88rem; color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .q-detail { font-size: .75rem; color: #52525b; flex-shrink: 0; }
@@ -268,8 +269,20 @@
     <button class="cat-btn" data-cat="timeline" onclick="selectCat('timeline')">
       📅 Timeline <span class="cat-count" id="count-timeline">0</span>
     </button>
-    <button class="cat-btn" data-cat="geography" onclick="selectCat('geography')">
-      🌍 Geography <span class="cat-count" id="count-geography">0</span>
+    <button class="cat-btn" data-cat="geo-built" onclick="selectCat('geo-built')">
+      🏛️ Built World <span class="cat-count" id="count-geo-built">0</span>
+    </button>
+    <button class="cat-btn" data-cat="geo-natural" onclick="selectCat('geo-natural')">
+      🏔️ Natural Wonders <span class="cat-count" id="count-geo-natural">0</span>
+    </button>
+    <button class="cat-btn" data-cat="geo-cities" onclick="selectCat('geo-cities')">
+      🏙️ Cities <span class="cat-count" id="count-geo-cities">0</span>
+    </button>
+    <button class="cat-btn" data-cat="geo-history" onclick="selectCat('geo-history')">
+      ⚔️ Where in History <span class="cat-count" id="count-geo-history">0</span>
+    </button>
+    <button class="cat-btn" data-cat="sequence" onclick="selectCat('sequence')">
+      🔢 Sequence <span class="cat-count" id="count-sequence">0</span>
     </button>
   </nav>
 
@@ -291,11 +304,14 @@ let questions = [];
 let currentCat = 'all';
 let editingIndex = null; // index in `questions` array, or null for "add new"
 
-const CATEGORIES = ['facts','science','sports','entertainment','flags','estimation','timeline','geography'];
+const CATEGORIES = ['facts','science','sports','entertainment','flags','estimation','timeline',
+                    'geo-built','geo-natural','geo-cities','geo-history','sequence'];
 
 const TYPE_FOR_CAT = {
   facts: 'text', science: 'text', sports: 'text', entertainment: 'text',
-  flags: 'flag', estimation: 'slider', timeline: 'timeline', geography: 'map'
+  flags: 'flag', estimation: 'slider', timeline: 'timeline',
+  'geo-built': 'map', 'geo-natural': 'map', 'geo-cities': 'map', 'geo-history': 'map',
+  sequence: 'sequence'
 };
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
@@ -314,7 +330,10 @@ function selectCat(cat) {
   const labels = {
     all: 'All Questions', facts: '📚 Facts', science: '🔬 Science',
     sports: '⚽ Sports', entertainment: '🎬 Entertainment', flags: '🏳️ Flags',
-    estimation: '📏 Estimation', timeline: '📅 Timeline', geography: '🌍 Geography'
+    estimation: '📏 Estimation', timeline: '📅 Timeline',
+    'geo-built': '🏛️ Built World', 'geo-natural': '🏔️ Natural Wonders',
+    'geo-cities': '🏙️ Cities', 'geo-history': '⚔️ Where in History',
+    sequence: '🔢 Sequence'
   };
   document.getElementById('panel-title').textContent = labels[cat] || cat;
   closeForm();
@@ -328,6 +347,7 @@ function updateCounts() {
     const el = document.getElementById('count-' + cat);
     if (el) el.textContent = questions.filter(q => q.category === cat).length;
   });
+  // legacy 'geography' cat no longer in sidebar, but keep tally silent
 }
 
 // ── Render question list ──────────────────────────────────────────────────────
@@ -356,6 +376,9 @@ function renderList() {
     } else if (type === 'slider' || type === 'timeline') {
       text = q.question;
       detail = `${q.min} – ${q.max} ${q.unit || ''}  ✓ ${q.correct}`;
+    } else if (type === 'sequence') {
+      text = q.question;
+      detail = q.items ? `${q.items.length} items` : '';
     } else {
       text = q.question;
       detail = `✓ ${q.answers[q.correct]}`;
@@ -405,7 +428,8 @@ function renderForm(q, title) {
 
   const typeOptions = [
     ['text','Multiple choice (text)'],['flag','Flag'],
-    ['slider','Estimation (slider)'],['timeline','Timeline'],['map','Map pin-drop']
+    ['slider','Estimation (slider)'],['timeline','Timeline'],
+    ['map','Map pin-drop'],['sequence','Sequence (drag-to-order)']
   ].map(([v,l]) => `<option value="${v}" ${v === type ? 'selected' : ''}>${l}</option>`).join('');
 
   let typeFields = '';
@@ -503,6 +527,23 @@ function renderForm(q, title) {
           <input id="f-location" value="${escHtml(q.locationName || '')}">
         </div>
       </div>`;
+  } else if (type === 'sequence') {
+    const items = q.items || ['', '', '', ''];
+    typeFields = `
+      <div class="form-row">
+        <div class="form-group">
+          <label>Question Text</label>
+          <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Items in correct order (1 = first, 4 = last)</label>
+        ${items.map((item, i) => `
+          <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+            <span style="color:#71717a; font-size:.8rem; width:18px; flex-shrink:0;">${i + 1}.</span>
+            <input id="f-item-${i}" value="${escHtml(item)}" placeholder="Item ${i + 1}" style="flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:7px; color:#e4e4e7; padding:8px 10px; font-size:.88rem; font-family:inherit;">
+          </div>`).join('')}
+      </div>`;
   }
 
   document.getElementById('form-area').innerHTML = `
@@ -538,6 +579,7 @@ function onTypeChange(type) {
     question: document.getElementById('f-question')?.value || '',
     answers: [0,1,2,3].map(i => document.getElementById('f-ans-'+i)?.value || ''),
     correct: Number(document.querySelector('input[name=correct]:checked')?.value ?? 0),
+    items: [0,1,2,3].map(i => document.getElementById('f-item-'+i)?.value || ''),
   };
   renderForm(partial, editingIndex !== null ? 'Edit Question' : 'Add Question');
 }
@@ -575,6 +617,9 @@ function collectForm() {
     q.correctLat   = Number(document.getElementById('f-lat').value);
     q.correctLng   = Number(document.getElementById('f-lng').value);
     q.locationName = document.getElementById('f-location').value.trim();
+  } else if (type === 'sequence') {
+    q.question = document.getElementById('f-question').value.trim();
+    q.items    = [0,1,2,3].map(i => document.getElementById('f-item-'+i).value.trim());
   }
 
   return q;
@@ -587,6 +632,7 @@ function validateQuestion(q) {
   }
   if ((q.type === 'slider' || q.type === 'timeline') && q.min >= q.max) return 'Min must be less than max.';
   if (q.type === 'map' && (isNaN(q.correctLat) || isNaN(q.correctLng))) return 'Latitude and longitude are required.';
+  if (q.type === 'sequence' && q.items.some(item => !item)) return 'All 4 items must be filled in.';
   return null;
 }
 

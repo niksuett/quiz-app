@@ -1160,7 +1160,7 @@
     "question": "Where is the Eiffel Tower?",
     "correctLat": 48.8584,
     "correctLng": 2.2945,
-    "locationName": "Paris, France"
+    "locationName": "Eiffel Tower, Paris"
   },
   {
     "category": "geo-built",
@@ -1168,7 +1168,7 @@
     "question": "Where is the Statue of Liberty?",
     "correctLat": 40.6892,
     "correctLng": -74.0445,
-    "locationName": "New York, USA"
+    "locationName": "Statue of Liberty, New York"
   },
   {
     "category": "geo-built",
@@ -1176,7 +1176,7 @@
     "question": "Where is Big Ben?",
     "correctLat": 51.5007,
     "correctLng": -0.1246,
-    "locationName": "London, UK"
+    "locationName": "Big Ben (Elizabeth Tower), London"
   },
   {
     "category": "geo-built",
@@ -1184,7 +1184,7 @@
     "question": "Where is the Sydney Opera House?",
     "correctLat": -33.8568,
     "correctLng": 151.2153,
-    "locationName": "Sydney, Australia"
+    "locationName": "Sydney Opera House, Australia"
   },
   {
     "category": "geo-built",
@@ -1192,7 +1192,7 @@
     "question": "Where is the Colosseum?",
     "correctLat": 41.8902,
     "correctLng": 12.4922,
-    "locationName": "Rome, Italy"
+    "locationName": "Colosseum, Rome"
   },
   {
     "category": "geo-built",
@@ -1200,7 +1200,7 @@
     "question": "Where is the Taj Mahal?",
     "correctLat": 27.1751,
     "correctLng": 78.0421,
-    "locationName": "Agra, India"
+    "locationName": "Taj Mahal, Agra, India"
   },
   {
     "category": "geo-built",
@@ -1208,7 +1208,7 @@
     "question": "Where is Christ the Redeemer?",
     "correctLat": -22.9519,
     "correctLng": -43.2105,
-    "locationName": "Rio de Janeiro, Brazil"
+    "locationName": "Christ the Redeemer, Rio de Janeiro"
   },
   {
     "category": "geo-built",
@@ -1216,7 +1216,7 @@
     "question": "Where are the Pyramids of Giza?",
     "correctLat": 29.9792,
     "correctLng": 31.1342,
-    "locationName": "Giza, Egypt"
+    "locationName": "Pyramids of Giza, Egypt"
   },
   {
     "category": "geo-natural",
@@ -1224,7 +1224,7 @@
     "question": "Where is Mount Everest?",
     "correctLat": 27.9881,
     "correctLng": 86.925,
-    "locationName": "Nepal / Tibet border"
+    "locationName": "Mount Everest, Nepal/Tibet"
   },
   {
     "category": "geo-cities",
@@ -1264,7 +1264,7 @@
     "question": "Where is the Great Wall of China (Mutianyu section)?",
     "correctLat": 40.4319,
     "correctLng": 116.5704,
-    "locationName": "Mutianyu, China"
+    "locationName": "Great Wall (Mutianyu), China"
   },
   {
     "category": "geo-built",
@@ -1272,7 +1272,7 @@
     "question": "Where is Machu Picchu?",
     "correctLat": -13.1631,
     "correctLng": -72.545,
-    "locationName": "Cusco Region, Peru"
+    "locationName": "Machu Picchu, Peru"
   },
   {
     "category": "entertainment",
@@ -1845,7 +1845,7 @@
     "question": "Where is the Sagrada Família?",
     "correctLat": 41.4036,
     "correctLng": 2.1744,
-    "locationName": "Barcelona, Spain"
+    "locationName": "Sagrada Família, Barcelona"
   },
   {
     "category": "geo-built",
@@ -1853,7 +1853,7 @@
     "question": "Where is Angkor Wat?",
     "correctLat": 13.4125,
     "correctLng": 103.867,
-    "locationName": "Siem Reap, Cambodia"
+    "locationName": "Angkor Wat, Cambodia"
   },
   {
     "category": "geo-built",
@@ -1861,7 +1861,7 @@
     "question": "Where is Stonehenge?",
     "correctLat": 51.1789,
     "correctLng": -1.8262,
-    "locationName": "Wiltshire, England"
+    "locationName": "Stonehenge, Wiltshire"
   },
   {
     "category": "geo-built",
@@ -1869,7 +1869,7 @@
     "question": "Where is Chichen Itza?",
     "correctLat": 20.6843,
     "correctLng": -88.5678,
-    "locationName": "Yucatán, Mexico"
+    "locationName": "Chichen Itza, Yucatán, Mexico"
   },
   {
     "category": "geo-built",
@@ -1877,7 +1877,7 @@
     "question": "Where is the ancient city of Petra?",
     "correctLat": 30.3285,
     "correctLng": 35.4444,
-    "locationName": "Ma'an, Jordan"
+    "locationName": "Petra, Jordan"
   },
   {
     "category": "geo-built",
@@ -1885,7 +1885,7 @@
     "question": "Where is the Burj Khalifa?",
     "correctLat": 25.1972,
     "correctLng": 55.2744,
-    "locationName": "Dubai, UAE"
+    "locationName": "Burj Khalifa, Dubai"
   },
   {
     "category": "geo-built",
@@ -1893,7 +1893,7 @@
     "question": "Where is the Hagia Sophia?",
     "correctLat": 41.0086,
     "correctLng": 28.9802,
-    "locationName": "Istanbul, Turkey"
+    "locationName": "Hagia Sophia, Istanbul"
   },
   {
     "category": "geo-built",
@@ -1901,7 +1901,7 @@
     "question": "Where is the Acropolis of Athens?",
     "correctLat": 37.9715,
     "correctLng": 23.7267,
-    "locationName": "Athens, Greece"
+    "locationName": "Acropolis of Athens, Greece"
   },
   {
     "category": "geo-natural",
@@ -1909,7 +1909,7 @@
     "question": "Where is Niagara Falls?",
     "correctLat": 43.0962,
     "correctLng": -79.0377,
-    "locationName": "Ontario, Canada / New York, USA"
+    "locationName": "Niagara Falls, Ontario/New York"
   },
   {
     "category": "geo-natural",
@@ -1917,7 +1917,7 @@
     "question": "Where is Victoria Falls?",
     "correctLat": -17.9243,
     "correctLng": 25.8572,
-    "locationName": "Zambia / Zimbabwe border"
+    "locationName": "Victoria Falls, Zambia/Zimbabwe"
   },
   {
     "category": "geo-built",
@@ -1925,7 +1925,7 @@
     "question": "Where is the Alhambra palace?",
     "correctLat": 37.1768,
     "correctLng": -3.5881,
-    "locationName": "Granada, Spain"
+    "locationName": "Alhambra, Granada"
   },
   {
     "category": "geo-built",
@@ -1933,7 +1933,7 @@
     "question": "Where is St. Basil's Cathedral?",
     "correctLat": 55.7525,
     "correctLng": 37.6231,
-    "locationName": "Moscow, Russia"
+    "locationName": "St. Basil's Cathedral, Moscow"
   },
   {
     "category": "geo-built",
@@ -1941,7 +1941,7 @@
     "question": "Where is the Louvre museum?",
     "correctLat": 48.8606,
     "correctLng": 2.3376,
-    "locationName": "Paris, France"
+    "locationName": "Louvre Museum, Paris"
   },
   {
     "category": "geo-built",
@@ -1949,7 +1949,7 @@
     "question": "Where is the Forbidden City?",
     "correctLat": 39.9163,
     "correctLng": 116.3972,
-    "locationName": "Beijing, China"
+    "locationName": "Forbidden City, Beijing"
   },
   {
     "category": "geo-natural",
@@ -1957,7 +1957,7 @@
     "question": "Where is Lake Baikal?",
     "correctLat": 53.5587,
     "correctLng": 108.165,
-    "locationName": "Siberia, Russia"
+    "locationName": "Lake Baikal, Siberia, Russia"
   },
   {
     "category": "geo-natural",
