@@ -169,15 +169,33 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 
 **Admin map picker for geography questions** — the map question form in `/admin.html` now embeds a live Leaflet map (Voyager No Labels tiles). Click anywhere on the map to place a draggable pin; coordinates auto-fill the Lat/Lng inputs. Typing coordinates manually also moves the pin. No more hand-typing lat/lng to add geo questions.
 
+**Sequence leaderboard layout fix** — player reveal blocks (`.seq-reveal-player`) were using the `tlPinAppear` animation which includes `translateX(-50%)`. That transform is designed for absolutely-positioned timeline pins; on regular block elements it shifted them 50% of their width to the left, escaping the card. Fixed by switching to the existing `fadeSlideIn` animation instead.
+
+**Sequence drag fix (desktop)** — `pointermove`/`pointerup`/`pointercancel` were attached to the dragged `<li>` element directly, and `setPointerCapture` was used to keep events on it. Moving the element in the DOM via `insertBefore` caused some browsers to fire `pointercancel`, ending the drag after one move. Fixed by removing pointer capture and attaching all three listeners to `document` instead — a stable target that is unaffected by DOM changes.
+
 ---
 
 ### Not yet done
 
-**1. Expand Timeline / History (target: 60+ questions)**
+**1. TV mode vs. Mobile mode**
+- Currently there's no meaningful host screen — the host just sees a "watching" placeholder during questions. This is fine for mobile-only games (everyone holds their own device) but unusable when playing on a TV.
+- Add a **TV mode** toggle (selectable at game setup or in the lobby): the host screen becomes the shared display — it shows the question text, timer, and leaderboard in a large-font format suitable for a TV or projector. Players use their own phones only for inputting answers.
+- **Mobile mode** is the current behaviour — keep it as the default.
+- TV mode needs a dedicated question view (large text, no answer buttons), a large-format leaderboard, and possibly a "spectator" URL distinct from the player URL.
+
+**2. Dynamic leaderboard duration based on player count**
+- The leaderboard autoplay pause is currently fixed per question type (MC=5s, timeline=8s, map=10s).
+- Scale the pause with the number of players: more players → more rows to read → more time needed. Proposed formula: `base + (playerCount − 1) × 0.5s`, capped at a reasonable max (e.g. 20s). Implemented server-side when emitting `show-leaderboard` or client-side by reading the leaderboard row count.
+
+**3. Clearer point breakdown and comparison to others**
+- Players want to know not just how many points they got, but WHY — exactly what position they ranked, how close they were to the top, and how their answer compared to others.
+- Ideas: show your rank position explicitly on the result screen (e.g. "2nd closest"), show the gap between your answer and the winning answer, and on the leaderboard highlight the difference between adjacent rows. Both the result screen and leaderboard could benefit.
+
+**4. Expand Timeline / History (target: 60+ questions)**
 - Current count is 25 (+ 3 photo questions). Cover all eras: ancient, medieval, early modern, modern, recent.
 - Pure content work — defer to a dedicated question-writing session.
 
-**2. New question type: Silhouette (MC)**
+**5. New question type: Silhouette (MC)**
 - Show a country/region outline silhouette; players pick the name from 4 buttons.
 - Low complexity — reuses the flag question mechanic (image + 4 MC buttons).
 

@@ -761,9 +761,6 @@ function initSequenceDrag() {
     if (!item || item.classList.contains('seq-locked')) return;
     e.preventDefault();
 
-    // setPointerCapture redirects all future pointer events for this ID to item,
-    // so pointermove/pointerup fire on item even when the pointer moves off it.
-    item.setPointerCapture(e.pointerId);
     item.classList.add('seq-grabbed');
     dragging = item;
 
@@ -792,12 +789,16 @@ function initSequenceDrag() {
         dragging.classList.remove('seq-grabbed');
         dragging = null;
       }
-      item.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup',     onEnd);
+      document.removeEventListener('pointercancel', onEnd);
     };
 
-    item.addEventListener('pointermove', onMove);
-    item.addEventListener('pointerup',     onEnd, { once: true });
-    item.addEventListener('pointercancel', onEnd, { once: true });
+    // Listen on document so events keep firing even when the pointer moves
+    // outside the list or the dragged element repositions in the DOM.
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup',     onEnd, { once: true });
+    document.addEventListener('pointercancel', onEnd, { once: true });
   });
 }
 

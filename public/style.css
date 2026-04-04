@@ -1442,7 +1442,7 @@ h3 {
 }
 .seq-reveal-player {
   margin-bottom: 10px;
-  animation: tlPinAppear .3s ease both;
+  animation: fadeSlideIn .3s ease both;
 }
 .seq-reveal-me .seq-reveal-name { color: var(--lapis); }
 .seq-reveal-name {
