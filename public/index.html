@@ -141,7 +141,7 @@
       <!-- Scoring System -->
       <div class="config-section">
         <h3>Scoring</h3>
-        <div class="scoring-selector">
+        <div class="scoring-selector" id="scoring-selector">
           <button class="scoring-btn active" data-scoring="rank">
             <span class="scoring-name">Rank</span>
             <span class="scoring-desc">Closest answer wins most · Everyone correct gets equal points · Max 10 pts</span>
@@ -149,6 +149,21 @@
           <button class="scoring-btn" data-scoring="accuracy-rank">
             <span class="scoring-name">Accuracy + Rank</span>
             <span class="scoring-desc">Points for how close you were · Rank bonus on top · Max 10 pts</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Display Mode -->
+      <div class="config-section">
+        <h3>Display Mode</h3>
+        <div class="scoring-selector" id="mode-selector">
+          <button class="scoring-btn active" data-mode="mobile">
+            <span class="scoring-name">📱 Mobile Mode</span>
+            <span class="scoring-desc">You play too — enter a nickname and join as a regular player. Best for small groups where everyone has their own phone.</span>
+          </button>
+          <button class="scoring-btn" data-mode="tv">
+            <span class="scoring-name">📺 TV Mode</span>
+            <span class="scoring-desc">Your screen shows the questions on a shared display. Players join on their phones to answer — you just watch and control.</span>
           </button>
         </div>
       </div>
@@ -171,7 +186,14 @@
       <h3>Players joined: <span id="player-count">0</span></h3>
       <ul id="player-list" class="player-list"></ul>
 
-      <button class="btn btn-red" onclick="startGame()">▶ Start Game</button>
+      <!-- Mobile mode only: host enters their own nickname to play -->
+      <div id="host-nickname-section" class="hidden">
+        <p class="hint" style="margin-bottom:6px;">You're playing too — enter your nickname:</p>
+        <input type="text" id="host-nickname-input" class="text-input"
+               placeholder="Your nickname" maxlength="16">
+      </div>
+
+      <button class="btn btn-red" id="start-btn" onclick="startGame()">▶ Start Game</button>
       <div id="start-error" class="error-msg hidden"></div>
     </div>
   </div>

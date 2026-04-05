@@ -225,11 +225,12 @@ io.on('connection', (socket) => {
   console.log('Browser connected:', socket.id);
 
   // ── HOST creates a game ────────────────────────────────────────────────────
-  socket.on('create-game', ({ rounds, categories, autoplay, scoringSystem } = {}) => {
+  socket.on('create-game', ({ rounds, categories, autoplay, scoringSystem, gameMode } = {}) => {
     rounds        = rounds        || '5';
     categories    = categories    || ['facts'];
     autoplay      = autoplay      !== false; // default true
     scoringSystem = scoringSystem || 'rank'; // 'rank' | 'accuracy-rank'
+    gameMode      = (gameMode === 'tv') ? 'tv' : 'mobile'; // 'mobile' | 'tv'
 
     let gameId;
     do { gameId = generateGameId(); } while (games[gameId]);
@@ -259,6 +260,7 @@ io.on('connection', (socket) => {
       state:             'lobby',
       autoplay,
       scoringSystem,
+      gameMode,
       timer:             null,
       questionStartTime: null,
     };
@@ -267,8 +269,8 @@ io.on('connection', (socket) => {
     socket.role   = 'host';
     socket.join(gameId);
 
-    socket.emit('game-created', { gameId });
-    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | scoring: ${scoringSystem}`);
+    socket.emit('game-created', { gameId, gameMode });
+    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | scoring: ${scoringSystem} | mode: ${gameMode}`);
   });
 
   // ── PLAYER joins ───────────────────────────────────────────────────────────
@@ -304,11 +306,30 @@ io.on('connection', (socket) => {
   });
 
   // ── HOST starts the game ───────────────────────────────────────────────────
-  socket.on('start-game', () => {
+  socket.on('start-game', ({ hostNickname } = {}) => {
     const game = games[socket.gameId];
     if (!game || socket.role !== 'host') return;
-    if (game.players.length === 0)
-      return socket.emit('start-error', 'You need at least 1 player to start!');
+
+    if (game.gameMode === 'mobile') {
+      // In mobile mode the host joins as a player with their own nickname
+      hostNickname = (hostNickname || '').trim();
+      if (!hostNickname)
+        return socket.emit('start-error', 'Enter your nickname to join the game.');
+      if (hostNickname.length > 16)
+        return socket.emit('start-error', 'Nickname must be 16 characters or less.');
+      if (game.players.find(p => p.nickname.toLowerCase() === hostNickname.toLowerCase()))
+        return socket.emit('start-error', 'That nickname is already taken. Try another.');
+      game.players.push({
+        id: socket.id, nickname: hostNickname, score: 0, answered: false,
+        stats: { roundsAnswered: 0, roundsFirst: 0, bestRound: 0 },
+      });
+      console.log(`Host "${hostNickname}" joined ${game.id} as a player (mobile mode)`);
+    } else {
+      // TV mode: need at least one player on their own device
+      if (game.players.length === 0)
+        return socket.emit('start-error', 'You need at least 1 player to start!');
+    }
+
     sendNextQuestion(game);
   });
 

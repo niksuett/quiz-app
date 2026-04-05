@@ -7,6 +7,7 @@ const socket = io();
 // ── State ─────────────────────────────────────────────────────────────────────
 let myRole          = null;
 let myNickname      = null;
+let gameMode        = 'mobile'; // 'mobile' | 'tv'
 let timerInterval      = null;
 let resultTimeout      = null;
 let currentScoringSystem = 'rank'; // 'rank' | 'accuracy-rank' — set per-question from server
@@ -292,14 +293,26 @@ function createGame() {
                            .map(cb => cb.value);
   if (categories.length === 0)
     return showError('config-error', 'Please select at least one category.');
-  const autoplay       = document.getElementById('autoplay-toggle').checked;
-  const activeScoringBtn = document.querySelector('.scoring-btn.active');
-  const scoringSystem  = activeScoringBtn ? activeScoringBtn.dataset.scoring : 'rank';
-  socket.emit('create-game', { rounds, categories, autoplay, scoringSystem });
+  const autoplay         = document.getElementById('autoplay-toggle').checked;
+  const activeScoringBtn = document.querySelector('#scoring-selector .scoring-btn.active');
+  const scoringSystem    = activeScoringBtn ? activeScoringBtn.dataset.scoring : 'rank';
+  const activeModeBtn    = document.querySelector('#mode-selector .scoring-btn.active');
+  const selectedMode     = activeModeBtn ? activeModeBtn.dataset.mode : 'mobile';
+  socket.emit('create-game', { rounds, categories, autoplay, scoringSystem, gameMode: selectedMode });
 }
 
 function startGame() {
-  socket.emit('start-game');
+  clearError('start-error');
+  if (gameMode === 'mobile') {
+    const hostNickname = document.getElementById('host-nickname-input').value.trim();
+    if (!hostNickname)
+      return showError('start-error', 'Enter your nickname to join the game.');
+    myNickname = hostNickname;
+    myRole     = 'player'; // host plays as a regular player in mobile mode
+    socket.emit('start-game', { hostNickname });
+  } else {
+    socket.emit('start-game', {});
+  }
 }
 
 function submitAnswer(index) {
@@ -321,9 +334,16 @@ document.querySelectorAll('.round-btn').forEach(btn => {
   });
 });
 
-document.querySelectorAll('.scoring-btn').forEach(btn => {
+document.querySelectorAll('#scoring-selector .scoring-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.scoring-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#scoring-selector .scoring-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.querySelectorAll('#mode-selector .scoring-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#mode-selector .scoring-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
 });
@@ -395,11 +415,18 @@ function stopTimer() {
 
 socket.on('create-error', (msg) => showError('config-error', msg));
 
-socket.on('game-created', ({ gameId }) => {
+socket.on('game-created', ({ gameId, gameMode: mode }) => {
+  gameMode = mode || 'mobile';
   document.getElementById('host-game-id').textContent = gameId;
   document.getElementById('player-count').textContent = '0';
   document.getElementById('player-list').innerHTML    = '';
+  document.getElementById('host-nickname-input').value = '';
   clearError('start-error');
+  // Show nickname input only in mobile mode (host plays as a player)
+  document.getElementById('host-nickname-section').classList.toggle('hidden', gameMode !== 'mobile');
+  // Update start button label to make the action clear
+  document.getElementById('start-btn').textContent =
+    gameMode === 'mobile' ? '▶ Join & Start' : '▶ Start Game';
   showScreen('screen-host-lobby');
 });
 
@@ -596,7 +623,7 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
           <span class="answer-letter">${letters[i]}</span>${text}
         </button>`
       ).join('');
-      document.getElementById('host-label').classList.remove('hidden');
+      document.getElementById('host-label').classList.add('hidden'); // not needed on TV
       document.getElementById('answer-progress').classList.remove('hidden');
       document.getElementById('progress-text').textContent = `0 / ? answered`;
     } else {
