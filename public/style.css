@@ -538,6 +538,15 @@ h3 {
   padding: 8px;
   margin-top: 4px;
 }
+.question-hint {
+  text-align: center;
+  color: var(--gold-muted);
+  font-family: var(--font-garamond);
+  font-style: italic;
+  font-size: .82rem;
+  margin-top: 10px;
+  letter-spacing: .01em;
+}
 
 /* ─── Slider ──────────────────────────────────────────────────────────────── */
 .answers-grid.slider-mode { grid-template-columns: 1fr; }
@@ -1071,7 +1080,7 @@ h3 {
 .lb-name  { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-stat  { font-size: .72rem; color: var(--aged); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
 .lb-round-info {
-  font-size: .7rem;
+  font-size: .75rem;
   color: var(--correct);
   font-family: var(--font-cinzel);
   font-weight: 600;
@@ -1080,6 +1089,7 @@ h3 {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.lb-round-info-zero { color: var(--aged); }
 
 /* ─── Correct-reveal tag + answer ────────────────────────────────────────── */
 .cr-tag {

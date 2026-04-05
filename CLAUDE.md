@@ -173,23 +173,23 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 
 **Sequence drag fix (desktop)** — `pointermove`/`pointerup`/`pointercancel` were attached to the dragged `<li>` element directly, and `setPointerCapture` was used to keep events on it. Moving the element in the DOM via `insertBefore` caused some browsers to fire `pointercancel`, ending the drag after one move. Fixed by removing pointer capture and attaching all three listeners to `document` instead — a stable target that is unaffected by DOM changes.
 
+**TV mode and Mobile mode** — host picks a display mode on the config screen:
+- **Mobile mode** (default): host enters their own nickname and joins as a regular player. Server registers the host in `game.players`; `myRole` is set to `'player'` client-side so the host sees answer controls, result screens, and a highlighted leaderboard row. The host socket still receives `waiting-for-host` for the "Next Question →" button.
+- **TV mode**: host device shows questions and leaderboard on a shared screen; players answer on their phones. Behaviour is the existing host view (read-only answer display, answer count).
+
+**Leaderboard clarity improvements** — several fixes to make it immediately obvious why you got each score:
+- `formatRoundInfo` now shows "Correct · +10 pts" for MC/Rank mode (was wrongly showing "1st place" for everyone), and "1st fastest · +10 pts" for MC/Accuracy+Rank mode (was "1st place", hiding that speed is the tiebreaker).
+- Wrong/no-answer round-info rows now show in a muted colour (`lb-round-info-zero`) instead of green.
+- Gain badge now shows "+8 pts" instead of just "+8".
+- For MC/flag questions in Accuracy+Rank mode: "⚡ Fastest correct answer earns the most points" hint shown below the answer buttons, and the result screen's rank bonus row is labelled "Speed rank bonus" instead of the generic "Rank bonus".
+
 ---
 
 ### Not yet done
 
-**1. TV mode vs. Mobile mode**
-- Currently there's no meaningful host screen — the host just sees a "watching" placeholder during questions. This is fine for mobile-only games (everyone holds their own device) but unusable when playing on a TV.
-- Add a **TV mode** toggle (selectable at game setup or in the lobby): the host screen becomes the shared display — it shows the question text, timer, and leaderboard in a large-font format suitable for a TV or projector. Players use their own phones only for inputting answers.
-- **Mobile mode** is the current behaviour — keep it as the default.
-- TV mode needs a dedicated question view (large text, no answer buttons), a large-format leaderboard, and possibly a "spectator" URL distinct from the player URL.
-
-**2. Dynamic leaderboard duration based on player count**
+**1. Dynamic leaderboard duration based on player count**
 - The leaderboard autoplay pause is currently fixed per question type (MC=5s, timeline=8s, map=10s).
 - Scale the pause with the number of players: more players → more rows to read → more time needed. Proposed formula: `base + (playerCount − 1) × 0.5s`, capped at a reasonable max (e.g. 20s). Implemented server-side when emitting `show-leaderboard` or client-side by reading the leaderboard row count.
-
-**3. Clearer point breakdown and comparison to others**
-- Players want to know not just how many points they got, but WHY — exactly what position they ranked, how close they were to the top, and how their answer compared to others.
-- Ideas: show your rank position explicitly on the result screen (e.g. "2nd closest"), show the gap between your answer and the winning answer, and on the leaderboard highlight the difference between adjacent rows. Both the result screen and leaderboard could benefit.
 
 **4. Expand Timeline / History (target: 60+ questions)**
 - Current count is 25 (+ 3 photo questions). Cover all eras: ancient, medieval, early modern, modern, recent.

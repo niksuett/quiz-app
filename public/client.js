@@ -133,7 +133,7 @@ function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
 
     // Permanent round-points line: shows rank + pts earned this round
     const roundInfoSpan = document.createElement('span');
-    roundInfoSpan.className   = 'lb-round-info';
+    roundInfoSpan.className   = 'lb-round-info' + (entry.roundPoints > 0 ? '' : ' lb-round-info-zero');
     roundInfoSpan.textContent = formatRoundInfo(entry, questionType, scoringSystem);
 
     const nameCol = document.createElement('div');
@@ -146,7 +146,7 @@ function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
 
     const gainSpan = document.createElement('span');
     gainSpan.className   = 'lb-gain';
-    gainSpan.textContent = entry.roundPoints > 0 ? `+${entry.roundPoints}` : '';
+    gainSpan.textContent = entry.roundPoints > 0 ? `+${entry.roundPoints} pts` : '';
 
     const scoreSpan = document.createElement('span');
     scoreSpan.className   = 'lb-score';
@@ -248,12 +248,19 @@ function formatRoundInfo(entry, questionType, scoringSystem) {
 
   const rankStr = rank ? ordinalStr(rank) : null;
 
-  // For proximity-based types, add "closest" qualifier to the rank
   const isProximity = (questionType === 'slider' || questionType === 'timeline' || questionType === 'map');
-  const rankLabel   = rankStr
-    ? questionType === 'sequence' ? `${rankStr} · best order`
+  const isMC        = !isProximity && questionType !== 'sequence';
+
+  // MC in Rank mode: all correct answers earn the same flat points — no rank
+  if (isMC && scoringSystem === 'rank') {
+    return `Correct · +${pts} pts`;
+  }
+
+  // MC in Accuracy+Rank mode: correct answers ranked by speed
+  const rankLabel = rankStr
+    ? questionType === 'sequence' ? `${rankStr} · most correct`
     : isProximity                 ? `${rankStr} closest`
-    :                               `${rankStr} place`
+    :                               `${rankStr} fastest`  // MC speed rank
     : null;
 
   return rankLabel ? `${rankLabel} · +${pts} pts` : `+${pts} pts`;
@@ -637,6 +644,15 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
       document.getElementById('host-label').classList.add('hidden');
       document.getElementById('answer-progress').classList.add('hidden');
     }
+  }
+
+  // Speed hint: only for MC/flag questions in Accuracy+Rank mode
+  const qHint = document.getElementById('question-hint');
+  if (qHint) {
+    const isMCType = type !== 'slider' && type !== 'timeline' && type !== 'map' && type !== 'sequence';
+    const showHint = isMCType && scoringSystem === 'accuracy-rank';
+    qHint.textContent = '⚡ Fastest correct answer earns the most points';
+    qHint.classList.toggle('hidden', !showHint);
   }
 
   showScreen('screen-question');
@@ -1254,7 +1270,7 @@ function showResultScreen(data) {
       heading.textContent = 'Correct!';
       if (data.scoringSystem === 'accuracy-rank') {
         // Show accuracy base now; speed-rank bonus comes on leaderboard
-        showBreakdownCard('Correct answer', data.immediatePoints, true);
+        showBreakdownCard('Correct answer', data.immediatePoints, true, 'Speed rank bonus');
       } else {
         // Option A: flat points for all correct players — can show immediately
         flatLine.textContent = `${data.immediatePoints} pts`;
@@ -1275,7 +1291,8 @@ function showResultScreen(data) {
 
 // Fills in and reveals the score breakdown card.
 // rankBonusPending=true means rank bonus will be added on the leaderboard.
-function showBreakdownCard(baseLabel, basePoints, rankBonusPending) {
+// bonusLabel overrides the default "Rank bonus" row label when supplied.
+function showBreakdownCard(baseLabel, basePoints, rankBonusPending, bonusLabel = null) {
   document.getElementById('score-base-label').textContent = baseLabel;
   document.getElementById('score-base-pts').textContent   = String(basePoints);
 
@@ -1284,7 +1301,7 @@ function showBreakdownCard(baseLabel, basePoints, rankBonusPending) {
   const totalRow   = document.querySelector('.score-row-total');
 
   if (rankBonusPending) {
-    document.getElementById('score-speed-label').textContent = 'Rank bonus';
+    document.getElementById('score-speed-label').textContent = bonusLabel || 'Rank bonus';
     document.getElementById('score-speed-pts').textContent   = '+ on leaderboard';
     document.getElementById('score-total-pts').textContent   = `${basePoints}+`;
     speedRow.classList.remove('hidden');
