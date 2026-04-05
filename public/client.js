@@ -107,7 +107,7 @@ function animateCount(el, target, duration = 700) {
     const progress = Math.min((now - start) / duration, 1);
     // ease-out curve: starts fast, slows at the end
     const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(eased * target).toLocaleString();
+    el.textContent = Math.round(eased * target).toLocaleString('en-US');
     if (progress < 1) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
@@ -131,16 +131,11 @@ function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
     statSpan.className   = 'lb-stat';
     statSpan.textContent = formatAnswerStat(entry.lastAnswer);
 
-    // Permanent round-points line: shows rank + pts earned this round
-    const roundInfoSpan = document.createElement('span');
-    roundInfoSpan.className   = 'lb-round-info' + (entry.roundPoints > 0 ? '' : ' lb-round-info-zero');
-    roundInfoSpan.textContent = formatRoundInfo(entry, questionType, scoringSystem);
-
     const nameCol = document.createElement('div');
     nameCol.className = 'lb-name-col';
-    nameCol.append(nameSpan, statSpan, roundInfoSpan);
+    nameCol.append(nameSpan, statSpan);
 
-    // Score area: previous total + animated gain badge → counts up to new total
+    // Score area: gain badge → counts up to total → rank reason below
     const scoreWrap = document.createElement('div');
     scoreWrap.className = 'lb-score-wrap';
 
@@ -152,9 +147,14 @@ function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
     scoreSpan.className   = 'lb-score';
 
     const prev = (entry.score || 0) - (entry.roundPoints || 0);
-    scoreSpan.textContent = prev.toLocaleString();
+    scoreSpan.textContent = prev.toLocaleString('en-US');
 
-    scoreWrap.append(gainSpan, scoreSpan);
+    // Rank reason line: explains how points were earned (e.g. "1st fastest · +10 pts")
+    const rankReasonSpan = document.createElement('span');
+    rankReasonSpan.className   = 'lb-rank-reason' + (entry.roundPoints > 0 ? '' : ' lb-rank-reason-zero');
+    rankReasonSpan.textContent = formatRoundInfo(entry, questionType, scoringSystem);
+
+    scoreWrap.append(gainSpan, scoreSpan, rankReasonSpan);
     li.append(nameCol, scoreWrap);
     listEl.append(li);
 
@@ -199,7 +199,7 @@ function renderFinalLeaderboard(listEl, entries) {
 
     const scoreSpan = document.createElement('span');
     scoreSpan.className   = 'lb-score';
-    scoreSpan.textContent = (entry.score || 0).toLocaleString();
+    scoreSpan.textContent = (entry.score || 0).toLocaleString('en-US');
 
     li.append(nameCol, scoreSpan);
     listEl.append(li);
@@ -209,12 +209,15 @@ function renderFinalLeaderboard(listEl, entries) {
 function formatAnswerStat(ans) {
   if (!ans) return 'No answer';
   if (ans.type === 'map') {
-    return `📍 ${ans.distanceKm.toLocaleString()} km away`;
+    return `📍 ${ans.distanceKm.toLocaleString('en-US')} km away`;
   }
   if (ans.type === 'slider' || ans.type === 'timeline') {
-    const u    = ans.unit ? ` ${ans.unit}` : '';
-    const diff = ans.diff === 0 ? 'exact!' : `off by ${ans.diff.toLocaleString()}${u}`;
-    return `${ans.value.toLocaleString()}${u} — ${diff}`;
+    const u      = ans.unit ? ` ${ans.unit}` : '';
+    // For timeline (years) avoid thousands separator; for sliders use en-US commas
+    const fmtVal = ans.type === 'timeline' ? String(Math.round(ans.value)) : ans.value.toLocaleString('en-US');
+    const fmtDiff = ans.type === 'timeline' ? String(Math.round(ans.diff)) : ans.diff.toLocaleString('en-US');
+    const diff = ans.diff === 0 ? 'exact!' : `off by ${fmtDiff}${u}`;
+    return `${fmtVal}${u} — ${diff}`;
   }
   if (ans.type === 'sequence') {
     return `${ans.correctCount} / ${ans.correctOrder.length} in correct position`;
@@ -258,7 +261,8 @@ function formatRoundInfo(entry, questionType, scoringSystem) {
 
   // MC in Accuracy+Rank mode: correct answers ranked by speed
   const rankLabel = rankStr
-    ? questionType === 'sequence' ? `${rankStr} · most correct`
+    ? questionType === 'sequence'
+        ? (entry.speedTiebreak ? `${rankStr} · faster ⚡` : `${rankStr} · most correct`)
     : isProximity                 ? `${rankStr} closest`
     :                               `${rankStr} fastest`  // MC speed rank
     : null;
@@ -549,8 +553,8 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
                oninput="updateSliderDisplay(this.value)"
                ${myRole === 'host' ? 'disabled' : ''}>
         <div class="slider-bounds">
-          <span>${min.toLocaleString()}${unit ? ' ' + unit : ''}</span>
-          <span>${max.toLocaleString()}${unit ? ' ' + unit : ''}</span>
+          <span>${min.toLocaleString('en-US')}${unit ? ' ' + unit : ''}</span>
+          <span>${max.toLocaleString('en-US')}${unit ? ' ' + unit : ''}</span>
         </div>
         ${myRole !== 'host'
           ? `<button class="btn btn-red slider-submit-btn" id="slider-submit-btn"
@@ -917,7 +921,7 @@ function showLeaderboardMap(mapData) {
         });
         L.marker([pin.lat, pin.lng], { icon: pinIcon })
           .addTo(leaderboardMap)
-          .bindPopup(`<b>${pin.nickname}</b><br>${pin.distanceKm.toLocaleString()} km away`);
+          .bindPopup(`<b>${pin.nickname}</b><br>${pin.distanceKm.toLocaleString('en-US')} km away`);
 
         // After the last pin lands, zoom to fit everything
         if (i === mapData.playerPins.length - 1) {
@@ -945,7 +949,7 @@ function showLeaderboardScale(timelineData) {
   wrap.classList.remove('hidden');
 
   const { correctValue, unit, playerGuesses } = timelineData;
-  const fmt = v => unit ? `${v.toLocaleString()} ${unit}` : String(v);
+  const fmt = v => unit ? `${v.toLocaleString('en-US')} ${unit}` : String(v);
 
   // Calculate the visible axis range with a bit of padding on each side
   const allValues = [correctValue, ...playerGuesses.map(g => g.value)];
@@ -1128,7 +1132,9 @@ function showResultScreen(data) {
   compareEl.classList.add('hidden');
 
   if (data.type === 'slider' || data.type === 'timeline') {
-    const fmt = v => data.unit ? `${v.toLocaleString()} ${data.unit}` : v.toLocaleString();
+    const fmt = v => data.unit
+      ? `${v.toLocaleString('en-US')} ${data.unit}`
+      : (data.type === 'timeline' ? String(Math.round(v)) : v.toLocaleString('en-US'));
     const pct = data.accuracyPct;
 
     if (pct >= 95) {
@@ -1151,7 +1157,7 @@ function showResultScreen(data) {
     const u = data.unit ? ` ${data.unit}` : '';
     const diff = data.yourAnswer === data.correctValue
       ? 'Exact!'
-      : `Off by ${Math.abs(data.yourAnswer - data.correctValue).toLocaleString()}${u}`;
+      : `Off by ${data.type === 'timeline' ? String(Math.round(Math.abs(data.yourAnswer - data.correctValue))) : Math.abs(data.yourAnswer - data.correctValue).toLocaleString('en-US')}${u}`;
     compareEl.innerHTML = `
       <div class="compare-grid">
         <div class="compare-cell">
@@ -1202,7 +1208,7 @@ function showResultScreen(data) {
       <div class="compare-grid">
         <div class="compare-cell">
           <span class="compare-label">Distance</span>
-          <span class="compare-value">${km.toLocaleString()} km</span>
+          <span class="compare-value">${km.toLocaleString('en-US')} km</span>
           <span class="compare-diff">${tier}</span>
         </div>
         <div class="compare-cell compare-correct">

@@ -179,9 +179,12 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 
 **Leaderboard clarity improvements** — several fixes to make it immediately obvious why you got each score:
 - `formatRoundInfo` now shows "Correct · +10 pts" for MC/Rank mode (was wrongly showing "1st place" for everyone), and "1st fastest · +10 pts" for MC/Accuracy+Rank mode (was "1st place", hiding that speed is the tiebreaker).
-- Wrong/no-answer round-info rows now show in a muted colour (`lb-round-info-zero`) instead of green.
+- Wrong/no-answer round-info rows now show in a muted colour instead of green.
 - Gain badge now shows "+8 pts" instead of just "+8".
-- For MC/flag questions in Accuracy+Rank mode: "⚡ Fastest correct answer earns the most points" hint shown below the answer buttons, and the result screen's rank bonus row is labelled "Speed rank bonus" instead of the generic "Rank bonus".
+- For MC/flag questions in Accuracy+Rank mode: "⚡ Fastest correct answer earns the most points" hint shown below the answer buttons, and the result screen's rank bonus row is labelled "Speed rank bonus".
+- Rank-reason text (e.g. "1st fastest · +10 pts") moved to the **right column** (below the score), so points and reason sit together. Left column now shows only name + answer stat.
+- Sequence speed tiebreaker: when two players get the same number correct, the faster one ranks higher. Ties show "faster ⚡" in the rank reason instead of "most correct".
+- Year decimal bug fixed: `toLocaleString()` was using the OS locale, causing "1.945" in European locales. All numeric displays now use `'en-US'` or `String()` for bare year values.
 
 ---
 

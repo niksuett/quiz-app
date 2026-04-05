@@ -89,12 +89,13 @@ function generateGameId() {
 function buildLeaderboard(game) {
   return game.players
     .map(p => ({
-      nickname:    p.nickname,
-      score:       p.score,
-      roundPoints: p.roundPoints || 0,
-      roundRank:   p.roundRank   || null,
-      lastAnswer:  p.lastAnswer  || null,
-      stats:       p.stats       || null,
+      nickname:     p.nickname,
+      score:        p.score,
+      roundPoints:  p.roundPoints  || 0,
+      roundRank:    p.roundRank    || null,
+      lastAnswer:   p.lastAnswer   || null,
+      stats:        p.stats        || null,
+      speedTiebreak: p.speedTiebreak || false,
     }))
     .sort((a, b) => b.score - a.score);
 }
@@ -157,10 +158,20 @@ function applyRoundScores(game, question) {
       .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
 
   } else if (qType === 'sequence') {
-    // ── Sequence: rank by correctCount descending (most correct positions = best) ─
+    // ── Sequence: rank by correctCount desc; speed is tiebreaker when tied ────
     const answered = game.players
       .filter(p => p.lastAnswer && p.lastAnswer.type === 'sequence')
-      .sort((a, b) => b.lastAnswer.correctCount - a.lastAnswer.correctCount);
+      .sort((a, b) => {
+        const diff = b.lastAnswer.correctCount - a.lastAnswer.correctCount;
+        if (diff !== 0) return diff;
+        return (a.answerTime || 999) - (b.answerTime || 999); // faster = better on tie
+      });
+
+    // Mark speedTiebreak on players who shared a correctCount with at least one other
+    answered.forEach(p => {
+      const count = p.lastAnswer.correctCount;
+      p.speedTiebreak = answered.filter(q => q.lastAnswer.correctCount === count).length > 1;
+    });
 
     answered.forEach((p, rank) => {
       let pts;
@@ -583,7 +594,7 @@ function showLeaderboard(game) {
   const correctAnswer = q.type === 'sequence'
     ? q.items.map((item, i) => `${i + 1}. ${item}`).join(' → ')
     : (q.type === 'slider' || q.type === 'timeline')
-      ? (q.unit ? `${q.correct.toLocaleString()} ${q.unit}` : `${q.correct}`)
+      ? (q.unit ? `${q.correct.toLocaleString('en-US')} ${q.unit}` : `${q.correct}`)
       : q.type === 'map'
         ? q.locationName
         : q.answers[q.correct];

@@ -1079,17 +1079,16 @@ h3 {
 .lb-name-col { flex: 1; padding-left: 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .lb-name  { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-stat  { font-size: .72rem; color: var(--aged); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
-.lb-round-info {
-  font-size: .75rem;
+.lb-rank-reason {
+  font-size: .68rem;
   color: var(--correct);
   font-family: var(--font-cinzel);
   font-weight: 600;
   letter-spacing: .04em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: right;
 }
-.lb-round-info-zero { color: var(--aged); }
+.lb-rank-reason-zero { color: var(--aged); }
 
 /* ─── Correct-reveal tag + answer ────────────────────────────────────────── */
 .cr-tag {
