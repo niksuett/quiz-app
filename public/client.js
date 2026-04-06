@@ -256,19 +256,37 @@ function formatRoundInfo(entry, questionType) {
     // MC/flag: always ranked by speed
     label = rankStr ? `Correct · ${rankStr} fastest` : 'Correct';
   } else if (questionType === 'sequence') {
-    // Sequence: ranked by correctCount; speed breaks ties
-    label = rankStr
-      ? entry.speedTiebreak      ? `${rankStr} · faster ⚡`
-      : entry.speedTiebreakedOut ? `Tied · slower`
-      :                            `${rankStr} · most correct`
-      : null;
+    const allCorrect = entry.lastAnswer &&
+      entry.lastAnswer.correctCount === entry.lastAnswer.correctOrder?.length;
+    if (allCorrect) {
+      label = entry.speedTiebreak      ? `Correct · faster ⚡`
+            : entry.speedTiebreakedOut ? `Correct · slower`
+            :                            `Correct`;
+    } else {
+      label = rankStr
+        ? entry.speedTiebreak      ? `${rankStr} · faster ⚡`
+        : entry.speedTiebreakedOut ? `Tied · slower`
+        :                            `${rankStr} · most correct`
+        : null;
+    }
   } else {
     // Proximity (slider / timeline / map): ranked by closeness; speed breaks ties
-    label = rankStr
-      ? entry.speedTiebreak      ? `${rankStr} closest · faster ⚡`
-      : entry.speedTiebreakedOut ? `Tied · slower`
-      :                            `${rankStr} closest`
-      : null;
+    const isExact = entry.lastAnswer && (
+      questionType === 'map'
+        ? entry.lastAnswer.distanceKm === 0
+        : entry.lastAnswer.diff === 0
+    );
+    if (isExact) {
+      label = entry.speedTiebreak      ? `Correct · faster ⚡`
+            : entry.speedTiebreakedOut ? `Correct · slower`
+            :                            `Correct`;
+    } else {
+      label = rankStr
+        ? entry.speedTiebreak      ? `${rankStr} closest · faster ⚡`
+        : entry.speedTiebreakedOut ? `Tied · slower`
+        :                            `${rankStr} closest`
+        : null;
+    }
   }
 
   return label ? `${label} · +${pts} pts` : `+${pts} pts`;
