@@ -65,8 +65,8 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 
 - Rank points by position: 1st=10, 2nd=8, 3rd=6, 4th=4, 5th=2, 6th+=1
 - **MC/Flag:** ranked by answer speed (fastest correct = 1st); wrong = 0
-- **Proximity (slider, timeline, map):** ranked by closeness (lowest error/distance = 1st)
-- **Sequence:** ranked by correctCount descending; speed is tiebreaker
+- **Proximity (slider, timeline, map):** ranked by closeness (lowest error/distance = 1st); speed is tiebreaker on equal closeness
+- **Sequence:** ranked by correctCount descending; speed is tiebreaker on equal count
 - Players who didn't answer = 0 pts
 
 ### Result screen behaviour
@@ -77,7 +77,7 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 
 ### Leaderboard rank-reason display
 - **MC:** "Correct · 1st fastest · +10 pts" (or 2nd, 3rd, etc.)
-- **Proximity:** "1st closest · +10 pts"
+- **Proximity:** "1st closest · +10 pts" (or "1st closest · faster ⚡ · +10 pts" when speed broke a tie)
 - **Sequence:** "1st · most correct · +10 pts" (or "faster ⚡" when speed broke a tie)
 
 ## Timer limits per question type
@@ -174,11 +174,18 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - **TV mode**: host device shows questions and leaderboard on a shared screen; players answer on their phones. Behaviour is the existing host view (read-only answer display, answer count).
 
 **Unified scoring mode (Rank + Speed)** — removed the two-mode scoring system (Rank / Accuracy+Rank). Single mode now:
-- MC/flag questions ranked by answer speed (fastest correct = 1st, 10 pts; 2nd = 8 pts, etc.)
-- Proximity and sequence questions unchanged (ranked by closeness / correctCount)
+- MC/flag: ranked by answer speed (fastest correct = 1st)
+- Proximity (slider/timeline/map): ranked by closeness; speed is tiebreaker on equal values
+- Sequence: ranked by correctCount; speed is tiebreaker on equal count
 - Config screen no longer has a scoring selector
-- Result screen shows "Speed rank — see leaderboard" for MC correct (rank deferred to leaderboard time)
-- Leaderboard shows "Correct · 1st fastest · +10 pts" for MC, "1st closest · +10 pts" for proximity
+- Result screen shows "Speed rank — see leaderboard" / "Rank points — see leaderboard" (rank deferred)
+- Leaderboard shows rank reason for all types; "faster ⚡" when speed broke a tie
+
+**Host pause button** — host can pause mid-question or mid-leaderboard:
+- During questions: timer bar freezes and shows ⏸ for all players; resumes from exact remaining time
+- During leaderboard (autoplay on): pauses the auto-advance countdown; leaderboard stays visible
+- Two separate buttons — one on the question screen, one on the leaderboard screen
+- Only shown to the host (tracked via `amHost` flag, separate from `myRole`)
 
 **Leaderboard clarity improvements** — several fixes to make it immediately obvious why you got each score:
 - `formatRoundInfo` now shows "Correct · +10 pts" for MC/Rank mode (was wrongly showing "1st place" for everyone), and "1st fastest · +10 pts" for MC/Accuracy+Rank mode (was "1st place", hiding that speed is the tiebreaker).

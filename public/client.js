@@ -9,6 +9,7 @@ let myRole          = null;
 let myNickname      = null;
 let gameMode        = 'mobile'; // 'mobile' | 'tv'
 let amHost          = false;    // true if this socket created the game (never changes to false)
+let gameAutoplay    = true;     // whether autoplay is on (set when game is created)
 let timerInterval      = null;
 let timerTotal         = 0;     // total seconds for current question (for proportional bar on resume)
 let gamePaused         = false; // client-side pause state
@@ -252,15 +253,18 @@ function formatRoundInfo(entry, questionType) {
 
   let label;
   if (isMC) {
-    // MC/flag: ranked by answer speed — show "Correct · 1st fastest · +N pts"
+    // MC/flag: always ranked by speed
     label = rankStr ? `Correct · ${rankStr} fastest` : 'Correct';
   } else if (questionType === 'sequence') {
+    // Sequence: ranked by correctCount; speed breaks ties
     label = rankStr
       ? (entry.speedTiebreak ? `${rankStr} · faster ⚡` : `${rankStr} · most correct`)
       : null;
   } else {
-    // Proximity (slider / timeline / map)
-    label = rankStr ? `${rankStr} closest` : null;
+    // Proximity (slider / timeline / map): ranked by closeness; speed breaks ties
+    label = rankStr
+      ? (entry.speedTiebreak ? `${rankStr} closest · faster ⚡` : `${rankStr} closest`)
+      : null;
   }
 
   return label ? `${label} · +${pts} pts` : `+${pts} pts`;
@@ -439,9 +443,10 @@ function stopTimer() {
 
 socket.on('create-error', (msg) => showError('config-error', msg));
 
-socket.on('game-created', ({ gameId, gameMode: mode }) => {
-  amHost   = true;
-  gameMode = mode || 'mobile';
+socket.on('game-created', ({ gameId, gameMode: mode, autoplay }) => {
+  amHost       = true;
+  gameMode     = mode || 'mobile';
+  gameAutoplay = autoplay !== false;
   document.getElementById('host-game-id').textContent = gameId;
   document.getElementById('player-count').textContent = '0';
   document.getElementById('player-list').innerHTML    = '';
@@ -678,14 +683,13 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
   const pill = document.getElementById('speed-bonus-display');
   if (pill) pill.classList.add('hidden');
 
-  // Pause button: only the host sees it
+  // Pause button: only the host sees it; hide leaderboard button, show question button
   gamePaused = false;
-  const pauseBtn = document.getElementById('pause-btn');
-  if (pauseBtn) {
-    pauseBtn.textContent = '⏸ Pause';
-    pauseBtn.classList.remove('paused');
-    pauseBtn.classList.toggle('hidden', !amHost);
-  }
+  setPauseBtns('⏸ Pause', false);
+  const pauseBtn   = document.getElementById('pause-btn');
+  const pauseBtnLb = document.getElementById('pause-btn-lb');
+  if (pauseBtn)   pauseBtn.classList.toggle('hidden', !amHost);
+  if (pauseBtnLb) pauseBtnLb.classList.add('hidden');
 });
 
 // ── Answer progress (host only) ───────────────────────────────────────────────
@@ -694,25 +698,37 @@ socket.on('answer-progress', ({ answered, total }) => {
 });
 
 // ── Pause / Resume ────────────────────────────────────────────────────────────
-socket.on('game-paused', ({ remainingMs }) => {
+socket.on('game-paused', () => {
   gamePaused = true;
-  clearInterval(timerInterval);
-  // Show ⏸ on the timer bar
-  const timerText = document.getElementById('timer-text');
-  if (timerText) { timerText.textContent = '⏸'; timerText.classList.remove('timer-urgent'); }
-  const fill = document.getElementById('timer-fill');
-  if (fill) fill.style.backgroundColor = 'var(--aged)';
-  // Update pause button for the host
-  const pauseBtn = document.getElementById('pause-btn');
-  if (pauseBtn) { pauseBtn.textContent = '▶ Resume'; pauseBtn.classList.add('paused'); }
+  // Freeze the countdown timer only on the question screen
+  if (document.getElementById('screen-question').classList.contains('active')) {
+    clearInterval(timerInterval);
+    const timerText = document.getElementById('timer-text');
+    if (timerText) { timerText.textContent = '⏸'; timerText.classList.remove('timer-urgent'); }
+    const fill = document.getElementById('timer-fill');
+    if (fill) fill.style.backgroundColor = 'var(--aged)';
+  }
+  setPauseBtns('▶ Resume', true);
 });
 
 socket.on('game-resumed', ({ remainingMs }) => {
   gamePaused = false;
-  const pauseBtn = document.getElementById('pause-btn');
-  if (pauseBtn) { pauseBtn.textContent = '⏸ Pause'; pauseBtn.classList.remove('paused'); }
-  resumeTimer(remainingMs);
+  setPauseBtns('⏸ Pause', false);
+  // Only restart the visual timer if currently on the question screen
+  if (document.getElementById('screen-question').classList.contains('active')) {
+    resumeTimer(remainingMs);
+  }
 });
+
+// Updates the text and paused state of both pause buttons (question + leaderboard screens).
+function setPauseBtns(text, paused) {
+  ['pause-btn', 'pause-btn-lb'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.textContent = text;
+    btn.classList.toggle('paused', paused);
+  });
+}
 
 // ── Slider helper functions ───────────────────────────────────────────────────
 
@@ -1337,9 +1353,12 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, quest
   gamePaused = false;
   clearTimeout(resultTimeout);
   soundLeaderboard();
-  // Hide pause button — game has moved past the question phase
-  const pauseBtn = document.getElementById('pause-btn');
-  if (pauseBtn) pauseBtn.classList.add('hidden');
+  // Switch pause button from question screen to leaderboard screen
+  setPauseBtns('⏸ Pause', false);
+  const pauseBtn   = document.getElementById('pause-btn');
+  const pauseBtnLb = document.getElementById('pause-btn-lb');
+  if (pauseBtn)   pauseBtn.classList.add('hidden');
+  if (pauseBtnLb) pauseBtnLb.classList.toggle('hidden', !amHost || !gameAutoplay);
   if (leafletMap) { leafletMap.remove(); leafletMap = null; mapPin = null; }
 
   // Reset all special reveal sections first
@@ -1398,8 +1417,13 @@ socket.on('waiting-for-host', () => {
 // ── Game over ─────────────────────────────────────────────────────────────────
 socket.on('game-over', ({ leaderboard }) => {
   stopTimer();
+  gamePaused = false;
   clearTimeout(resultTimeout);
   soundGameOver();
+  ['pause-btn', 'pause-btn-lb'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.add('hidden');
+  });
   if (leafletMap)     { leafletMap.remove();     leafletMap = null;     mapPin = null; }
   if (leaderboardMap) { leaderboardMap.remove(); leaderboardMap = null; }
 

@@ -100,10 +100,19 @@ function applyRoundScores(game, question) {
   const qType = question.type || 'text';
 
   if (qType === 'map') {
-    // ── Map: rank by distance ascending (closest = best) ──────────────────────
+    // ── Map: rank by distance ascending; speed is tiebreaker on equal distance ─
     const answered = game.players
       .filter(p => p.mapAnswer)
-      .sort((a, b) => a.mapAnswer.distanceKm - b.mapAnswer.distanceKm);
+      .sort((a, b) => {
+        const diff = a.mapAnswer.distanceKm - b.mapAnswer.distanceKm;
+        if (diff !== 0) return diff;
+        return (a.answerTime || 999) - (b.answerTime || 999);
+      });
+
+    answered.forEach((p, i) => {
+      p.speedTiebreak = i + 1 < answered.length &&
+        answered[i + 1].mapAnswer.distanceKm === p.mapAnswer.distanceKm;
+    });
 
     answered.forEach((p, rank) => {
       const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
@@ -117,10 +126,19 @@ function applyRoundScores(game, question) {
     game.players.filter(p => !p.mapAnswer).forEach(p => { p.roundPoints = 0; p.roundRank = null; });
 
   } else if (qType === 'slider' || qType === 'timeline') {
-    // ── Proximity: rank by absolute error ascending (closest = best) ──────────
+    // ── Proximity: rank by absolute error ascending; speed is tiebreaker ──────
     const answered = game.players
       .filter(p => p.lastAnswer && p.lastAnswer.type === qType && p.lastAnswer.diff !== undefined)
-      .sort((a, b) => a.lastAnswer.diff - b.lastAnswer.diff);
+      .sort((a, b) => {
+        const diff = a.lastAnswer.diff - b.lastAnswer.diff;
+        if (diff !== 0) return diff;
+        return (a.answerTime || 999) - (b.answerTime || 999);
+      });
+
+    answered.forEach((p, i) => {
+      p.speedTiebreak = i + 1 < answered.length &&
+        answered[i + 1].lastAnswer.diff === p.lastAnswer.diff;
+    });
 
     answered.forEach((p, rank) => {
       const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
@@ -233,7 +251,7 @@ io.on('connection', (socket) => {
     socket.role   = 'host';
     socket.join(gameId);
 
-    socket.emit('game-created', { gameId, gameMode });
+    socket.emit('game-created', { gameId, gameMode, autoplay });
     console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | mode: ${gameMode}`);
   });
 
@@ -429,7 +447,7 @@ io.on('connection', (socket) => {
   // ── HOST pauses / resumes ──────────────────────────────────────────────────
   socket.on('pause-game', () => {
     const game = games[socket.gameId];
-    if (!game || socket.role !== 'host' || game.state !== 'question' || game.isPaused) return;
+    if (!game || socket.role !== 'host' || (game.state !== 'question' && game.state !== 'leaderboard') || game.isPaused || !game.timer) return;
 
     game.pausedRemainingMs = Math.max(1000, game.timerEndAt - Date.now());
     clearTimeout(game.timer);
@@ -596,6 +614,7 @@ function showLeaderboard(game) {
                          : LEADERBOARD_PAUSE;
 
   if (game.autoplay) {
+    game.timerEndAt = Date.now() + leaderboardPause * 1000;
     game.timer = setTimeout(() => sendNextQuestion(game), leaderboardPause * 1000);
   } else {
     io.to(game.hostId).emit('waiting-for-host');
