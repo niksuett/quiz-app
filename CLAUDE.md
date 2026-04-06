@@ -73,7 +73,7 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - **MC correct:** shows "Speed rank — see leaderboard" (can't know rank until all answers in)
 - **MC wrong:** shows correct answer, 0 pts
 - **Proximity / sequence:** shows guess vs correct + "Rank points — see leaderboard"
-- The `lb-gain` badge on the leaderboard shows the total round points earned
+- Points earned per round are shown in the rank-reason line below the score (e.g. "Correct · 1st fastest · +10 pts")
 
 ### Leaderboard rank-reason display
 - **MC:** "Correct · 1st fastest · +10 pts" (or 2nd, 3rd, etc.)
@@ -103,7 +103,7 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
   - Map: km distance, 5-tier label (Pinpoint / Very close / In the area / Not quite / Way off), rank pending
 - Leaderboard:
   - Per-player answer stat line (✓/✗ answer text for MC; guess + error for sliders; km away for map)
-  - Animated score reveal: previous score → +gained badge pops in → counts up to new total
+  - Animated score reveal: previous score counts up to new total shortly after the row slides in
   - Current player's row highlighted with lapis border + "← you" label
   - Gold/silver/bronze medal styling for top 3
 - Map leaderboard reveal: gold star at correct location, player pins animate in sequentially; auto-fit bounds, maxZoom 19
@@ -111,7 +111,7 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Autoplay off mode: host sees "Next Question →" button
 - Final leaderboard + Play Again button
 - Mobile-friendly layout
-- Animations: screen fade-in, answer button stagger, correct flash, wrong shake, timer urgency pulse, score count-up, gain badge pop
+- Animations: screen fade-in, answer button stagger, correct flash, wrong shake, timer urgency pulse, score count-up
 - Sound effects (Web Audio API, no files): question chime, correct/wrong tones, countdown ticks (≤5s), leaderboard fanfare, game-over melody
 - Question editor at `/admin.html`: category tabs, add/edit/delete all question types, saves to `questions.json` live
 - Historical photo support: any question can include an optional `imageUrl` field; photo shown above question text

@@ -138,17 +138,12 @@ function renderLeaderboard(listEl, entries, questionType) {
     nameCol.className = 'lb-name-col';
     nameCol.append(nameSpan, statSpan);
 
-    // Score area: gain badge → counts up to total → rank reason below
+    // Score area: counts up to total → rank reason below
     const scoreWrap = document.createElement('div');
     scoreWrap.className = 'lb-score-wrap';
 
-    const gainSpan = document.createElement('span');
-    gainSpan.className   = 'lb-gain';
-    gainSpan.textContent = entry.roundPoints > 0 ? `+${entry.roundPoints} pts` : '';
-
     const scoreSpan = document.createElement('span');
     scoreSpan.className   = 'lb-score';
-
     const prev = (entry.score || 0) - (entry.roundPoints || 0);
     scoreSpan.textContent = prev.toLocaleString('en-US');
 
@@ -157,17 +152,13 @@ function renderLeaderboard(listEl, entries, questionType) {
     rankReasonSpan.className   = 'lb-rank-reason' + (entry.roundPoints > 0 ? '' : ' lb-rank-reason-zero');
     rankReasonSpan.textContent = formatRoundInfo(entry, questionType);
 
-    scoreWrap.append(gainSpan, scoreSpan, rankReasonSpan);
+    scoreWrap.append(scoreSpan, rankReasonSpan);
     li.append(nameCol, scoreWrap);
     listEl.append(li);
 
     const slideDelay = i * 90 + 300;
     if (entry.roundPoints > 0) {
-      setTimeout(() => gainSpan.classList.add('lb-gain-pop'), slideDelay + 400);
-      setTimeout(() => {
-        gainSpan.classList.add('lb-gain-fade');
-        animateCount(scoreSpan, entry.score);
-      }, slideDelay + 1100);
+      setTimeout(() => animateCount(scoreSpan, entry.score), slideDelay + 400);
     }
   });
 }

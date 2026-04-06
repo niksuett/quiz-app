@@ -1138,23 +1138,6 @@ h3 {
   color: var(--gold);
   font-variant-numeric: tabular-nums;
 }
-.lb-gain {
-  font-family: var(--font-cinzel);
-  font-size: .68rem;
-  font-weight: 700;
-  color: var(--correct);
-  opacity: 0;
-  transition: opacity .2s;
-  font-variant-numeric: tabular-nums;
-}
-.lb-gain-pop  { opacity: 1; animation: gainPop .35s cubic-bezier(.18,.89,.32,1.28); }
-.lb-gain-fade { opacity: 0; transition: opacity .4s; }
-
-@keyframes gainPop {
-  0%   { transform: translateY(4px) scale(.85); opacity: 0; }
-  60%  { transform: translateY(-2px) scale(1.08); opacity: 1; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
-}
 
 .leaderboard-list li.me {
   border-left: 3px solid var(--lapis);
