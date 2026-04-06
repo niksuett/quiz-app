@@ -138,21 +138,6 @@
         </div>
       </div>
 
-      <!-- Scoring System -->
-      <div class="config-section">
-        <h3>Scoring</h3>
-        <div class="scoring-selector" id="scoring-selector">
-          <button class="scoring-btn active" data-scoring="rank">
-            <span class="scoring-name">Rank</span>
-            <span class="scoring-desc">Closest answer wins most · Everyone correct gets equal points · Max 10 pts</span>
-          </button>
-          <button class="scoring-btn" data-scoring="accuracy-rank">
-            <span class="scoring-name">Accuracy + Rank</span>
-            <span class="scoring-desc">Points for how close you were · Rank bonus on top · Max 10 pts</span>
-          </button>
-        </div>
-      </div>
-
       <!-- Display Mode -->
       <div class="config-section">
         <h3>Display Mode</h3>
@@ -280,26 +265,7 @@
       </div>
       <div class="result-right">
         <!-- Score breakdown — shown for every answered question -->
-        <div id="score-breakdown" class="score-breakdown hidden">
-          <div class="score-row">
-            <span class="score-label" id="score-base-label">Base score</span>
-            <span class="score-value" id="score-base-pts">6</span>
-          </div>
-          <div class="score-row" id="score-speed-row">
-            <span class="score-label" id="score-speed-label">Rank bonus</span>
-            <span class="score-value score-speed" id="score-speed-pts">+ on leaderboard</span>
-          </div>
-          <div class="score-divider"></div>
-          <div class="score-row score-row-total">
-            <span class="score-label">So far</span>
-            <span class="score-value score-total" id="score-total-pts">6+</span>
-          </div>
-        </div>
-
-        <!-- Option A correct MC: flat points (no breakdown) -->
-        <p id="score-flat" class="score-flat hidden">10 pts</p>
-
-        <!-- Option A proximity: rank pending -->
+        <!-- Rank pending: shown for all correct answers (points decided at leaderboard time) -->
         <p id="score-pending" class="score-pending hidden">Rank points — see leaderboard</p>
 
         <!-- Wrong answers -->

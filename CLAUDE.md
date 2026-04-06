@@ -61,28 +61,24 @@ quiz-app/
 
 ## Scoring rules
 
-Two selectable systems — host picks at game setup. Scoring is **deferred**: points are calculated server-side after all answers are in (at leaderboard time), not immediately on answer submission.
+Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are calculated server-side after all answers are in (at leaderboard time), not immediately on answer submission.
 
-### Option A — Rank (default)
 - Rank points by position: 1st=10, 2nd=8, 3rd=6, 4th=4, 5th=2, 6th+=1
-- **MC/Flag:** all correct players get flat 10 pts (no speed differentiation); wrong = 0
+- **MC/Flag:** ranked by answer speed (fastest correct = 1st); wrong = 0
 - **Proximity (slider, timeline, map):** ranked by closeness (lowest error/distance = 1st)
-- **Sequence:** ranked by correctCount descending (most positions correct = 1st)
+- **Sequence:** ranked by correctCount descending; speed is tiebreaker
 - Players who didn't answer = 0 pts
 
-### Option B — Accuracy + Rank
-- Accuracy score 0–6 pts + rank bonus 0–4 pts = max 10 pts per question
-- **MC/Flag:** correct = 6 pts base + rank bonus by speed (1st fastest=+4, 2nd=+3, 3rd=+2, 4th=+1); wrong = 0
-- **Proximity:** accuracy score via `round(6 × accuracyFraction)` + rank bonus by closeness
-  - Slider/timeline: `accuracyFraction = max(0, 1 − error/(range×0.5))`
-  - Map: `accuracyFraction = exp(−(dist/50)^0.6)` stretched exponential
-- **Sequence:** `accuracyFraction = correctCount / 4`; rank bonus by rank among players
-
 ### Result screen behaviour
-- **Option A, MC correct:** shows flat "10 pts" immediately
-- **Option A, proximity:** shows accuracy label ("150 km away") + "Rank points — see leaderboard"
-- **Option B:** shows accuracy pts immediately + "Rank bonus on leaderboard"
-- The `lb-gain` badge on the leaderboard always shows the total round points earned
+- **MC correct:** shows "Speed rank — see leaderboard" (can't know rank until all answers in)
+- **MC wrong:** shows correct answer, 0 pts
+- **Proximity / sequence:** shows guess vs correct + "Rank points — see leaderboard"
+- The `lb-gain` badge on the leaderboard shows the total round points earned
+
+### Leaderboard rank-reason display
+- **MC:** "Correct · 1st fastest · +10 pts" (or 2nd, 3rd, etc.)
+- **Proximity:** "1st closest · +10 pts"
+- **Sequence:** "1st · most correct · +10 pts" (or "faster ⚡" when speed broke a tie)
 
 ## Timer limits per question type
 - MC / Flags: **15 seconds**
@@ -96,15 +92,15 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 
 ## What's built
 - Home screen with animated globe SVG (two-column: ink-dark left / parchment right)
-- Host config screen: round count, category selection (11 categories), autoplay toggle, scoring system selector
+- Host config screen: round count, category selection (11 categories), autoplay toggle, display mode selector (Mobile/TV)
 - 6-character Game ID; players join by entering ID + nickname
 - Host lobby: live player list
 - Per-question-type timer limits (MC/flag=15s, estimation/timeline=20s, map=35s)
 - Answer result screen: two-column layout (icon + heading left; score right)
-  - MC correct: flat pts shown immediately (Option A) or accuracy base + "rank bonus on leaderboard" (Option B)
+  - MC correct: "Speed rank — see leaderboard" (rank deferred until all answers in)
   - MC wrong: correct answer shown, 0 pts
-  - Slider/timeline: guess vs correct, accuracy % label, pts (Option B) or "rank pending" (Option A)
-  - Map: km distance, 5-tier label (Pinpoint / Very close / In the area / Not quite / Way off), same pts logic
+  - Slider/timeline: guess vs correct, accuracy % label, "Rank points — see leaderboard"
+  - Map: km distance, 5-tier label (Pinpoint / Very close / In the area / Not quite / Way off), rank pending
 - Leaderboard:
   - Per-player answer stat line (✓/✗ answer text for MC; guess + error for sliders; km away for map)
   - Animated score reveal: previous score → +gained badge pops in → counts up to new total
@@ -176,6 +172,13 @@ Two selectable systems — host picks at game setup. Scoring is **deferred**: po
 **TV mode and Mobile mode** — host picks a display mode on the config screen:
 - **Mobile mode** (default): host enters their own nickname and joins as a regular player. Server registers the host in `game.players`; `myRole` is set to `'player'` client-side so the host sees answer controls, result screens, and a highlighted leaderboard row. The host socket still receives `waiting-for-host` for the "Next Question →" button.
 - **TV mode**: host device shows questions and leaderboard on a shared screen; players answer on their phones. Behaviour is the existing host view (read-only answer display, answer count).
+
+**Unified scoring mode (Rank + Speed)** — removed the two-mode scoring system (Rank / Accuracy+Rank). Single mode now:
+- MC/flag questions ranked by answer speed (fastest correct = 1st, 10 pts; 2nd = 8 pts, etc.)
+- Proximity and sequence questions unchanged (ranked by closeness / correctCount)
+- Config screen no longer has a scoring selector
+- Result screen shows "Speed rank — see leaderboard" for MC correct (rank deferred to leaderboard time)
+- Leaderboard shows "Correct · 1st fastest · +10 pts" for MC, "1st closest · +10 pts" for proximity
 
 **Leaderboard clarity improvements** — several fixes to make it immediately obvious why you got each score:
 - `formatRoundInfo` now shows "Correct · +10 pts" for MC/Rank mode (was wrongly showing "1st place" for everyone), and "1st fastest · +10 pts" for MC/Accuracy+Rank mode (was "1st place", hiding that speed is the tiebreaker).

@@ -62,19 +62,12 @@ const LEADERBOARD_PAUSE = 5; // seconds leaderboard auto-advances (for MC/flag)
 
 // ── Scoring constants ─────────────────────────────────────────────────────────
 //
-// Option A — "Rank": pure rank-based
-//   MC/Flag  : correct = RANK_POINTS[0] flat (everyone correct = same), wrong = 0
-//   Proximity: ranked by closeness, points by position in RANK_POINTS
-//
-// Option B — "Accuracy + Rank": accuracy base + rank bonus
-//   MC/Flag  : correct = ACC_BASE_MAX + speed-rank bonus (ACC_RANK_BONUS[rank]), wrong = 0
-//   Proximity: accuracy score (0–ACC_BASE_MAX) + closeness-rank bonus (ACC_RANK_BONUS[rank])
-//
-// Both options have a max of ACC_BASE_MAX + ACC_RANK_BONUS[0] = 10 pts per question.
+// Single scoring mode: Rank + Speed
+//   MC/Flag  : ranked by answer speed (fastest correct = 1st), wrong = 0
+//   Proximity: ranked by closeness (slider/timeline/map) or correctCount (sequence)
+//   Points by rank position: 1st=10, 2nd=8, 3rd=6, 4th=4, 5th=2, 6th+=1
 
-const RANK_POINTS    = [10, 8, 6, 4, 2, 1]; // by rank position (0 = 1st place)
-const ACC_BASE_MAX   = 6;                    // max accuracy points in Option B
-const ACC_RANK_BONUS = [4, 3, 2, 1, 0];     // rank bonus by position (0 = 1st place)
+const RANK_POINTS = [10, 8, 6, 4, 2, 1]; // by rank position (0-indexed: 0 = 1st place)
 
 // ── Active games ──────────────────────────────────────────────────────────────
 const games = {};
@@ -104,8 +97,7 @@ function buildLeaderboard(game) {
 // Calculates roundPoints for every player and adds them to player.score.
 // Must be called AFTER all answers are stored on player objects.
 function applyRoundScores(game, question) {
-  const qType  = question.type || 'text';
-  const system = game.scoringSystem; // 'rank' | 'accuracy-rank'
+  const qType = question.type || 'text';
 
   if (qType === 'map') {
     // ── Map: rank by distance ascending (closest = best) ──────────────────────
@@ -114,16 +106,9 @@ function applyRoundScores(game, question) {
       .sort((a, b) => a.mapAnswer.distanceKm - b.mapAnswer.distanceKm);
 
     answered.forEach((p, rank) => {
-      let pts;
-      if (system === 'rank') {
-        pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      } else {
-        const accPts = Math.round(ACC_BASE_MAX * (p.accuracyRaw || 0));
-        const bonus  = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
-        pts = accPts + bonus;
-      }
+      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
       p.roundPoints = pts;
-      p.roundRank   = rank + 1; // 1-based
+      p.roundRank   = rank + 1;
       p.score      += pts;
       p.stats.roundsAnswered++;
       if (rank === 0) p.stats.roundsFirst++;
@@ -138,14 +123,7 @@ function applyRoundScores(game, question) {
       .sort((a, b) => a.lastAnswer.diff - b.lastAnswer.diff);
 
     answered.forEach((p, rank) => {
-      let pts;
-      if (system === 'rank') {
-        pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      } else {
-        const accPts = Math.round(ACC_BASE_MAX * (p.accuracyRaw || 0));
-        const bonus  = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
-        pts = accPts + bonus;
-      }
+      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
       p.roundPoints = pts;
       p.roundRank   = rank + 1;
       p.score      += pts;
@@ -164,25 +142,16 @@ function applyRoundScores(game, question) {
       .sort((a, b) => {
         const diff = b.lastAnswer.correctCount - a.lastAnswer.correctCount;
         if (diff !== 0) return diff;
-        return (a.answerTime || 999) - (b.answerTime || 999); // faster = better on tie
+        return (a.answerTime || 999) - (b.answerTime || 999);
       });
 
-    // Mark speedTiebreak only for the faster player in each tied correctCount group:
-    // if this player ranks immediately above someone with the same count, speed decided it.
     answered.forEach((p, i) => {
       p.speedTiebreak = i + 1 < answered.length &&
         answered[i + 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
     });
 
     answered.forEach((p, rank) => {
-      let pts;
-      if (system === 'rank') {
-        pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      } else {
-        const accPts = Math.round(ACC_BASE_MAX * (p.accuracyRaw || 0));
-        const bonus  = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
-        pts = accPts + bonus;
-      }
+      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
       p.roundPoints = pts;
       p.roundRank   = rank + 1;
       p.score      += pts;
@@ -195,38 +164,23 @@ function applyRoundScores(game, question) {
       .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
 
   } else {
-    // ── MC / Flag ─────────────────────────────────────────────────────────────
+    // ── MC / Flag: rank by answer speed (fastest correct = most points) ───────
     const correct = game.players
       .filter(p => p.lastAnswer && p.lastAnswer.isCorrect)
-      .sort((a, b) => (a.answerTime || 999) - (b.answerTime || 999)); // fastest first
-    const wrong   = game.players.filter(p => !p.lastAnswer || !p.lastAnswer.isCorrect);
+      .sort((a, b) => (a.answerTime || 999) - (b.answerTime || 999));
+    const wrong = game.players.filter(p => !p.lastAnswer || !p.lastAnswer.isCorrect);
 
-    if (system === 'rank') {
-      // All correct players get the same flat points — no speed differentiation
-      correct.forEach(p => {
-        p.roundPoints = RANK_POINTS[0];
-        p.roundRank   = 1; // everyone correct is equally "1st" in pure rank mode
-        p.score      += RANK_POINTS[0];
-        p.stats.roundsAnswered++;
-        p.stats.roundsFirst++;
-        if (RANK_POINTS[0] > p.stats.bestRound) p.stats.bestRound = RANK_POINTS[0];
-      });
-    } else {
-      // Accuracy-rank: correct = ACC_BASE_MAX base + speed-rank bonus
-      correct.forEach((p, rank) => {
-        const bonus = ACC_RANK_BONUS[Math.min(rank, ACC_RANK_BONUS.length - 1)] ?? 0;
-        const pts   = ACC_BASE_MAX + bonus;
-        p.roundPoints = pts;
-        p.roundRank   = rank + 1;
-        p.score      += pts;
-        p.stats.roundsAnswered++;
-        if (rank === 0) p.stats.roundsFirst++;
-        if (pts > p.stats.bestRound) p.stats.bestRound = pts;
-      });
-    }
+    correct.forEach((p, rank) => {
+      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
+      p.roundPoints = pts;
+      p.roundRank   = rank + 1;
+      p.score      += pts;
+      p.stats.roundsAnswered++;
+      if (rank === 0) p.stats.roundsFirst++;
+      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
+    });
     wrong.forEach(p => {
       p.roundPoints = 0; p.roundRank = null;
-      // Count as answered if they submitted a wrong answer (vs. not answering at all)
       if (p.lastAnswer) p.stats.roundsAnswered++;
     });
   }
@@ -237,12 +191,11 @@ io.on('connection', (socket) => {
   console.log('Browser connected:', socket.id);
 
   // ── HOST creates a game ────────────────────────────────────────────────────
-  socket.on('create-game', ({ rounds, categories, autoplay, scoringSystem, gameMode } = {}) => {
-    rounds        = rounds        || '5';
-    categories    = categories    || ['facts'];
-    autoplay      = autoplay      !== false; // default true
-    scoringSystem = scoringSystem || 'rank'; // 'rank' | 'accuracy-rank'
-    gameMode      = (gameMode === 'tv') ? 'tv' : 'mobile'; // 'mobile' | 'tv'
+  socket.on('create-game', ({ rounds, categories, autoplay, gameMode } = {}) => {
+    rounds     = rounds     || '5';
+    categories = categories || ['facts'];
+    autoplay   = autoplay   !== false; // default true
+    gameMode   = (gameMode === 'tv') ? 'tv' : 'mobile'; // 'mobile' | 'tv'
 
     let gameId;
     do { gameId = generateGameId(); } while (games[gameId]);
@@ -271,7 +224,6 @@ io.on('connection', (socket) => {
       currentIndex:      -1,
       state:             'lobby',
       autoplay,
-      scoringSystem,
       gameMode,
       timer:             null,
       questionStartTime: null,
@@ -282,7 +234,7 @@ io.on('connection', (socket) => {
     socket.join(gameId);
 
     socket.emit('game-created', { gameId, gameMode });
-    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | scoring: ${scoringSystem} | mode: ${gameMode}`);
+    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | mode: ${gameMode}`);
   });
 
   // ── PLAYER joins ───────────────────────────────────────────────────────────
@@ -363,7 +315,7 @@ io.on('connection', (socket) => {
     const elapsed  = (Date.now() - game.questionStartTime) / 1000;
     const qType    = question.type || 'text';
 
-    player.answerTime = elapsed; // needed for MC speed-rank in accuracy-rank mode
+    player.answerTime = elapsed;
 
     if (qType === 'slider' || qType === 'timeline') {
       const range      = question.max - question.min;
@@ -379,20 +331,13 @@ io.on('connection', (socket) => {
         unit:    question.unit || '',
       };
 
-      const accuracyPts = game.scoringSystem === 'accuracy-rank'
-        ? Math.round(ACC_BASE_MAX * accuracyRaw)
-        : null; // Option A: rank determines all points, unknown until leaderboard
-
       socket.emit('answer-result', {
-        type:          qType,
-        soundCorrect:  accuracyRaw > 0,
-        scoringSystem: game.scoringSystem,
-        accuracyPct:   Math.round(accuracyRaw * 100),
-        yourAnswer:    answerValue,
-        correctValue:  question.correct,
-        unit:          question.unit,
-        accuracyPts,               // null for Option A; 0–6 for Option B
-        rankBonusPending: true,    // always: rank bonus added on leaderboard
+        type:        qType,
+        soundCorrect: accuracyRaw > 0,
+        accuracyPct:  Math.round(accuracyRaw * 100),
+        yourAnswer:   answerValue,
+        correctValue: question.correct,
+        unit:         question.unit,
       });
 
     } else if (qType === 'map') {
@@ -403,22 +348,14 @@ io.on('connection', (socket) => {
       player.mapAnswer   = { lat: answerLat, lng: answerLng, distanceKm: Math.round(dist) };
       player.lastAnswer  = { type: 'map', distanceKm: Math.round(dist) };
 
-      const accuracyPts = game.scoringSystem === 'accuracy-rank'
-        ? Math.round(ACC_BASE_MAX * accuracyRaw)
-        : null;
-
       socket.emit('answer-result', {
-        type:          'map',
-        soundCorrect:  dist < 2000,
-        scoringSystem: game.scoringSystem,
-        distanceKm:    Math.round(dist),
-        locationName:  question.locationName,
-        accuracyPts,
-        rankBonusPending: true,
+        type:        'map',
+        soundCorrect: dist < 2000,
+        distanceKm:   Math.round(dist),
+        locationName: question.locationName,
       });
 
     } else if (qType === 'sequence') {
-      // Sequence — compare submitted order against correct order by position
       const correctOrder  = question.items;
       const playerOrder   = answerSequence || [];
       const correctCount  = playerOrder.filter((item, i) => item === correctOrder[i]).length;
@@ -432,20 +369,13 @@ io.on('connection', (socket) => {
         correctOrder,
       };
 
-      const accuracyPts = game.scoringSystem === 'accuracy-rank'
-        ? Math.round(ACC_BASE_MAX * accuracyRaw)
-        : null;
-
       socket.emit('answer-result', {
-        type:             'sequence',
-        soundCorrect:     correctCount >= Math.ceil(correctOrder.length / 2),
-        scoringSystem:    game.scoringSystem,
+        type:         'sequence',
+        soundCorrect: correctCount >= Math.ceil(correctOrder.length / 2),
         correctCount,
-        totalItems:       correctOrder.length,
+        totalItems:   correctOrder.length,
         correctOrder,
         playerOrder,
-        accuracyPts,
-        rankBonusPending: true,
       });
 
     } else {
@@ -459,24 +389,14 @@ io.on('connection', (socket) => {
         correctText: (question.answers || [])[question.correct] || '—',
       };
 
-      // For Option A: flat RANK_POINTS[0] for correct, 0 for wrong — can show immediately
-      // For Option B: ACC_BASE_MAX for correct (+ rank bonus later), 0 for wrong — can show base immediately
-      const immediatePoints = isCorrect
-        ? (game.scoringSystem === 'rank' ? RANK_POINTS[0] : ACC_BASE_MAX)
-        : 0;
-
+      // Points depend on final speed rank — deferred to leaderboard time
       socket.emit('answer-result', {
-        type:              qType,
-        soundCorrect:      isCorrect,
-        scoringSystem:     game.scoringSystem,
+        type:         qType,
+        soundCorrect: isCorrect,
         isCorrect,
-        correctIndex:      question.correct,
-        correctText:       (question.answers || [])[question.correct] || '—',
-        yourText:          (question.answers || [])[answerIndex]      || '—',
-        immediatePoints,
-        // Rank bonus is pending for accuracy-rank mode (ranked by speed);
-        // in rank mode everyone correct gets the same flat amount, no pending bonus.
-        rankBonusPending:  game.scoringSystem === 'accuracy-rank' && isCorrect,
+        correctIndex: question.correct,
+        correctText:  (question.answers || [])[question.correct] || '—',
+        yourText:     (question.answers || [])[answerIndex]      || '—',
       });
     }
 
@@ -596,7 +516,6 @@ function sendNextQuestion(game) {
     answers:        q.answers,
     timeLimit,
     type:           qType,
-    scoringSystem:  game.scoringSystem,
     // Slider/timeline fields:
     min:  q.min,
     max:  q.max,
@@ -669,7 +588,6 @@ function showLeaderboard(game) {
     mapData,
     timelineData,
     sequenceData,
-    scoringSystem:    game.scoringSystem,
   });
 
   const leaderboardPause = q.type === 'map'                               ? 10

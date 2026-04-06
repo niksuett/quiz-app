@@ -13,7 +13,6 @@ let timerInterval      = null;
 let timerTotal         = 0;     // total seconds for current question (for proportional bar on resume)
 let gamePaused         = false; // client-side pause state
 let resultTimeout      = null;
-let currentScoringSystem = 'rank'; // 'rank' | 'accuracy-rank' — set per-question from server
 
 let leafletMap       = null;  // Leaflet map instance (during question)
 let mapPin           = null;  // the marker the player drops
@@ -118,7 +117,7 @@ function animateCount(el, target, duration = 700) {
 
 // Builds and animates the leaderboard list, with staggered slide-ins
 // and score count-up for each entry.
-function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
+function renderLeaderboard(listEl, entries, questionType) {
   listEl.innerHTML = '';
   entries.forEach((entry, i) => {
     const li = document.createElement('li');
@@ -155,7 +154,7 @@ function renderLeaderboard(listEl, entries, questionType, scoringSystem) {
     // Rank reason line: explains how points were earned (e.g. "1st fastest · +10 pts")
     const rankReasonSpan = document.createElement('span');
     rankReasonSpan.className   = 'lb-rank-reason' + (entry.roundPoints > 0 ? '' : ' lb-rank-reason-zero');
-    rankReasonSpan.textContent = formatRoundInfo(entry, questionType, scoringSystem);
+    rankReasonSpan.textContent = formatRoundInfo(entry, questionType);
 
     scoreWrap.append(gainSpan, scoreSpan, rankReasonSpan);
     li.append(nameCol, scoreWrap);
@@ -238,39 +237,33 @@ function ordinalStr(n) {
 }
 
 // Returns a one-line summary of how many points a player earned this round
-// and why (e.g. "1st closest · +10 pts" or "Incorrect · 0 pts").
-function formatRoundInfo(entry, questionType, scoringSystem) {
+// and why (e.g. "Correct · 1st fastest · +10 pts" or "Incorrect · 0 pts").
+function formatRoundInfo(entry, questionType) {
   const pts  = entry.roundPoints || 0;
   const rank = entry.roundRank;
 
   if (!entry.lastAnswer) return 'No answer · 0 pts';
-
-  // Wrong MC / flag answer (isCorrect is only set on MC/flag types)
-  if ('isCorrect' in entry.lastAnswer && !entry.lastAnswer.isCorrect) {
-    return 'Incorrect · 0 pts';
-  }
-
+  if ('isCorrect' in entry.lastAnswer && !entry.lastAnswer.isCorrect) return 'Incorrect · 0 pts';
   if (pts === 0) return '0 pts this round';
 
   const rankStr = rank ? ordinalStr(rank) : null;
-
   const isProximity = (questionType === 'slider' || questionType === 'timeline' || questionType === 'map');
   const isMC        = !isProximity && questionType !== 'sequence';
 
-  // MC in Rank mode: all correct answers earn the same flat points — no rank
-  if (isMC && scoringSystem === 'rank') {
-    return `Correct · +${pts} pts`;
+  let label;
+  if (isMC) {
+    // MC/flag: ranked by answer speed — show "Correct · 1st fastest · +N pts"
+    label = rankStr ? `Correct · ${rankStr} fastest` : 'Correct';
+  } else if (questionType === 'sequence') {
+    label = rankStr
+      ? (entry.speedTiebreak ? `${rankStr} · faster ⚡` : `${rankStr} · most correct`)
+      : null;
+  } else {
+    // Proximity (slider / timeline / map)
+    label = rankStr ? `${rankStr} closest` : null;
   }
 
-  // MC in Accuracy+Rank mode: correct answers ranked by speed
-  const rankLabel = rankStr
-    ? questionType === 'sequence'
-        ? (entry.speedTiebreak ? `${rankStr} · faster ⚡` : `${rankStr} · most correct`)
-    : isProximity                 ? `${rankStr} closest`
-    :                               `${rankStr} fastest`  // MC speed rank
-    : null;
-
-  return rankLabel ? `${rankLabel} · +${pts} pts` : `+${pts} pts`;
+  return label ? `${label} · +${pts} pts` : `+${pts} pts`;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -307,12 +300,10 @@ function createGame() {
                            .map(cb => cb.value);
   if (categories.length === 0)
     return showError('config-error', 'Please select at least one category.');
-  const autoplay         = document.getElementById('autoplay-toggle').checked;
-  const activeScoringBtn = document.querySelector('#scoring-selector .scoring-btn.active');
-  const scoringSystem    = activeScoringBtn ? activeScoringBtn.dataset.scoring : 'rank';
-  const activeModeBtn    = document.querySelector('#mode-selector .scoring-btn.active');
-  const selectedMode     = activeModeBtn ? activeModeBtn.dataset.mode : 'mobile';
-  socket.emit('create-game', { rounds, categories, autoplay, scoringSystem, gameMode: selectedMode });
+  const autoplay      = document.getElementById('autoplay-toggle').checked;
+  const activeModeBtn = document.querySelector('#mode-selector .scoring-btn.active');
+  const selectedMode  = activeModeBtn ? activeModeBtn.dataset.mode : 'mobile';
+  socket.emit('create-game', { rounds, categories, autoplay, gameMode: selectedMode });
 }
 
 function startGame() {
@@ -344,13 +335,6 @@ function nextQuestion() {
 document.querySelectorAll('.round-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-
-document.querySelectorAll('#scoring-selector .scoring-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#scoring-selector .scoring-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
 });
@@ -491,8 +475,7 @@ socket.on('join-success', ({ gameId, nickname }) => {
 socket.on('join-error', (msg) => showError('join-error', msg));
 
 // ── New question ──────────────────────────────────────────────────────────────
-socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, type, min, max, step, unit, imageUrl, items, scoringSystem }) => {
-  currentScoringSystem = scoringSystem || 'rank';
+socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, timeLimit, type, min, max, step, unit, imageUrl, items }) => {
   stopTimer();
   clearTimeout(resultTimeout);
   soundQuestionStart();
@@ -684,9 +667,8 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
   const qHint = document.getElementById('question-hint');
   if (qHint) {
     const isMCType = type !== 'slider' && type !== 'timeline' && type !== 'map' && type !== 'sequence';
-    const showHint = isMCType && scoringSystem === 'accuracy-rank';
     qHint.textContent = '⚡ Fastest correct answer earns the most points';
-    qHint.classList.toggle('hidden', !showHint);
+    qHint.classList.toggle('hidden', !isMCType);
   }
 
   showScreen('screen-question');
@@ -1232,11 +1214,8 @@ function showResultScreen(data) {
       <div class="compare-diff">${diff}</div>`;
     compareEl.classList.remove('hidden');
 
-    if (data.scoringSystem === 'accuracy-rank') {
-      showBreakdownCard('Accuracy', data.accuracyPts, true);
-    } else {
-      pendingLine.classList.remove('hidden');
-    }
+    pendingLine.textContent = 'Rank points — see leaderboard';
+    pendingLine.classList.remove('hidden');
 
   } else if (data.type === 'map') {
     const km = data.distanceKm;
@@ -1278,11 +1257,8 @@ function showResultScreen(data) {
       </div>`;
     compareEl.classList.remove('hidden');
 
-    if (data.scoringSystem === 'accuracy-rank') {
-      showBreakdownCard('Accuracy', data.accuracyPts, true);
-    } else {
-      pendingLine.classList.remove('hidden');
-    }
+    pendingLine.textContent = 'Rank points — see leaderboard';
+    pendingLine.classList.remove('hidden');
 
   } else if (data.type === 'sequence') {
     const n = data.correctCount;
@@ -1323,25 +1299,17 @@ function showResultScreen(data) {
       </div>`;
     compareEl.classList.remove('hidden');
 
-    if (data.scoringSystem === 'accuracy-rank') {
-      showBreakdownCard(`${n}/${t} correct`, data.accuracyPts, true);
-    } else {
-      pendingLine.classList.remove('hidden');
-    }
+    pendingLine.textContent = 'Rank points — see leaderboard';
+    pendingLine.classList.remove('hidden');
 
   } else {
     // Multiple choice / flag
     if (data.isCorrect) {
       icon.textContent = '✓'; icon.style.color = 'var(--correct)';
       heading.textContent = 'Correct!';
-      if (data.scoringSystem === 'accuracy-rank') {
-        // Show accuracy base now; speed-rank bonus comes on leaderboard
-        showBreakdownCard('Correct answer', data.immediatePoints, true, 'Speed rank bonus');
-      } else {
-        // Option A: flat points for all correct players — can show immediately
-        flatLine.textContent = `${data.immediatePoints} pts`;
-        flatLine.classList.remove('hidden');
-      }
+      // Speed rank is deferred to leaderboard (can't know rank until all answers in)
+      pendingLine.textContent = 'Speed rank — see leaderboard';
+      pendingLine.classList.remove('hidden');
     } else {
       icon.textContent = '✗'; icon.style.color = 'var(--wrong)';
       heading.textContent = 'Incorrect';
@@ -1355,33 +1323,6 @@ function showResultScreen(data) {
   showScreen('screen-answer-result');
 }
 
-// Fills in and reveals the score breakdown card.
-// rankBonusPending=true means rank bonus will be added on the leaderboard.
-// bonusLabel overrides the default "Rank bonus" row label when supplied.
-function showBreakdownCard(baseLabel, basePoints, rankBonusPending, bonusLabel = null) {
-  document.getElementById('score-base-label').textContent = baseLabel;
-  document.getElementById('score-base-pts').textContent   = String(basePoints);
-
-  const speedRow   = document.getElementById('score-speed-row');
-  const divider    = document.querySelector('.score-divider');
-  const totalRow   = document.querySelector('.score-row-total');
-
-  if (rankBonusPending) {
-    document.getElementById('score-speed-label').textContent = bonusLabel || 'Rank bonus';
-    document.getElementById('score-speed-pts').textContent   = '+ on leaderboard';
-    document.getElementById('score-total-pts').textContent   = `${basePoints}+`;
-    speedRow.classList.remove('hidden');
-    divider.classList.remove('hidden');
-    totalRow.classList.remove('hidden');
-  } else {
-    speedRow.classList.add('hidden');
-    divider.classList.add('hidden');
-    totalRow.classList.add('hidden');
-  }
-
-  document.getElementById('score-breakdown').classList.remove('hidden');
-}
-
 // ── Leaderboard ───────────────────────────────────────────────────────────────
 const CATEGORY_LABELS = {
   facts: 'Facts', science: 'Science', sports: 'Sports', entertainment: 'Entertainment',
@@ -1391,7 +1332,7 @@ const CATEGORY_LABELS = {
   sequence: 'Sequence',
 };
 
-socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, questionNumber, totalQuestions, questionCategory, isLastQuestion, mapData, timelineData, sequenceData, scoringSystem }) => {
+socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, questionNumber, totalQuestions, questionCategory, isLastQuestion, mapData, timelineData, sequenceData }) => {
   stopTimer();
   gamePaused = false;
   clearTimeout(resultTimeout);
@@ -1440,7 +1381,7 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, quest
     correctReveal.classList.remove('hidden');
   }
 
-  renderLeaderboard(document.getElementById('leaderboard-list'), leaderboard, questionType, scoringSystem);
+  renderLeaderboard(document.getElementById('leaderboard-list'), leaderboard, questionType);
 
   document.getElementById('next-hint').textContent =
     isLastQuestion ? 'Final results coming up…' : 'Next question in a moment…';
