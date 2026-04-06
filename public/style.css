@@ -452,14 +452,7 @@ h3 {
   box-shadow: 0 4px 20px rgba(0,0,0,.4);
   filter: sepia(15%);
 }
-.question-photo-caption {
-  display: block;
-  font-family: var(--font-lora);
-  font-size: 1.1rem;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--ink);
-}
+
 
 /* ─── 2 × 2 answer button grid ───────────────────────────────────────────── */
 .answers-grid {
@@ -1594,6 +1587,23 @@ h3 {
 
 /* ─── Config: round selector ──────────────────────────────────────────────── */
 .config-section { margin-bottom: 24px; }
+.config-section-header { display: flex; align-items: baseline; justify-content: space-between; }
+.config-section-header h3 { margin: 0; }
+.btn-deselect {
+  background: none;
+  border: none;
+  color: var(--aged);
+  font-family: var(--font-cinzel);
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 2px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn-deselect:hover { color: var(--ink); }
 .round-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .round-btn {
   flex: 1;

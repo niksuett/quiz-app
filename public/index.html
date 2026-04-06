@@ -61,67 +61,70 @@
 
       <!-- Categories -->
       <div class="config-section">
-        <h3>Categories</h3>
+        <div class="config-section-header">
+          <h3>Categories</h3>
+          <button type="button" class="btn-deselect" onclick="deselectAllCategories()">Deselect all</button>
+        </div>
         <div class="category-grid">
+          <label class="cat-card" data-cat="geo-natural">
+            <input type="checkbox" value="geo-natural" checked>
+            <span class="cat-emoji">🏔️</span>
+            <span class="cat-name">Natural Wonders</span>
+          </label>
+          <label class="cat-card" data-cat="geo-built">
+            <input type="checkbox" value="geo-built" checked>
+            <span class="cat-emoji">🏛️</span>
+            <span class="cat-name">Built World</span>
+          </label>
+          <label class="cat-card" data-cat="geo-cities">
+            <input type="checkbox" value="geo-cities" checked>
+            <span class="cat-emoji">🏙️</span>
+            <span class="cat-name">Cities</span>
+          </label>
+          <label class="cat-card" data-cat="geo-history">
+            <input type="checkbox" value="geo-history" checked>
+            <span class="cat-emoji">⚔️</span>
+            <span class="cat-name">Where in History</span>
+          </label>
+          <label class="cat-card" data-cat="timeline">
+            <input type="checkbox" value="timeline" checked>
+            <span class="cat-emoji">📅</span>
+            <span class="cat-name">Timeline</span>
+          </label>
+          <label class="cat-card" data-cat="estimation">
+            <input type="checkbox" value="estimation" checked>
+            <span class="cat-emoji">📏</span>
+            <span class="cat-name">Estimation</span>
+          </label>
+          <label class="cat-card" data-cat="sequence">
+            <input type="checkbox" value="sequence" checked>
+            <span class="cat-emoji">🔢</span>
+            <span class="cat-name">Sequence</span>
+          </label>
+          <label class="cat-card" data-cat="flags">
+            <input type="checkbox" value="flags" checked>
+            <span class="cat-emoji">🏳️</span>
+            <span class="cat-name">Flags</span>
+          </label>
           <label class="cat-card" data-cat="facts">
             <input type="checkbox" value="facts" checked>
             <span class="cat-emoji">📚</span>
             <span class="cat-name">Facts</span>
           </label>
           <label class="cat-card" data-cat="science">
-            <input type="checkbox" value="science">
+            <input type="checkbox" value="science" checked>
             <span class="cat-emoji">🔬</span>
             <span class="cat-name">Science</span>
           </label>
-          <label class="cat-card" data-cat="sports">
-            <input type="checkbox" value="sports">
-            <span class="cat-emoji">⚽</span>
-            <span class="cat-name">Sports</span>
-          </label>
           <label class="cat-card" data-cat="entertainment">
-            <input type="checkbox" value="entertainment">
+            <input type="checkbox" value="entertainment" checked>
             <span class="cat-emoji">🎬</span>
             <span class="cat-name">Entertainment</span>
           </label>
-          <label class="cat-card" data-cat="flags">
-            <input type="checkbox" value="flags">
-            <span class="cat-emoji">🏳️</span>
-            <span class="cat-name">Flags</span>
-          </label>
-          <label class="cat-card" data-cat="estimation">
-            <input type="checkbox" value="estimation">
-            <span class="cat-emoji">📏</span>
-            <span class="cat-name">Estimation</span>
-          </label>
-          <label class="cat-card" data-cat="timeline">
-            <input type="checkbox" value="timeline">
-            <span class="cat-emoji">📅</span>
-            <span class="cat-name">Timeline</span>
-          </label>
-          <label class="cat-card" data-cat="geo-natural">
-            <input type="checkbox" value="geo-natural">
-            <span class="cat-emoji">🏔️</span>
-            <span class="cat-name">Natural Wonders</span>
-          </label>
-          <label class="cat-card" data-cat="geo-built">
-            <input type="checkbox" value="geo-built">
-            <span class="cat-emoji">🏛️</span>
-            <span class="cat-name">Built World</span>
-          </label>
-          <label class="cat-card" data-cat="geo-cities">
-            <input type="checkbox" value="geo-cities">
-            <span class="cat-emoji">🏙️</span>
-            <span class="cat-name">Cities</span>
-          </label>
-          <label class="cat-card" data-cat="geo-history">
-            <input type="checkbox" value="geo-history">
-            <span class="cat-emoji">⚔️</span>
-            <span class="cat-name">Where in History</span>
-          </label>
-          <label class="cat-card" data-cat="sequence">
-            <input type="checkbox" value="sequence">
-            <span class="cat-emoji">🔢</span>
-            <span class="cat-name">Sequence</span>
+          <label class="cat-card" data-cat="sports">
+            <input type="checkbox" value="sports" checked>
+            <span class="cat-emoji">⚽</span>
+            <span class="cat-name">Sports</span>
           </label>
         </div>
       </div>
@@ -237,6 +240,8 @@
     </div>
 
     <div class="question-box">
+      <!-- Historical photo — shown only when the question has an imageUrl -->
+      <img id="question-photo" class="question-photo hidden" src="" alt="">
       <p id="question-text">Loading…</p>
     </div>
 

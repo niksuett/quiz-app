@@ -348,6 +348,13 @@ function nextQuestion() {
   socket.emit('next-question');
 }
 
+function deselectAllCategories() {
+  document.querySelectorAll('.cat-card input').forEach(cb => {
+    cb.checked = false;
+    cb.closest('.cat-card').classList.remove('checked');
+  });
+}
+
 // ── Config screen interactivity ───────────────────────────────────────────────
 document.querySelectorAll('.round-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -503,18 +510,25 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
   document.getElementById('question-number').textContent =
     `Question ${questionNumber} / ${totalQuestions}`;
 
-  // Render the question box based on type
+  // Show/hide the historical photo (separate element above the question text)
+  const photoEl = document.getElementById('question-photo');
+  if (photoEl) {
+    if (imageUrl) {
+      photoEl.src = imageUrl;
+      photoEl.classList.remove('hidden');
+    } else {
+      photoEl.src = '';
+      photoEl.classList.add('hidden');
+    }
+  }
+
+  // Render the question text
   const qText = document.getElementById('question-text');
   if (type === 'flag') {
     // question = ISO 2-letter code (e.g. 'fr') — fetch real image from flagcdn.com
     qText.innerHTML =
       `<span class="flag-prompt">Which country does this flag belong to?</span>` +
       `<img src="https://flagcdn.com/w320/${question}.png" class="flag-image" alt="Flag">`;
-  } else if (imageUrl) {
-    // Timeline (or any type) with an attached historical photo
-    qText.innerHTML =
-      `<img src="${imageUrl}" class="question-photo" alt="Historical photo">` +
-      `<span class="question-photo-caption">${question}</span>`;
   } else {
     qText.textContent = question;
   }
