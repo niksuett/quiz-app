@@ -26,7 +26,7 @@ quiz-app/
 
 ## Core game flow
 1. Host opens app → sees a configuration screen
-2. Host configures: number of rounds (5/10/15/20/∞), which categories to include, autoplay on/off, scoring system (Rank or Accuracy + Rank)
+2. Host configures: number of rounds (5/10/15/20/∞), which categories to include, autoplay on/off, display mode (Mobile/TV)
 3. Players join at the same URL, enter Game ID + nickname → see a waiting screen
 4. Host sees lobby with live player count → clicks Start
 5. Each question: host screen shows question + how many players have answered; player screens show the answer interface
@@ -47,7 +47,7 @@ quiz-app/
 | Built World | `geo-built` | Map pin-drop | 22 | Monuments, temples, famous buildings |
 | Cities | `geo-cities` | Map pin-drop | 12 | Urban centres worldwide |
 | Where in History | `geo-history` | Map pin-drop | 8 | Battle sites, historical events, ruins |
-| Sequence | `sequence` | Drag-to-order | 10 | 4 items in correct order; scored by positions correct |
+| Sequence | `sequence` | Drag-to-order | 20 | 4 items in correct order; scored by positions correct |
 
 ## Answer mechanics
 | Type | How it works |
@@ -87,12 +87,12 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Geography map pin: **35 seconds**
 
 ## Host controls
-- Can advance manually OR use autoplay (auto-advances after `LEADERBOARD_PAUSE = 5` seconds)
+- Can advance manually OR use autoplay (auto-advances after a dynamic pause: base per type + 0.5s per extra player, capped at 20s)
 - Host-only view during questions: sees question + timer + answered count (not what players answered)
 
 ## What's built
 - Home screen with animated globe SVG (two-column: ink-dark left / parchment right)
-- Host config screen: round count, category selection (11 categories), autoplay toggle, display mode selector (Mobile/TV)
+- Host config screen: round count, category selection (12 categories, all on by default; "Deselect all" button), autoplay toggle, display mode selector (Mobile/TV)
 - 6-character Game ID; players join by entering ID + nickname
 - Host lobby: live player list
 - Per-question-type timer limits (MC/flag=15s, estimation/timeline=20s, map=35s)
@@ -154,10 +154,7 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 
 **Sequence question fixes & expansion** — removed years from all item labels (years in parentheses spoiled the correct order). Expanded from 10 to 20 questions, adding non-chronological ordering tasks (planets by distance from Sun, mountains by height, oceans by size, animals by lifespan) alongside new chronological sets (US presidents, voyages of exploration, famous paintings, literature, French rulers, communication technologies).
 
-**Scoring system rebalance** — replaced the old speed-bonus-heavy system with two selectable rank-based systems (host picks at game setup):
-- **Rank** (Option A): closest answer wins most; all MC correct = same points; 10/8/6/4/2/1 pts by rank; no speed differentiation.
-- **Accuracy + Rank** (Option B): 0–6 pts for accuracy; +4/3/2/1/0 rank bonus; max 10 pts per question. MC ranked by speed, proximity ranked by closeness.
-- Scoring is deferred to leaderboard time (server calculates rank after all answers are in). Result screen shows accuracy feedback; leaderboard shows final rank points. Speed bonus pill removed.
+**Scoring system** — single Rank + Speed mode. Scoring is deferred to leaderboard time (server calculates rank after all answers are in). Speed bonus pill removed.
 
 **Landmark locationName accuracy audit** — updated 26 geo question `locationName` fields to include the specific landmark name (e.g. "Paris, France" → "Eiffel Tower, Paris") so the answer reveal is informative rather than just showing the city.
 
@@ -188,27 +185,25 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Only shown to the host (tracked via `amHost` flag, separate from `myRole`)
 
 **Leaderboard clarity improvements** — several fixes to make it immediately obvious why you got each score:
-- `formatRoundInfo` now shows "Correct · +10 pts" for MC/Rank mode (was wrongly showing "1st place" for everyone), and "1st fastest · +10 pts" for MC/Accuracy+Rank mode (was "1st place", hiding that speed is the tiebreaker).
-- Wrong/no-answer round-info rows now show in a muted colour instead of green.
-- Gain badge now shows "+8 pts" instead of just "+8".
-- For MC/flag questions in Accuracy+Rank mode: "⚡ Fastest correct answer earns the most points" hint shown below the answer buttons, and the result screen's rank bonus row is labelled "Speed rank bonus".
-- Rank-reason text (e.g. "1st fastest · +10 pts") moved to the **right column** (below the score), so points and reason sit together. Left column now shows only name + answer stat.
-- Sequence speed tiebreaker: when two players get the same number correct, the faster one ranks higher. Ties show "faster ⚡" in the rank reason instead of "most correct".
-- Year decimal bug fixed: `toLocaleString()` was using the OS locale, causing "1.945" in European locales. All numeric displays now use `'en-US'` or `String()` for bare year values.
+- Rank-reason line (e.g. "1st fastest · +10 pts") shown in the right column below the score; left column shows only name + answer stat.
+- Wrong/no-answer rows shown in muted colour.
+- "Tied · slower" label for the loser of a speed tiebreak (not "2nd closest", which would imply less accuracy).
+- "Correct" shown instead of "1st closest" when a player gets the exact correct answer on proximity/sequence questions.
+- "faster ⚡" shown in rank reason when speed broke a tie on proximity or sequence questions.
+- Year decimal bug fixed: all numeric displays now use `toLocaleString('en-US')` or `String()` to avoid "1.945" in European locales.
+- Gain badge (+N pts overlay) removed — redundant with the rank-reason line.
+
+**Dynamic leaderboard duration** — leaderboard autoplay pause now scales with player count: `base + (playerCount − 1) × 0.5s`, capped at 20s. Base times: MC/flag=5s, slider/timeline/sequence=8s, map=10s. Implemented server-side in `showLeaderboard()`.
 
 ---
 
 ### Not yet done
 
-**1. Dynamic leaderboard duration based on player count**
-- The leaderboard autoplay pause is currently fixed per question type (MC=5s, timeline=8s, map=10s).
-- Scale the pause with the number of players: more players → more rows to read → more time needed. Proposed formula: `base + (playerCount − 1) × 0.5s`, capped at a reasonable max (e.g. 20s). Implemented server-side when emitting `show-leaderboard` or client-side by reading the leaderboard row count.
-
-**4. Expand Timeline / History (target: 60+ questions)**
+**Expand Timeline / History (target: 60+ questions)**
 - Current count is 25 (+ 3 photo questions). Cover all eras: ancient, medieval, early modern, modern, recent.
 - Pure content work — defer to a dedicated question-writing session.
 
-**5. New question type: Silhouette (MC)**
+**New question type: Silhouette (MC)**
 - Show a country/region outline silhouette; players pick the name from 4 buttons.
 - Low complexity — reuses the flag question mechanic (image + 4 MC buttons).
 

@@ -609,10 +609,11 @@ function showLeaderboard(game) {
     sequenceData,
   });
 
-  const leaderboardPause = q.type === 'map'                               ? 10
-                         : (q.type === 'slider' || q.type === 'timeline') ? 8
-                         : q.type === 'sequence'                          ? 8
-                         : LEADERBOARD_PAUSE;
+  const baseLeaderboardPause = q.type === 'map'                               ? 10
+                             : (q.type === 'slider' || q.type === 'timeline') ? 8
+                             : q.type === 'sequence'                          ? 8
+                             : LEADERBOARD_PAUSE;
+  const leaderboardPause = Math.min(20, baseLeaderboardPause + (game.players.length - 1) * 0.5);
 
   if (game.autoplay) {
     game.timerEndAt = Date.now() + leaderboardPause * 1000;
