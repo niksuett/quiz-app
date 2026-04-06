@@ -258,12 +258,16 @@ function formatRoundInfo(entry, questionType) {
   } else if (questionType === 'sequence') {
     // Sequence: ranked by correctCount; speed breaks ties
     label = rankStr
-      ? (entry.speedTiebreak ? `${rankStr} · faster ⚡` : `${rankStr} · most correct`)
+      ? entry.speedTiebreak      ? `${rankStr} · faster ⚡`
+      : entry.speedTiebreakedOut ? `Tied · slower`
+      :                            `${rankStr} · most correct`
       : null;
   } else {
     // Proximity (slider / timeline / map): ranked by closeness; speed breaks ties
     label = rankStr
-      ? (entry.speedTiebreak ? `${rankStr} closest · faster ⚡` : `${rankStr} closest`)
+      ? entry.speedTiebreak      ? `${rankStr} closest · faster ⚡`
+      : entry.speedTiebreakedOut ? `Tied · slower`
+      :                            `${rankStr} closest`
       : null;
   }
 

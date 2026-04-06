@@ -88,7 +88,8 @@ function buildLeaderboard(game) {
       roundRank:    p.roundRank    || null,
       lastAnswer:   p.lastAnswer   || null,
       stats:        p.stats        || null,
-      speedTiebreak: p.speedTiebreak || false,
+      speedTiebreak:       p.speedTiebreak       || false,
+      speedTiebreakedOut:  p.speedTiebreakedOut  || false,
     }))
     .sort((a, b) => b.score - a.score);
 }
@@ -110,8 +111,8 @@ function applyRoundScores(game, question) {
       });
 
     answered.forEach((p, i) => {
-      p.speedTiebreak = i + 1 < answered.length &&
-        answered[i + 1].mapAnswer.distanceKm === p.mapAnswer.distanceKm;
+      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].mapAnswer.distanceKm === p.mapAnswer.distanceKm;
+      p.speedTiebreakedOut = i > 0             && answered[i - 1].mapAnswer.distanceKm === p.mapAnswer.distanceKm;
     });
 
     answered.forEach((p, rank) => {
@@ -136,8 +137,8 @@ function applyRoundScores(game, question) {
       });
 
     answered.forEach((p, i) => {
-      p.speedTiebreak = i + 1 < answered.length &&
-        answered[i + 1].lastAnswer.diff === p.lastAnswer.diff;
+      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].lastAnswer.diff === p.lastAnswer.diff;
+      p.speedTiebreakedOut = i > 0             && answered[i - 1].lastAnswer.diff === p.lastAnswer.diff;
     });
 
     answered.forEach((p, rank) => {
@@ -164,8 +165,8 @@ function applyRoundScores(game, question) {
       });
 
     answered.forEach((p, i) => {
-      p.speedTiebreak = i + 1 < answered.length &&
-        answered[i + 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
+      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
+      p.speedTiebreakedOut = i > 0             && answered[i - 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
     });
 
     answered.forEach((p, rank) => {
