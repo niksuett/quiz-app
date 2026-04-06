@@ -167,10 +167,11 @@ function applyRoundScores(game, question) {
         return (a.answerTime || 999) - (b.answerTime || 999); // faster = better on tie
       });
 
-    // Mark speedTiebreak on players who shared a correctCount with at least one other
-    answered.forEach(p => {
-      const count = p.lastAnswer.correctCount;
-      p.speedTiebreak = answered.filter(q => q.lastAnswer.correctCount === count).length > 1;
+    // Mark speedTiebreak only for the faster player in each tied correctCount group:
+    // if this player ranks immediately above someone with the same count, speed decided it.
+    answered.forEach((p, i) => {
+      p.speedTiebreak = i + 1 < answered.length &&
+        answered[i + 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
     });
 
     answered.forEach((p, rank) => {
@@ -493,6 +494,7 @@ io.on('connection', (socket) => {
                        : game.currentQuestionType === 'sequence'                                               ? 4000
                        : 3000;
       clearTimeout(game.timer);
+      game.timerEndAt = Date.now() + earlyPause;
       game.timer = setTimeout(() => showLeaderboard(game), earlyPause);
     }
   });
@@ -502,6 +504,33 @@ io.on('connection', (socket) => {
     const game = games[socket.gameId];
     if (!game || socket.role !== 'host') return;
     sendNextQuestion(game);
+  });
+
+  // ── HOST pauses / resumes ──────────────────────────────────────────────────
+  socket.on('pause-game', () => {
+    const game = games[socket.gameId];
+    if (!game || socket.role !== 'host' || game.state !== 'question' || game.isPaused) return;
+
+    game.pausedRemainingMs = Math.max(1000, game.timerEndAt - Date.now());
+    clearTimeout(game.timer);
+    game.timer    = null;
+    game.isPaused = true;
+
+    io.to(game.id).emit('game-paused', { remainingMs: game.pausedRemainingMs });
+    console.log(`Game ${game.id} paused (${Math.round(game.pausedRemainingMs / 1000)}s remaining)`);
+  });
+
+  socket.on('resume-game', () => {
+    const game = games[socket.gameId];
+    if (!game || socket.role !== 'host' || !game.isPaused) return;
+
+    game.isPaused   = false;
+    const remaining = game.pausedRemainingMs || 5000;
+    game.timerEndAt = Date.now() + remaining;
+    game.timer      = setTimeout(() => showLeaderboard(game), remaining);
+
+    io.to(game.id).emit('game-resumed', { remainingMs: remaining });
+    console.log(`Game ${game.id} resumed (${Math.round(remaining / 1000)}s remaining)`);
   });
 
   // ── Disconnect ─────────────────────────────────────────────────────────────
@@ -557,6 +586,8 @@ function sendNextQuestion(game) {
 
   game.currentTimeLimit    = timeLimit;
   game.currentQuestionType = qType;
+  game.isPaused            = false;
+  game.timerEndAt          = Date.now() + timeLimit * 1000;
 
   io.to(game.id).emit('new-question', {
     questionNumber: game.currentIndex + 1,

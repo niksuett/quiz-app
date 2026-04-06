@@ -548,6 +548,24 @@ h3 {
   letter-spacing: .01em;
 }
 
+.pause-btn {
+  display: block;
+  margin: 10px auto 0;
+  background: none;
+  border: 1.5px solid var(--aged);
+  border-radius: 6px;
+  color: var(--aged);
+  font-family: var(--font-cinzel);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.pause-btn:hover       { border-color: var(--gold); color: var(--gold); }
+.pause-btn.paused      { border-color: var(--correct); color: var(--correct); }
+
 /* ─── Slider ──────────────────────────────────────────────────────────────── */
 .answers-grid.slider-mode { grid-template-columns: 1fr; }
 
