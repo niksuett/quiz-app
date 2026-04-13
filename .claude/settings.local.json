@@ -7,7 +7,13 @@
       "Bash(echo \"Exit: $?\")",
       "Bash(node:*)",
       "Bash(curl -s http://localhost:3000/admin/questions)",
-      "Bash(node -e \"require\\(''''./C:/Users/niksu/projects/quiz-app/server.js''''\\)\")"
+      "Bash(node -e \"require\\(''''./C:/Users/niksu/projects/quiz-app/server.js''''\\)\")",
+      "Bash(del:*)",
+      "Bash(node -e \":*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(python3:*)"
     ]
   }
 }
