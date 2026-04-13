@@ -6,7 +6,7 @@ const express    = require('express');
 const http       = require('http');
 const { Server } = require('socket.io');
 const path       = require('path');
-const fs         = require('fs');
+const { db, rowToQuestion, questionToRow } = require('./db');
 
 const app    = express();
 const server = http.createServer(app);
@@ -16,10 +16,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Question bank ─────────────────────────────────────────────────────────────
-const QUESTIONS_FILE = path.join(__dirname, 'questions.json');
-
 function loadQuestions() {
-  return JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf8'));
+  return db.prepare('SELECT * FROM questions').all().map(rowToQuestion);
 }
 
 // ── Admin API ─────────────────────────────────────────────────────────────────
@@ -30,7 +28,19 @@ app.get('/admin/questions', (req, res) => {
 app.post('/admin/questions', (req, res) => {
   const questions = req.body;
   if (!Array.isArray(questions)) return res.status(400).json({ error: 'Expected an array' });
-  fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questions, null, 2));
+
+  const deleteAll = db.prepare('DELETE FROM questions');
+  const insert    = db.prepare(`
+    INSERT INTO questions (category, type, question, correct, image_url, extra)
+    VALUES (@category, @type, @question, @correct, @image_url, @extra)
+  `);
+
+  const replaceAll = db.transaction(qs => {
+    deleteAll.run();
+    for (const q of qs) insert.run(questionToRow(q));
+  });
+
+  replaceAll(questions);
   res.json({ ok: true, count: questions.length });
 });
 
