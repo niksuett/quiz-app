@@ -27,6 +27,23 @@ quiz-app/
     └── admin.html     — question editor UI at http://localhost:3000/admin.html
 ```
 
+## Running locally
+
+**First time only (or after pulling on a new machine):**
+```
+npm install          — installs all packages (express, socket.io, better-sqlite3)
+node migrate.js      — creates quiz.db and loads all questions from questions.json
+```
+
+**Every time:**
+```
+node server.js       — starts the app at http://localhost:3000
+```
+
+`quiz.db` is excluded from git because it's generated from `questions.json`. Any fresh clone needs `node migrate.js` run once before `node server.js` will work.
+
+---
+
 ## Core game flow
 1. Host opens app → sees a configuration screen
 2. Host configures: number of rounds (5/10/15/20/∞), which categories to include, autoplay on/off, display mode (Mobile/TV)
@@ -45,22 +62,26 @@ quiz-app/
 | Entertainment | `entertainment` | Multiple choice | 20 | |
 | Flags | `flags` | Flag image + MC | 30 | Shows real flag image from flagcdn.com |
 | Estimation | `estimation` | Slider | 23 | Drag to guess a number; scored by proximity |
-| Timeline | `timeline` | Year slider | 25 | Drag to guess a year; scored by proximity |
+| Timeline | `timeline` | Year slider | 28 | Drag to guess a year; scored by proximity |
 | Natural Wonders | `geo-natural` | Map pin-drop | 10 | Mountains, lakes, waterfalls, etc. |
 | Built World | `geo-built` | Map pin-drop | 22 | Monuments, temples, famous buildings |
 | Cities | `geo-cities` | Map pin-drop | 12 | Urban centres worldwide |
 | Where in History | `geo-history` | Map pin-drop | 8 | Battle sites, historical events, ruins |
 | Sequence | `sequence` | Drag-to-order | 20 | 4 items in correct order; scored by positions correct |
 
+**Total: 233 questions.** Some timeline questions include an optional `imageUrl` (historical photo shown above the question text).
+
 ## Answer mechanics
 | Type | How it works |
 |------|-------------|
 | Multiple choice | 4 clickable buttons, one correct answer |
 | Flag | Flag image shown, 4 country-name buttons |
-| Slider | Draggable bar between a numeric range, scored by proximity |
-| Timeline | Draggable marker on a year axis, scored by proximity |
-| Map pin drop | Click/tap on a map, scored by haversine distance (exponential decay) |
+| Slider | Draggable bar + editable number input; scored by proximity to correct value |
+| Timeline | Draggable marker on a year axis + editable number input; scored by proximity |
+| Map pin drop | Click/tap on a Leaflet map; scored by haversine distance with exponential decay `exp(-(dist/50)^0.6)` |
 | Sequence | Drag 4 items into the correct order; scored by how many are in the right position (0–4) |
+
+Slider and timeline thumbs start at a **random position** in the inner 80% of the range (not the midpoint) to avoid anchoring bias.
 
 ## Scoring rules
 
@@ -73,151 +94,92 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Players who didn't answer = 0 pts
 
 ### Result screen behaviour
-- **MC correct:** shows "Speed rank — see leaderboard" (can't know rank until all answers in)
+- **MC correct:** shows "Speed rank — see leaderboard" (rank unknown until all answers in)
 - **MC wrong:** shows correct answer, 0 pts
 - **Proximity / sequence:** shows guess vs correct + "Rank points — see leaderboard"
-- Points earned per round are shown in the rank-reason line below the score (e.g. "Correct · 1st fastest · +10 pts")
+- Points earned are shown in the rank-reason line below the score (e.g. "Correct · 1st fastest · +10 pts")
 
 ### Leaderboard rank-reason display
 - **MC:** "Correct · 1st fastest · +10 pts" (or 2nd, 3rd, etc.)
 - **Proximity:** "1st closest · +10 pts" (or "1st closest · faster ⚡ · +10 pts" when speed broke a tie)
 - **Sequence:** "1st · most correct · +10 pts" (or "faster ⚡" when speed broke a tie)
+- **Tied · slower** shown for the loser of a speed tiebreak
 
 ## Timer limits per question type
 - MC / Flags: **15 seconds**
-- Sequence: **30 seconds**
 - Estimation / Timeline: **20 seconds**
+- Sequence: **30 seconds**
 - Geography map pin: **35 seconds**
 
 ## Host controls
-- Can advance manually OR use autoplay (auto-advances after a dynamic pause: base per type + 0.5s per extra player, capped at 20s)
-- Host-only view during questions: sees question + timer + answered count (not what players answered)
+- **Mobile mode** (default): host enters their own nickname and plays as a regular player; sees answer controls, result screens, and a highlighted leaderboard row
+- **TV mode**: host device shows questions and leaderboard on a shared screen; players answer on their phones
+- **Autoplay on**: game auto-advances after a dynamic pause — `base + (playerCount − 1) × 0.5s`, capped at 20s. Base times: MC/flag=5s, slider/timeline/sequence=8s, map=10s
+- **Autoplay off**: host sees "Next Question →" button and advances manually
+- **Pause button**: freezes the timer mid-question (bar shows ⏸ for all players) or pauses the leaderboard auto-advance countdown; resumes from exact remaining time
 
 ## What's built
+
+**Screens & flow**
 - Home screen with animated globe SVG (two-column: ink-dark left / parchment right)
-- Host config screen: round count, category selection (12 categories, all on by default; "Deselect all" button), autoplay toggle, display mode selector (Mobile/TV)
-- 6-character Game ID; players join by entering ID + nickname
-- Host lobby: live player list
-- Per-question-type timer limits (MC/flag=15s, estimation/timeline=20s, map=35s)
-- Answer result screen: two-column layout (icon + heading left; score right)
-  - MC correct: "Speed rank — see leaderboard" (rank deferred until all answers in)
-  - MC wrong: correct answer shown, 0 pts
-  - Slider/timeline: guess vs correct, accuracy % label, "Rank points — see leaderboard"
-  - Map: km distance, 5-tier label (Pinpoint / Very close / In the area / Not quite / Way off), rank pending
-- Leaderboard:
-  - Per-player answer stat line (✓/✗ answer text for MC; guess + error for sliders; km away for map)
-  - Animated score reveal: previous score counts up to new total shortly after the row slides in
-  - Current player's row highlighted with lapis border + "← you" label
-  - Gold/silver/bronze medal styling for top 3
-- Map leaderboard reveal: gold star at correct location, player pins animate in sequentially; auto-fit bounds, maxZoom 19
-- Timeline/estimation leaderboard reveal: horizontal axis with gold star at correct value, animated player-pin dots
-- Autoplay off mode: host sees "Next Question →" button
+- Host config: round count (5/10/15/20/∞), 12 category checkboxes (all on by default, "Deselect all" button), autoplay toggle, Mobile/TV mode selector
+- 6-character Game ID; players join at the same URL with their Game ID + nickname
+- Host lobby with live player list and Start button
+- Per-player answer result screen (two-column: icon + heading left, score right)
+- Animated leaderboard with per-player rank-reason lines and score count-up
 - Final leaderboard + Play Again button
-- Mobile-friendly layout
+
+**Question display**
+- Multiple choice / flag: 4 answer buttons with staggered fade-in animation
+- Slider / timeline: draggable thumb + editable number input, both stay in sync
+- Map: Leaflet map (Voyager No Labels tiles); click to place a pin
+- Sequence: drag-and-drop list (works on mobile and desktop via pointer events)
+- Optional historical photo above question text (uses `<img>` tag, not innerHTML)
+
+**Leaderboard reveals (per question type)**
+- Map: gold star at correct location, player pins animate in sequentially, map auto-fits bounds
+- Timeline / estimation: horizontal axis with gold star at correct value, animated player-pin dots
+- Sequence: correct-order numbered list + per-player 2×2 grid (green = correct position, red = wrong)
+
+**Admin editor (`/admin.html`)**
+- Category tabs with question counts; add / edit / delete all 6 question types
+- Sequence editor: four numbered item fields in correct order
+- Map picker: embedded Leaflet map — click to place a pin, coordinates auto-fill lat/lng inputs
+- Saves to `quiz.db` live via the admin API (no server restart needed)
+
+**Polish**
+- Parchment & Ink visual theme: warm gold/ink palette, Cinzel / EB Garamond / Lora font system
+- Sound effects via Web Audio API (no audio files): question chime, correct/wrong tones, countdown ticks (≤5s), leaderboard fanfare, game-over melody
 - Animations: screen fade-in, answer button stagger, correct flash, wrong shake, timer urgency pulse, score count-up
-- Sound effects (Web Audio API, no files): question chime, correct/wrong tones, countdown ticks (≤5s), leaderboard fanfare, game-over melody
-- Question editor at `/admin.html`: category tabs, add/edit/delete all question types, saves to `questions.json` live
-- Historical photo support: any question can include an optional `imageUrl` field; photo shown via a dedicated `<img id="question-photo">` element above the question text (not injected via innerHTML)
+- Mobile-friendly layout throughout
 
 ## Question database
 - All questions live in `quiz.db` (SQLite, 233 total) — managed via `db.js`
-- Schema: single `questions` table with columns `id`, `category`, `type`, `question`, `correct`, `image_url`, `extra` (JSON blob for type-varying fields like answers[], items[], coordinates, min/max/step)
-- `questions.json` is kept as a seed/backup file but is no longer read at runtime
-- To set up a fresh install: run `node migrate.js` once to load `questions.json` → `quiz.db`
-- Server queries the DB every time a new game is created — admin edits take effect without restarting
-- Admin API: `GET /admin/questions` and `POST /admin/questions` (POST replaces all rows in a transaction)
-- Slider/timeline ranges are intentionally asymmetric (answer is not at midpoint)
-- Geography coordinates are exact landmark locations (not just city centres)
-- User accounts can be added later as a new `users` table — no changes to the questions table needed
+- Schema: single `questions` table — `id`, `category`, `type`, `question`, `correct`, `image_url`, `extra` (JSON blob for type-varying fields: `answers[]`, `items[]`, coordinates, `min`/`max`/`step`/`unit`)
+- `questions.json` is kept as a seed/backup; it is not read at runtime
+- Server queries the DB on every `create-game` event — admin edits take effect without restarting
+- Admin POST endpoint replaces all rows atomically in a single transaction
+- User accounts can be added later as a new `users` table — no changes to `questions` needed
 
 ---
 
-## Known issues & planned improvements
-*(Discovered during testing. Add new ones here as they come up.)*
-
-### Completed
-
-**Geography scoring curve** — replaced `exp(-dist/95)` with `exp(-(dist/50)^0.6)` in `server.js`. Same city now scores ~68pts instead of ~94pts; being in the right region still earns 10–37pts.
-
-**Per-type result & leaderboard durations** — early-advance delay is now MC/flags=3s, estimation/timeline=4s, map=5s. Leaderboard autoplay pause is now MC/flags=5s, estimation/timeline=8s, map=10s.
-
-**Slider/timeline text input** — the big value display for estimation and timeline questions is now an editable `<input type="number">` that stays in sync with the drag slider.
-
-**Visual scale reveal on leaderboard** — after timeline and estimation questions, the leaderboard shows a horizontal axis with a gold star at the correct value and animated player-pin dots at each player's guess. Rendered by `showLeaderboardScale()` in `client.js`.
-
-**Geography split into 4 subcategories** — old `geography` category retired. All 30 existing questions migrated to `geo-built` / `geo-natural` / `geo-cities`. New `geo-history` category added. 22 new questions added across all four. Config screen now shows 4 separate cards. Total questions: 188 → 210.
-
-**Slider/timeline randomised start position** — thumb starts at a random position in the inner 80% of the range, not the midpoint.
-
-**Historical photo support** — any question can include an optional `imageUrl` field; the photo is shown above the question text. 3 example photo-timeline questions added.
-
-**Map leaderboard zoom** — removed `maxZoom` cap from `fitBounds` so the map zooms in as far as needed when guesses are close together.
-
-**Map tile aesthetics** — switched both maps (question screen + leaderboard reveal) from CartoDB dark no-labels to **CartoDB Voyager No Labels** (`rastertiles/voyager_nolabels`). Lighter style with roads, water and borders visible. Removed the faint label overlay. `maxZoom` bumped to 19.
-
-**Visual redesign: Parchment & Ink theme** — full redesign of `style.css` and `index.html`. Warm parchment/ink/gold palette. Three-font system: Cinzel (headings/labels), EB Garamond (decorative/italic), Lora (body/questions). Two-column home screen (ink left, parchment right). Two-column result screen (ink left with icon, parchment right with score). Answer buttons are white parchment cards with a colored left border per slot.
-
-**New question type: Sequence** — drag 4 items into the correct chronological/logical order. Pointer-events drag (works on mobile and desktop). Scored by number of items in correct position (0–4), ranked like proximity questions. CSS counter auto-numbers items live as they are reordered. Leaderboard shows a correct-order numbered list + per-player 2×2 grid (green = correct position, red = wrong). 30-second timer.
-
-**Sequence question fixes & expansion** — removed years from all item labels (years in parentheses spoiled the correct order). Expanded from 10 to 20 questions, adding non-chronological ordering tasks (planets by distance from Sun, mountains by height, oceans by size, animals by lifespan) alongside new chronological sets (US presidents, voyages of exploration, famous paintings, literature, French rulers, communication technologies).
-
-**Scoring system** — single Rank + Speed mode. Scoring is deferred to leaderboard time (server calculates rank after all answers are in). Speed bonus pill removed.
-
-**Landmark locationName accuracy audit** — updated 26 geo question `locationName` fields to include the specific landmark name (e.g. "Paris, France" → "Eiffel Tower, Paris") so the answer reveal is informative rather than just showing the city.
-
-**Admin sequence question editor** — added Sequence as a fully editable type in `/admin.html`: four numbered item fields in correct order, collect/validate logic, pink badge. Also fixed the Geography sidebar to show the 4 real subcategories (geo-built, geo-natural, geo-cities, geo-history) with correct question counts.
-
-**Admin map picker for geography questions** — the map question form in `/admin.html` now embeds a live Leaflet map (Voyager No Labels tiles). Click anywhere on the map to place a draggable pin; coordinates auto-fill the Lat/Lng inputs. Typing coordinates manually also moves the pin. No more hand-typing lat/lng to add geo questions.
-
-**Sequence leaderboard layout fix** — player reveal blocks (`.seq-reveal-player`) were using the `tlPinAppear` animation which includes `translateX(-50%)`. That transform is designed for absolutely-positioned timeline pins; on regular block elements it shifted them 50% of their width to the left, escaping the card. Fixed by switching to the existing `fadeSlideIn` animation instead.
-
-**Sequence drag fix (desktop)** — `pointermove`/`pointerup`/`pointercancel` were attached to the dragged `<li>` element directly, and `setPointerCapture` was used to keep events on it. Moving the element in the DOM via `insertBefore` caused some browsers to fire `pointercancel`, ending the drag after one move. Fixed by removing pointer capture and attaching all three listeners to `document` instead — a stable target that is unaffected by DOM changes.
-
-**TV mode and Mobile mode** — host picks a display mode on the config screen:
-- **Mobile mode** (default): host enters their own nickname and joins as a regular player. Server registers the host in `game.players`; `myRole` is set to `'player'` client-side so the host sees answer controls, result screens, and a highlighted leaderboard row. The host socket still receives `waiting-for-host` for the "Next Question →" button.
-- **TV mode**: host device shows questions and leaderboard on a shared screen; players answer on their phones. Behaviour is the existing host view (read-only answer display, answer count).
-
-**Unified scoring mode (Rank + Speed)** — removed the two-mode scoring system (Rank / Accuracy+Rank). Single mode now:
-- MC/flag: ranked by answer speed (fastest correct = 1st)
-- Proximity (slider/timeline/map): ranked by closeness; speed is tiebreaker on equal values
-- Sequence: ranked by correctCount; speed is tiebreaker on equal count
-- Config screen no longer has a scoring selector
-- Result screen shows "Speed rank — see leaderboard" / "Rank points — see leaderboard" (rank deferred)
-- Leaderboard shows rank reason for all types; "faster ⚡" when speed broke a tie
-
-**Host pause button** — host can pause mid-question or mid-leaderboard:
-- During questions: timer bar freezes and shows ⏸ for all players; resumes from exact remaining time
-- During leaderboard (autoplay on): pauses the auto-advance countdown; leaderboard stays visible
-- Two separate buttons — one on the question screen, one on the leaderboard screen
-- Only shown to the host (tracked via `amHost` flag, separate from `myRole`)
-
-**Leaderboard clarity improvements** — several fixes to make it immediately obvious why you got each score:
-- Rank-reason line (e.g. "1st fastest · +10 pts") shown in the right column below the score; left column shows only name + answer stat.
-- Wrong/no-answer rows shown in muted colour.
-- "Tied · slower" label for the loser of a speed tiebreak (not "2nd closest", which would imply less accuracy).
-- "Correct" shown instead of "1st closest" when a player gets the exact correct answer on proximity/sequence questions.
-- "faster ⚡" shown in rank reason when speed broke a tie on proximity or sequence questions.
-- Year decimal bug fixed: all numeric displays now use `toLocaleString('en-US')` or `String()` to avoid "1.945" in European locales.
-- Gain badge (+N pts overlay) removed — redundant with the rank-reason line.
-
-**Dynamic leaderboard duration** — leaderboard autoplay pause now scales with player count: `base + (playerCount − 1) × 0.5s`, capped at 20s. Base times: MC/flag=5s, slider/timeline/sequence=8s, map=10s. Implemented server-side in `showLeaderboard()`.
-
-**SQLite database for questions** — questions migrated from `questions.json` to a SQLite database (`quiz.db`) via `better-sqlite3`. New files: `db.js` (schema + `rowToQuestion`/`questionToRow` helpers) and `migrate.js` (one-time seed script). The admin save endpoint now writes to the DB via a replace-all transaction. Game state remains in-memory. Schema is designed to support user accounts as a future addition (new `users` table, no changes needed to `questions`).
-
----
-
-### Not yet done
+## Planned improvements
 
 **Expand Timeline / History (target: 60+ questions)**
-- Current count is 25 (+ 3 photo questions). Cover all eras: ancient, medieval, early modern, modern, recent.
+- Currently 28 questions. Cover all eras: ancient, medieval, early modern, modern, recent.
 - Pure content work — defer to a dedicated question-writing session.
 
 **New question type: Silhouette (MC)**
 - Show a country/region outline silhouette; players pick the name from 4 buttons.
-- Low complexity — reuses the flag question mechanic (image + 4 MC buttons).
+- Reuses the flag question mechanic (image + 4 MC buttons) — low implementation complexity.
+- Needs a source of country silhouette SVGs.
+
+**User accounts**
+- Schema is ready (add a `users` table, optionally link questions to `created_by`).
+- Frontend login/register flow and session handling not yet designed.
 
 ### Supplemental categories — keep but don't grow
-Facts, Science, Sports, Entertainment, Flags are supporting acts. Focus on quality over quantity; don't expand these.
+Facts, Science, Sports, Entertainment, Flags are supporting acts. Focus on quality over quantity.
 
 ---
 
