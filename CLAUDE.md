@@ -32,7 +32,6 @@ quiz-app/
 **First time only (or after pulling on a new machine):**
 ```
 npm install          — installs all packages (express, socket.io, better-sqlite3)
-node migrate.js      — creates quiz.db and loads all questions from questions.json
 ```
 
 **Every time:**
@@ -40,7 +39,9 @@ node migrate.js      — creates quiz.db and loads all questions from questions.
 node server.js       — starts the app at http://localhost:3000
 ```
 
-`quiz.db` is excluded from git because it's generated from `questions.json`. Any fresh clone needs `node migrate.js` run once before `node server.js` will work.
+`quiz.db` is committed to git and is the source of truth for all questions. `questions.json` is kept only as a backup/seed reference. To add or edit questions: use the admin editor at `/admin.html`, then commit and push `quiz.db` — Railway will pick up the new questions automatically on its next deploy.
+
+`migrate.js` only needs to be run if `quiz.db` is ever lost or corrupted. It rebuilds the database from `questions.json`.
 
 ---
 
@@ -156,7 +157,8 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 ## Question database
 - All questions live in `quiz.db` (SQLite, 233 total) — managed via `db.js`
 - Schema: single `questions` table — `id`, `category`, `type`, `question`, `correct`, `image_url`, `extra` (JSON blob for type-varying fields: `answers[]`, `items[]`, coordinates, `min`/`max`/`step`/`unit`)
-- `questions.json` is kept as a seed/backup; it is not read at runtime
+- `quiz.db` is committed to git — it is the source of truth for all questions
+- `questions.json` is kept as a backup only; it is not read at runtime
 - Server queries the DB on every `create-game` event — admin edits take effect without restarting
 - Admin POST endpoint replaces all rows atomically in a single transaction
 - User accounts can be added later as a new `users` table — no changes to `questions` needed
