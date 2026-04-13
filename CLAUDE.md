@@ -8,14 +8,17 @@ A multiplayer quiz game inspired by gameon.world. A host configures and starts a
 - **Frontend:** Plain HTML + CSS + JavaScript (no frameworks)
 - **Real-time communication:** Socket.io (WebSockets)
 - **Maps:** Leaflet.js with CartoDB Voyager No Labels tiles (`rastertiles/voyager_nolabels`), maxZoom 19
-- **Storage:** No database — game state in server memory, questions in `questions.json`
+- **Storage:** SQLite (`quiz.db`) via `better-sqlite3` for questions; game state in server memory
 - **Entry point:** `node server.js` → runs at `http://localhost:3000`
 
 ## Project structure
 ```
 quiz-app/
 ├── server.js          — backend: game logic, scoring, Socket.io events
-├── questions.json     — all questions (edit here or via /admin.html)
+├── db.js              — SQLite setup, rowToQuestion / questionToRow helpers
+├── migrate.js         — one-time script: loads questions.json → quiz.db (run once)
+├── quiz.db            — SQLite database file (gitignored; created by migrate.js)
+├── questions.json     — original question data; kept as seed/backup, not read at runtime
 ├── package.json       — project metadata and dependencies
 └── public/
     ├── index.html     — all 9 game screens in one file (shown/hidden by JS)
@@ -117,11 +120,15 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Historical photo support: any question can include an optional `imageUrl` field; photo shown via a dedicated `<img id="question-photo">` element above the question text (not injected via innerHTML)
 
 ## Question database
-- All questions live in `questions.json` (213 total)
-- Server reloads the file every time a new game is created — admin edits take effect without restarting
-- Admin API: `GET /admin/questions` and `POST /admin/questions`
+- All questions live in `quiz.db` (SQLite, 233 total) — managed via `db.js`
+- Schema: single `questions` table with columns `id`, `category`, `type`, `question`, `correct`, `image_url`, `extra` (JSON blob for type-varying fields like answers[], items[], coordinates, min/max/step)
+- `questions.json` is kept as a seed/backup file but is no longer read at runtime
+- To set up a fresh install: run `node migrate.js` once to load `questions.json` → `quiz.db`
+- Server queries the DB every time a new game is created — admin edits take effect without restarting
+- Admin API: `GET /admin/questions` and `POST /admin/questions` (POST replaces all rows in a transaction)
 - Slider/timeline ranges are intentionally asymmetric (answer is not at midpoint)
 - Geography coordinates are exact landmark locations (not just city centres)
+- User accounts can be added later as a new `users` table — no changes to the questions table needed
 
 ---
 
@@ -194,6 +201,8 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Gain badge (+N pts overlay) removed — redundant with the rank-reason line.
 
 **Dynamic leaderboard duration** — leaderboard autoplay pause now scales with player count: `base + (playerCount − 1) × 0.5s`, capped at 20s. Base times: MC/flag=5s, slider/timeline/sequence=8s, map=10s. Implemented server-side in `showLeaderboard()`.
+
+**SQLite database for questions** — questions migrated from `questions.json` to a SQLite database (`quiz.db`) via `better-sqlite3`. New files: `db.js` (schema + `rowToQuestion`/`questionToRow` helpers) and `migrate.js` (one-time seed script). The admin save endpoint now writes to the DB via a replace-all transaction. Game state remains in-memory. Schema is designed to support user accounts as a future addition (new `users` table, no changes needed to `questions`).
 
 ---
 
