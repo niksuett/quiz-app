@@ -4,7 +4,7 @@
   "description": "A multiplayer quiz game",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node migrate.js && node server.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
