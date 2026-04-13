@@ -116,7 +116,7 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 - Mobile-friendly layout
 - Animations: screen fade-in, answer button stagger, correct flash, wrong shake, timer urgency pulse, score count-up
 - Sound effects (Web Audio API, no files): question chime, correct/wrong tones, countdown ticks (≤5s), leaderboard fanfare, game-over melody
-- Question editor at `/admin.html`: category tabs, add/edit/delete all question types, saves to `questions.json` live
+- Question editor at `/admin.html`: category tabs, add/edit/delete all question types, saves to `quiz.db` live (via the admin API)
 - Historical photo support: any question can include an optional `imageUrl` field; photo shown via a dedicated `<img id="question-photo">` element above the question text (not injected via innerHTML)
 
 ## Question database
