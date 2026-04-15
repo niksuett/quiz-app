@@ -20,6 +20,7 @@ quiz-app/
 ├── quiz.db            — SQLite database file (gitignored; created by migrate.js)
 ├── questions.json     — original question data; kept as seed/backup, not read at runtime
 ├── package.json       — project metadata and dependencies
+├── QUESTION_PIPELINE.md — technical spec for the question data model and pipeline design (paste into a Claude chat to brainstorm new ingestion sources)
 └── public/
     ├── index.html     — all 9 game screens in one file (shown/hidden by JS)
     ├── style.css      — Parchment & Ink theme (Cinzel/EB Garamond/Lora fonts, gold accents)
