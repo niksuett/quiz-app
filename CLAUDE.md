@@ -57,20 +57,20 @@ node server.js       — starts the app at http://localhost:3000
 ## Question categories
 | Category | `category` value | Type | Count | Notes |
 |----------|-----------------|------|-------|-------|
-| Facts | `facts` | Multiple choice | 20 | General knowledge |
-| Science | `science` | Multiple choice | 20 | |
-| Sports | `sports` | Multiple choice | 20 | |
-| Entertainment | `entertainment` | Multiple choice | 20 | |
-| Flags | `flags` | Flag image + MC | 30 | Shows real flag image from flagcdn.com |
-| Estimation | `estimation` | Slider | 23 | Drag to guess a number; scored by proximity |
-| Timeline | `timeline` | Year slider | 28 | Drag to guess a year; scored by proximity |
-| Natural Wonders | `geo-natural` | Map pin-drop | 10 | Mountains, lakes, waterfalls, etc. |
-| Built World | `geo-built` | Map pin-drop | 22 | Monuments, temples, famous buildings |
-| Cities | `geo-cities` | Map pin-drop | 12 | Urban centres worldwide |
-| Where in History | `geo-history` | Map pin-drop | 8 | Battle sites, historical events, ruins |
-| Sequence | `sequence` | Drag-to-order | 20 | 4 items in correct order; scored by positions correct |
+| Facts | `facts` | Multiple choice | 106 | General knowledge |
+| Science | `science` | Multiple choice | 97 | |
+| Sports | `sports` | Multiple choice | 72 | |
+| Entertainment | `entertainment` | Multiple choice | 84 | |
+| Flags | `flags` | Flag image + MC | 102 | Shows real flag image from flagcdn.com |
+| Estimation | `estimation` | Slider | 80 | Drag to guess a number; scored by proximity |
+| Timeline | `timeline` | Year slider | 81 | Drag to guess a year; scored by proximity |
+| Natural Wonders | `geo-natural` | Map pin-drop | 72 | Mountains, lakes, waterfalls, etc. |
+| Built World | `geo-built` | Map pin-drop | 142 | Monuments, temples, famous buildings |
+| Cities | `geo-cities` | Map pin-drop | 81 | Urban centres worldwide |
+| Where in History | `geo-history` | Map pin-drop | 58 | Battle sites, historical events, ruins |
+| Sequence | `sequence` | Drag-to-order | 110 | 4 items in correct order; scored by positions correct |
 
-**Total: 233 questions.** Some timeline questions include an optional `imageUrl` (historical photo shown above the question text).
+**Total: 1085 questions.** Some timeline questions include an optional `imageUrl` (historical photo shown above the question text).
 
 ## Answer mechanics
 | Type | How it works |
@@ -166,10 +166,6 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 ---
 
 ## Planned improvements
-
-**Expand Timeline / History (target: 60+ questions)**
-- Currently 28 questions. Cover all eras: ancient, medieval, early modern, modern, recent.
-- Pure content work — defer to a dedicated question-writing session.
 
 **New question type: Silhouette (MC)**
 - Show a country/region outline silhouette; players pick the name from 4 buttons.
