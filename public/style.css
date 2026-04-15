@@ -743,6 +743,16 @@ h3 {
 .timeline-year-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .timeline-year-input[type=number] { -moz-appearance: textfield; }
 
+/* BCE hint — only shown when the question's range dips below year 1 */
+.timeline-bce-hint {
+  margin: 6px 0 12px;
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  font-style: italic;
+  text-align: center;
+}
+.timeline-bce-hint strong { font-style: normal; color: var(--ink); }
+
 /* ─── Map pin-drop ────────────────────────────────────────────────────────── */
 .map-wrap {
   background: var(--parchment);

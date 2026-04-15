@@ -64,14 +64,14 @@ node server.js       — starts the app at http://localhost:3000
 | Entertainment | `entertainment` | Multiple choice | 84 | |
 | Flags | `flags` | Flag image + MC | 102 | Shows real flag image from flagcdn.com |
 | Estimation | `estimation` | Slider | 80 | Drag to guess a number; scored by proximity |
-| Timeline | `timeline` | Year slider | 81 | Drag to guess a year; scored by proximity |
+| Timeline | `timeline` | Year slider | 84 | Drag to guess a year; scored by proximity. Negative years = BCE (display formatted as "X BCE") |
 | Natural Wonders | `geo-natural` | Map pin-drop | 72 | Mountains, lakes, waterfalls, etc. |
 | Built World | `geo-built` | Map pin-drop | 142 | Monuments, temples, famous buildings |
 | Cities | `geo-cities` | Map pin-drop | 81 | Urban centres worldwide |
 | Where in History | `geo-history` | Map pin-drop | 58 | Battle sites, historical events, ruins |
 | Sequence | `sequence` | Drag-to-order | 110 | 4 items in correct order; scored by positions correct |
 
-**Total: 1085 questions.** Some timeline questions include an optional `imageUrl` (historical photo shown above the question text).
+**Total: 1088 questions.** Some timeline questions include an optional `imageUrl` (historical photo shown above the question text).
 
 ## Answer mechanics
 | Type | How it works |
@@ -167,6 +167,25 @@ Single scoring mode — **Rank + Speed**. Scoring is **deferred**: points are ca
 ---
 
 ## Planned improvements
+
+**Map questions — tolerance radius for fuzzy features**
+- Problem: single-point map questions for large features (Sahara, Atacama, Dead Sea, Yellowstone, etc.) are frustrating — players don't know whether the "correct" point is the centroid, the most famous part, or whatever the author picked. This is a known annoyance in other quiz games we want to avoid.
+- Decision (made 2026-04-16): add an optional `toleranceKm` field to map questions stored in the `extra` JSON blob. Any guess within that radius is treated as a perfect hit (effective distance 0); outside, distance is `max(0, haversineDist − toleranceKm)`. Fully backward compatible — existing 353 map questions stay as point questions.
+- Why not polygons/GeoJSON: proper area-based scoring would require sourcing polygon data for every fuzzy feature, a point-in-polygon + distance-to-boundary routine, and a polygon reveal layer on the Leaflet map. ~10× the work for maybe 10% more fidelity. Tolerance radius covers the real pain points.
+- Implementation order when picking this up:
+  1. **Schema + validation** — add `toleranceKm` as an optional positive number to the `extra` JSON blob. Update `db.js` (`rowToQuestion` and `questionToRow` — currently drop any field not in the hardcoded list) and `import.js` validation. Document in `QUESTION_PIPELINE.md` under the map question section.
+  2. **Server scoring** — in `server.js` ranking logic, compute `effectiveDist = Math.max(0, haversineDist - (q.toleranceKm || 0))` and rank by that. Players inside the radius all tie at 0 and speed breaks the tie (matches existing tiebreak behavior). Check whether the decay formula `exp(-(dist/50)^0.6)` is used anywhere for absolute scoring vs. just ranking — if just ranking, no formula change needed.
+  3. **Leaderboard reveal** — in `public/client.js` `showLeaderboardMap`, draw an `L.circle` with radius `toleranceKm * 1000` around the gold star (subtle fill, matching the parchment/ink theme). Only when `toleranceKm > 0`.
+  4. **Admin editor** — in `public/admin.html`, add an optional numeric "Tolerance (km)" input next to the lat/lng fields. Bonus: live circle preview on the map picker so the author can see the tolerance visually.
+  5. **Content pass** — add tolerance radii to existing fuzzy features. Either a one-shot script that takes `{"Atacama Desert": 400, "Sahara Desert": 1500, ...}` and UPDATEs the DB, or incremental via the admin editor. Rough starting list: deserts (Sahara ~1500 km, Atacama ~400 km, Gobi ~600 km, Rub' al Khali ~500 km), large lakes/seas (Caspian ~400 km, Baikal ~250 km, Dead Sea ~20 km, Lake Victoria ~150 km), forests/biomes (Amazon basin ~1500 km, Okavango ~100 km, Pantanal ~300 km), mountain ranges (Himalayas ~1000 km, Andes ~2000 km), reefs (Great Barrier Reef ~800 km).
+- Also worth a look at the same time: reviewing existing map questions for ambiguous phrasings and clarifying them with natural anchor points where applicable (e.g. "Where is the source of the Amazon?", "Where is the Grand Canyon Village visitor center?"). Option A from the design discussion.
+- Design discussion lives in the 2026-04-16 conversation. Short summary: considered (A) better wording only, (B) full polygon/GeoJSON scoring, (C) tolerance radius. Picked C + A together as the best cost/value. See `QUESTION_PIPELINE.md` for the data model context a pipeline would need.
+
+**Expand ancient / pre-year-0 timeline coverage**
+- The frontend was updated on 2026-04-16 to handle BCE dates properly: negative `correct`/`min`/`max` values now render as "X BCE" in tick labels, the leaderboard reveal, the result screen, and the correct-answer banner. A hint under the number input ("Type a negative number for BCE") appears when the question's range dips below year 1. Only 3 BCE questions exist so far (Great Pyramid, Alexander's death, Actium).
+- Goal: add ~20–30 more ancient questions spanning pre-500 CE — other Greco-Roman battles (Marathon, Cannae, Thermopylae, Gaugamela, Zama, Teutoburg Forest), foundings (Rome's traditional founding 753 BCE, Athens' democracy reforms, Persian Empire, Han dynasty), construction dates (Parthenon, Colosseum, Hadrian's Wall, Great Wall first unification under Qin Shi Huang), scientific/cultural firsts (Pythagoras, Aristotle, Archimedes' death, Hippocrates, Confucius), significant religious dates if uncontested (first Jewish Temple, Buddha's approximate lifetime). Skip anything with disputed dates or multiple "reasonable" years — the importer won't catch that and it'll annoy players.
+- The existing non-BCE medieval bucket is already fairly well covered. Focus ancient expansion on the pre-500 CE gap.
+- Pipeline hook: could also be driven from WikiData SPARQL queries that filter by `P585` (point in time) before year 500 — see `QUESTION_PIPELINE.md`.
 
 **New question type: Silhouette (MC)**
 - Show a country/region outline silhouette; players pick the name from 4 buttons.

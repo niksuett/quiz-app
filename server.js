@@ -570,13 +570,23 @@ function showLeaderboard(game) {
   // Apply rank-based scores now that all answers are in
   applyRoundScores(game, q);
 
+  // Format a year for the leaderboard banner: negative = BCE, 1–999 = "X CE", 1000+ = plain.
+  const fmtYear = y => {
+    const n = Math.round(y);
+    if (n < 0)    return `${Math.abs(n)} BCE`;
+    if (n < 1000) return `${n} CE`;
+    return String(n);
+  };
+
   const correctAnswer = q.type === 'sequence'
     ? q.items.map((item, i) => `${i + 1}. ${item}`).join(' → ')
-    : (q.type === 'slider' || q.type === 'timeline')
-      ? (q.unit ? `${q.correct.toLocaleString('en-US')} ${q.unit}` : `${q.correct}`)
-      : q.type === 'map'
-        ? q.locationName
-        : q.answers[q.correct];
+    : q.type === 'timeline'
+      ? fmtYear(q.correct)
+      : q.type === 'slider'
+        ? (q.unit ? `${q.correct.toLocaleString('en-US')} ${q.unit}` : `${q.correct}`)
+        : q.type === 'map'
+          ? q.locationName
+          : q.answers[q.correct];
 
   const mapData = q.type === 'map' ? {
     playerPins:   game.players
@@ -599,6 +609,7 @@ function showLeaderboard(game) {
   } : null;
 
   const timelineData = (q.type === 'timeline' || q.type === 'slider') ? {
+    type:          q.type,
     correctValue:  q.correct,
     unit:          q.unit || '',
     playerGuesses: game.players

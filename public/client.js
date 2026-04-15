@@ -200,18 +200,29 @@ function renderFinalLeaderboard(listEl, entries) {
   });
 }
 
+// Format a year for display. Negative = BCE, 1–999 = "X CE", 1000+ = plain year.
+// Used so questions dating back before 0 AD render as e.g. "323 BCE" instead of "-323".
+function formatYear(y) {
+  const n = Math.round(y);
+  if (n < 0) return `${Math.abs(n)} BCE`;
+  if (n < 1000) return `${n} CE`;
+  return String(n);
+}
+
 function formatAnswerStat(ans) {
   if (!ans) return 'No answer';
   if (ans.type === 'map') {
     return `📍 ${ans.distanceKm.toLocaleString('en-US')} km away`;
   }
-  if (ans.type === 'slider' || ans.type === 'timeline') {
-    const u      = ans.unit ? ` ${ans.unit}` : '';
-    // For timeline (years) avoid thousands separator; for sliders use en-US commas
-    const fmtVal = ans.type === 'timeline' ? String(Math.round(ans.value)) : ans.value.toLocaleString('en-US');
-    const fmtDiff = ans.type === 'timeline' ? String(Math.round(ans.diff)) : ans.diff.toLocaleString('en-US');
-    const diff = ans.diff === 0 ? 'exact!' : `off by ${fmtDiff}${u}`;
-    return `${fmtVal}${u} — ${diff}`;
+  if (ans.type === 'timeline') {
+    // Timeline (years): BCE/CE formatting for the value; diff is a plain magnitude in years
+    const diff = ans.diff === 0 ? 'exact!' : `off by ${Math.round(ans.diff)} years`;
+    return `${formatYear(ans.value)} — ${diff}`;
+  }
+  if (ans.type === 'slider') {
+    const u = ans.unit ? ` ${ans.unit}` : '';
+    const diff = ans.diff === 0 ? 'exact!' : `off by ${ans.diff.toLocaleString('en-US')}${u}`;
+    return `${ans.value.toLocaleString('en-US')}${u} — ${diff}`;
   }
   if (ans.type === 'sequence') {
     return `${ans.correctCount} / ${ans.correctOrder.length} in correct position`;
@@ -546,10 +557,15 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
     const margin  = Math.round((max - min) * 0.1);
     const midYear = Math.round(min + margin + Math.random() * (max - min - 2 * margin));
 
-    // Build 5 evenly-spaced year labels for the tick row
+    // Build 5 evenly-spaced year labels for the tick row (BCE/CE-formatted)
     const ticks = Array.from({ length: 5 }, (_, i) =>
       Math.round(min + (i / 4) * (max - min))
-    ).map(y => `<span>${y}</span>`).join('');
+    ).map(y => `<span>${formatYear(y)}</span>`).join('');
+
+    // Only show the BCE hint when the question's range dips below year 1
+    const bceHint = min < 1
+      ? `<p class="timeline-bce-hint">Type a negative number for BCE (e.g. <strong>-323</strong> means 323 BCE)</p>`
+      : '';
 
     grid.innerHTML = `
       <div class="timeline-wrap">
@@ -558,6 +574,7 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
                oninput="syncTimelineFromInput(this.value)"
                onblur="clampTimelineInput()"
                ${myRole === 'host' ? 'disabled' : ''}>
+        ${bceHint}
         <input type="range" id="timeline-input" class="timeline-input"
                min="${min}" max="${max}" step="1" value="${midYear}"
                oninput="updateTimelineDisplay(this.value)"
@@ -1033,8 +1050,12 @@ function showLeaderboardScale(timelineData) {
   wrap.innerHTML = '';
   wrap.classList.remove('hidden');
 
-  const { correctValue, unit, playerGuesses } = timelineData;
-  const fmt = v => unit ? `${v.toLocaleString('en-US')} ${unit}` : String(v);
+  const { type, correctValue, unit, playerGuesses } = timelineData;
+  const isTimeline = type === 'timeline';
+  // Timeline values render as BCE/CE; slider values render with thousands separators + unit
+  const fmt = v => isTimeline
+    ? formatYear(v)
+    : (unit ? `${v.toLocaleString('en-US')} ${unit}` : String(v));
 
   // Calculate the visible axis range with a bit of padding on each side
   const allValues = [correctValue, ...playerGuesses.map(g => g.value)];
@@ -1081,7 +1102,7 @@ function showLeaderboardScale(timelineData) {
     const lbl = document.createElement('span');
     lbl.className  = 'tl-tick-label';
     lbl.style.left = p + '%';
-    lbl.textContent = v;
+    lbl.textContent = isTimeline ? formatYear(v) : v;
     labelsRow.appendChild(lbl);
   }
 
@@ -1217,9 +1238,9 @@ function showResultScreen(data) {
   compareEl.classList.add('hidden');
 
   if (data.type === 'slider' || data.type === 'timeline') {
-    const fmt = v => data.unit
-      ? `${v.toLocaleString('en-US')} ${data.unit}`
-      : (data.type === 'timeline' ? String(Math.round(v)) : v.toLocaleString('en-US'));
+    const fmt = v => data.type === 'timeline'
+      ? formatYear(v)
+      : (data.unit ? `${v.toLocaleString('en-US')} ${data.unit}` : v.toLocaleString('en-US'));
     const pct = data.accuracyPct;
 
     if (pct >= 95) {
@@ -1240,9 +1261,12 @@ function showResultScreen(data) {
 
     // Structured compare boxes: Your guess | Correct answer
     const u = data.unit ? ` ${data.unit}` : '';
+    const absDiff = Math.abs(data.yourAnswer - data.correctValue);
     const diff = data.yourAnswer === data.correctValue
       ? 'Exact!'
-      : `Off by ${data.type === 'timeline' ? String(Math.round(Math.abs(data.yourAnswer - data.correctValue))) : Math.abs(data.yourAnswer - data.correctValue).toLocaleString('en-US')}${u}`;
+      : data.type === 'timeline'
+        ? `Off by ${Math.round(absDiff)} years`
+        : `Off by ${absDiff.toLocaleString('en-US')}${u}`;
     compareEl.innerHTML = `
       <div class="compare-grid">
         <div class="compare-cell">
