@@ -565,13 +565,13 @@ socket.on('new-question', ({ questionNumber, totalQuestions, question, answers, 
 
     // Only show the BCE hint when the question's range dips below year 1
     const bceHint = min < 1
-      ? `<p class="timeline-bce-hint">Type a negative number for BCE (e.g. <strong>-323</strong> means 323 BCE)</p>`
+      ? `<p class="timeline-bce-hint">Type a year, e.g. <strong>44 BCE</strong> or <strong>1969</strong></p>`
       : '';
 
     grid.innerHTML = `
       <div class="timeline-wrap">
-        <input type="number" class="timeline-year-input" id="timeline-year-display"
-               min="${min}" max="${max}" step="1" value="${midYear}"
+        <input type="text" inputmode="numeric" class="timeline-year-input" id="timeline-year-display"
+               value="${formatYear(midYear)}"
                oninput="syncTimelineFromInput(this.value)"
                onblur="clampTimelineInput()"
                ${myRole === 'host' ? 'disabled' : ''}>
@@ -816,25 +816,40 @@ function submitSlider() {
 
 // ── Timeline helper functions ─────────────────────────────────────────────────
 
+// Parse a year string typed by the player. Accepts "323 BCE", "44 bce", "-323", "1969", "100 CE".
+function parseYearInput(text) {
+  const s = (text || '').trim();
+  const bceMatch = s.match(/^(\d+)\s*bce$/i);
+  if (bceMatch) return -parseInt(bceMatch[1], 10);
+  const ceMatch  = s.match(/^(\d+)\s*ce$/i);
+  if (ceMatch)  return  parseInt(ceMatch[1],  10);
+  const n = parseInt(s, 10);
+  return isNaN(n) ? null : n;
+}
+
 // Called every time the timeline thumb moves — keeps the year input in sync
 function updateTimelineDisplay(value) {
   const numInput = document.getElementById('timeline-year-display');
-  if (numInput) numInput.value = value;
+  if (numInput) numInput.value = formatYear(parseInt(value, 10));
 }
 
 // Called when the player types in the year input — keeps the range slider in sync
-function syncTimelineFromInput(value) {
+function syncTimelineFromInput(text) {
   const slider = document.getElementById('timeline-input');
-  if (slider) slider.value = value;
+  if (!slider) return;
+  const n = parseYearInput(text);
+  if (n !== null) slider.value = n;
 }
 
-// Called when the player leaves the year input — clamps to valid range
+// Called when the player leaves the year input — clamps to valid range and reformats
 function clampTimelineInput() {
   const numInput = document.getElementById('timeline-year-display');
   const slider   = document.getElementById('timeline-input');
   if (!numInput || !slider) return;
-  const v = Math.max(parseInt(slider.min), Math.min(parseInt(slider.max), parseInt(numInput.value) || parseInt(slider.value)));
-  numInput.value = v;
+  const parsed = parseYearInput(numInput.value);
+  const raw    = parsed !== null ? parsed : parseInt(slider.value, 10);
+  const v      = Math.max(parseInt(slider.min), Math.min(parseInt(slider.max), raw));
+  numInput.value = formatYear(v);
   slider.value   = v;
 }
 
