@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizBlast — Admin Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'EB Garamond', Georgia, serif;
+      background: #1a1108;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #f5eed8;
+      color: #1a1108;
+      border-radius: 12px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1a1108;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #6b5a3a;
+      margin-bottom: 32px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #c9a84c;
+      border-radius: 8px;
+      background: #fdf8ec;
+      color: #1a1108;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+
+    input[type="password"]:focus {
+      border-color: #a07828;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #c9a84c;
+      color: #1a1108;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #a07828;
+      color: #f5eed8;
+    }
+
+    .error-msg {
+      color: #c0392b;
+      font-size: 0.88rem;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Admin Panel</h1>
+    <p class="subtitle">QuizBlast Question Editor</p>
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+    <button onclick="submitPassword()">Enter</button>
+    <p class="error-msg" id="error-msg">Incorrect password. Try again.</p>
+  </div>
+
+  <script>
+    if (new URLSearchParams(window.location.search).get('error') === '1') {
+      document.getElementById('error-msg').classList.add('visible');
+    }
+
+    document.getElementById('pw-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') submitPassword();
+    });
+
+    function submitPassword() {
+      const pw = document.getElementById('pw-input').value;
+      window.location.href = '/admin-auth?pw=' + encodeURIComponent(pw);
+    }
+  </script>
+</body>
+</html>

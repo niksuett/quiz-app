@@ -111,4 +111,11 @@ function questionToRow(q) {
   };
 }
 
-module.exports = { db, rowToQuestion, questionToRow };
+// ── getQuestionById ───────────────────────────────────────────────────────────
+// Fetches a single question by its numeric ID. Returns null if not found.
+function getQuestionById(id) {
+  const row = db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
+  return row ? rowToQuestion(row) : null;
+}
+
+module.exports = { db, rowToQuestion, questionToRow, getQuestionById };

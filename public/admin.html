@@ -255,6 +255,7 @@
   <div class="topbar-right">
     <span class="save-status" id="save-status"></span>
     <a href="/" style="color:#71717a; font-size:.8rem; text-decoration:none;">← Back to game</a>
+    <a href="/admin-logout" style="color:#71717a; font-size:.8rem; text-decoration:none;">Log out</a>
   </div>
 </div>
 
@@ -315,6 +316,11 @@
 <button class="global-save" onclick="saveToServer()">Save All Changes</button>
 
 <script>
+// ── Auth guard ─────────────────────────────────────────────────────────────────
+if (!document.cookie.split(';').some(c => c.trim() === 'adminAuth=ilikehistory99')) {
+  window.location.href = '/admin-login.html';
+}
+
 // ── State ──────────────────────────────────────────────────────────────────────
 let questions = [];
 let currentCat = 'all';

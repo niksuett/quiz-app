@@ -2,18 +2,37 @@
 // server.js — backend: game logic, scoring, Socket.io events
 // ─────────────────────────────────────────────────────────────────────────────
 
-const express    = require('express');
-const http       = require('http');
-const { Server } = require('socket.io');
-const path       = require('path');
-const { db, rowToQuestion, questionToRow } = require('./db');
+const express      = require('express');
+const http         = require('http');
+const { Server }   = require('socket.io');
+const path         = require('path');
+const cookieParser = require('cookie-parser');
+const { db, rowToQuestion, questionToRow, getQuestionById } = require('./db');
 
 const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server);
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Admin auth endpoints ───────────────────────────────────────────────────────
+const ADMIN_PASSWORD = 'ilikehistory99';
+
+app.get('/admin-auth', (req, res) => {
+  if (req.query.pw === ADMIN_PASSWORD) {
+    res.cookie('adminAuth', ADMIN_PASSWORD, { maxAge: 8 * 60 * 60 * 1000, httpOnly: false });
+    res.redirect('/admin.html');
+  } else {
+    res.redirect('/admin-login.html?error=1');
+  }
+});
+
+app.get('/admin-logout', (req, res) => {
+  res.clearCookie('adminAuth');
+  res.redirect('/');
+});
 
 // ── Question bank ─────────────────────────────────────────────────────────────
 function loadQuestions() {
@@ -220,7 +239,7 @@ io.on('connection', (socket) => {
   console.log('Browser connected:', socket.id);
 
   // ── HOST creates a game ────────────────────────────────────────────────────
-  socket.on('create-game', ({ rounds, categories, autoplay, gameMode } = {}) => {
+  socket.on('create-game', ({ rounds, categories, autoplay, gameMode, testIds } = {}) => {
     rounds     = rounds     || '5';
     categories = categories || ['facts'];
     autoplay   = autoplay   !== false; // default true
@@ -229,21 +248,32 @@ io.on('connection', (socket) => {
     let gameId;
     do { gameId = generateGameId(); } while (games[gameId]);
 
-    ALL_QUESTIONS = loadQuestions();
+    let questions;
 
-    const pool = ALL_QUESTIONS
-      .filter(q => categories.includes(q.category))
-      .sort(() => Math.random() - 0.5);
+    if (testIds) {
+      // ?testIds= mode: load specific questions by ID, skip shuffle and category filter
+      const ids = String(testIds).split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+      questions = ids.map(id => getQuestionById(id)).filter(q => q !== null);
+      if (questions.length === 0) {
+        return socket.emit('create-error', 'No valid question IDs found in testIds.');
+      }
+    } else {
+      ALL_QUESTIONS = loadQuestions();
 
-    if (pool.length === 0) {
-      return socket.emit('create-error', 'No questions found for the selected categories.');
+      const pool = ALL_QUESTIONS
+        .filter(q => categories.includes(q.category))
+        .sort(() => Math.random() - 0.5);
+
+      if (pool.length === 0) {
+        return socket.emit('create-error', 'No questions found for the selected categories.');
+      }
+
+      const numRounds = rounds === 'infinite'
+        ? pool.length
+        : Math.min(parseInt(rounds, 10), pool.length);
+
+      questions = pool.slice(0, numRounds);
     }
-
-    const numRounds = rounds === 'infinite'
-      ? pool.length
-      : Math.min(parseInt(rounds, 10), pool.length);
-
-    const questions = pool.slice(0, numRounds);
 
     games[gameId] = {
       id:                gameId,
@@ -263,7 +293,7 @@ io.on('connection', (socket) => {
     socket.join(gameId);
 
     socket.emit('game-created', { gameId, gameMode, autoplay });
-    console.log(`Game ${gameId} | ${numRounds} rounds | categories: ${categories.join(',')} | autoplay: ${autoplay} | mode: ${gameMode}`);
+    console.log(`Game ${gameId} | ${questions.length} rounds | categories: ${testIds ? 'testIds=' + testIds : categories.join(',')} | autoplay: ${autoplay} | mode: ${gameMode}`);
   });
 
   // ── PLAYER joins ───────────────────────────────────────────────────────────

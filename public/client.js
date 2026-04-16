@@ -331,7 +331,8 @@ function createGame() {
   const autoplay      = document.getElementById('autoplay-toggle').checked;
   const activeModeBtn = document.querySelector('#mode-selector .scoring-btn.active');
   const selectedMode  = activeModeBtn ? activeModeBtn.dataset.mode : 'mobile';
-  socket.emit('create-game', { rounds, categories, autoplay, gameMode: selectedMode });
+  const testIds = new URLSearchParams(window.location.search).get('testIds');
+  socket.emit('create-game', { rounds, categories, autoplay, gameMode: selectedMode, testIds });
 }
 
 function startGame() {
