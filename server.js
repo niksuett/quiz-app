@@ -134,14 +134,14 @@ function applyRoundScores(game, question) {
     const answered = game.players
       .filter(p => p.mapAnswer)
       .sort((a, b) => {
-        const diff = a.mapAnswer.distanceKm - b.mapAnswer.distanceKm;
+        const diff = a.mapAnswer.effectiveDist - b.mapAnswer.effectiveDist;
         if (diff !== 0) return diff;
         return (a.answerTime || 999) - (b.answerTime || 999);
       });
 
     answered.forEach((p, i) => {
-      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].mapAnswer.distanceKm === p.mapAnswer.distanceKm;
-      p.speedTiebreakedOut = i > 0             && answered[i - 1].mapAnswer.distanceKm === p.mapAnswer.distanceKm;
+      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].mapAnswer.effectiveDist === p.mapAnswer.effectiveDist;
+      p.speedTiebreakedOut = i > 0             && answered[i - 1].mapAnswer.effectiveDist === p.mapAnswer.effectiveDist;
     });
 
     answered.forEach((p, rank) => {
@@ -400,16 +400,17 @@ io.on('connection', (socket) => {
       });
 
     } else if (qType === 'map') {
-      const dist       = haversineKm(answerLat, answerLng, question.correctLat, question.correctLng);
-      const accuracyRaw = Math.exp(-Math.pow(dist / 50, 0.6));
+      const dist        = haversineKm(answerLat, answerLng, question.correctLat, question.correctLng);
+      const effectiveDist = Math.max(0, dist - (question.toleranceKm || 0));
+      const accuracyRaw = Math.exp(-Math.pow(effectiveDist / 50, 0.6));
 
       player.accuracyRaw = accuracyRaw;
-      player.mapAnswer   = { lat: answerLat, lng: answerLng, distanceKm: Math.round(dist) };
+      player.mapAnswer   = { lat: answerLat, lng: answerLng, distanceKm: Math.round(dist), effectiveDist };
       player.lastAnswer  = { type: 'map', distanceKm: Math.round(dist) };
 
       socket.emit('answer-result', {
         type:        'map',
-        soundCorrect: dist < 2000,
+        soundCorrect: effectiveDist < 2000,
         distanceKm:   Math.round(dist),
         locationName: question.locationName,
       });
@@ -625,6 +626,7 @@ function showLeaderboard(game) {
     correctLat:   q.correctLat,
     correctLng:   q.correctLng,
     locationName: q.locationName,
+    toleranceKm:  q.toleranceKm || 0,
   } : null;
 
   const sequenceData = q.type === 'sequence' ? {

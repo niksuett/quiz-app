@@ -1016,6 +1016,18 @@ function showLeaderboardMap(mapData) {
       .addTo(leaderboardMap)
       .bindPopup(`<b>✓ ${mapData.locationName}</b>`);
 
+    // ── Tolerance radius circle (only shown when toleranceKm > 0) ───────────
+    if (mapData.toleranceKm > 0) {
+      L.circle([mapData.correctLat, mapData.correctLng], {
+        radius:      mapData.toleranceKm * 1000,
+        color:       '#c9a84c',
+        weight:      1.5,
+        opacity:     0.6,
+        fillColor:   '#c9a84c',
+        fillOpacity: 0.08,
+      }).addTo(leaderboardMap);
+    }
+
     const allLatLngs = [[mapData.correctLat, mapData.correctLng]];
 
     // ── Player pins: animate in one by one ──────────────────────────────────

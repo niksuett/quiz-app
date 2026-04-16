@@ -64,9 +64,10 @@ function rowToQuestion(row) {
     q.correct = parseFloat(row.correct);
 
   } else if (type === 'map') {
-    q.correctLat  = extra.correctLat;
-    q.correctLng  = extra.correctLng;
+    q.correctLat   = extra.correctLat;
+    q.correctLng   = extra.correctLng;
     q.locationName = extra.locationName;
+    if (extra.toleranceKm) q.toleranceKm = extra.toleranceKm;
     // map questions have no `correct` scalar value
 
   } else if (type === 'sequence') {
@@ -94,6 +95,7 @@ function questionToRow(q) {
 
   } else if (type === 'map') {
     extraObj = { correctLat: q.correctLat, correctLng: q.correctLng, locationName: q.locationName || '' };
+    if (q.toleranceKm) extraObj.toleranceKm = q.toleranceKm;
     correct  = null;
 
   } else if (type === 'sequence') {

@@ -549,6 +549,12 @@ function renderForm(q, title) {
           <input id="f-location" value="${escHtml(q.locationName || '')}">
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tolerance radius (km) — optional, for large/fuzzy features</label>
+          <input id="f-tolerance" type="number" min="0" step="1" value="${q.toleranceKm ?? ''}" placeholder="Leave blank for a single point" oninput="updateToleranceCircle()">
+        </div>
+      </div>
       <div class="form-group">
         <label>Click the map to set the pin location</label>
         <div id="admin-map"></div>
@@ -648,6 +654,8 @@ function collectForm() {
     q.correctLat   = Number(document.getElementById('f-lat').value);
     q.correctLng   = Number(document.getElementById('f-lng').value);
     q.locationName = document.getElementById('f-location').value.trim();
+    const tolVal   = parseFloat(document.getElementById('f-tolerance').value);
+    if (!isNaN(tolVal) && tolVal > 0) q.toleranceKm = tolVal;
   } else if (type === 'sequence') {
     q.question = document.getElementById('f-question').value.trim();
     q.items    = [0,1,2,3].map(i => document.getElementById('f-item-'+i).value.trim());
@@ -745,6 +753,8 @@ function initAdminMap(lat, lng) {
     });
   }
 
+  updateToleranceCircle();
+
   _adminMap.on('click', e => {
     const { lat, lng } = e.latlng;
     if (_adminMarker) {
@@ -757,6 +767,7 @@ function initAdminMap(lat, lng) {
       });
     }
     setLatLngInputs(lat, lng);
+    updateToleranceCircle();
   });
 }
 
@@ -782,6 +793,29 @@ function syncMarkerFromInputs() {
     });
   }
   _adminMap.panTo([lat, lng]);
+  updateToleranceCircle();
+}
+
+let _toleranceCircle = null;
+
+function updateToleranceCircle() {
+  if (!_adminMap) return;
+  const lat = parseFloat(document.getElementById('f-lat').value);
+  const lng = parseFloat(document.getElementById('f-lng').value);
+  const km  = parseFloat(document.getElementById('f-tolerance')?.value);
+
+  if (_toleranceCircle) { _toleranceCircle.remove(); _toleranceCircle = null; }
+
+  if (!isNaN(lat) && !isNaN(lng) && km > 0) {
+    _toleranceCircle = L.circle([lat, lng], {
+      radius:      km * 1000,
+      color:       '#c9a84c',
+      weight:      1.5,
+      opacity:     0.7,
+      fillColor:   '#c9a84c',
+      fillOpacity: 0.12,
+    }).addTo(_adminMap);
+  }
 }
 </script>
 </body>
