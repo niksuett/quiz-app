@@ -19,6 +19,7 @@ let leafletMap       = null;  // Leaflet map instance (during question)
 let mapPin           = null;  // the marker the player drops
 let pendingMapCoords = null;  // { lat, lng } set when player clicks the map
 let leaderboardMap   = null;  // Leaflet map instance (leaderboard reveal)
+let flipTimeout      = null;  // pending re-sort animation timer
 
 // ═════════════════════════════════════════════════════════════════════════════
 // SOUND SYSTEM
@@ -103,79 +104,191 @@ function resetAnimation(el, animationClass) {
   el.classList.add(animationClass);
 }
 
-// Counts a number up from 0 to `target` over `duration` milliseconds.
-function animateCount(el, target, duration = 700) {
+// Counts a number from `from` to `to` over `duration` milliseconds.
+function animateCount(el, from, to, duration = 700) {
   const start = performance.now();
+  const delta = to - from;
   function tick(now) {
     const progress = Math.min((now - start) / duration, 1);
-    // ease-out curve: starts fast, slows at the end
     const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(eased * target).toLocaleString('en-US');
+    el.textContent = Math.round(from + eased * delta).toLocaleString('en-US');
     if (progress < 1) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 }
 
-// Builds and animates the leaderboard list, with staggered slide-ins
-// and score count-up for each entry.
+// Builds and animates the leaderboard list with the new three-section layout.
+// Phase 1: sorted by round performance (who won THIS round).
+// Phase 2: after a delay, FLIP-animates into total-score order (overall standing).
 function renderLeaderboard(listEl, entries, questionType) {
+  if (flipTimeout) { clearTimeout(flipTimeout); flipTimeout = null; }
   listEl.innerHTML = '';
-  entries.forEach((entry, i) => {
+
+  const sortLabel = document.getElementById('lb-sort-label');
+  if (sortLabel) { sortLabel.textContent = 'This round'; sortLabel.style.opacity = '1'; sortLabel.style.transition = ''; }
+
+  // Sort by this round's performance first
+  const roundOrder = [...entries].sort((a, b) => {
+    const ptsDiff = (b.roundPoints || 0) - (a.roundPoints || 0);
+    if (ptsDiff !== 0) return ptsDiff;
+    const rankDiff = (a.roundRank || 999) - (b.roundRank || 999);
+    if (rankDiff !== 0) return rankDiff;
+    return (a.lastAnswer ? 0 : 1) - (b.lastAnswer ? 0 : 1);
+  });
+
+  roundOrder.forEach((entry, i) => {
     const li = document.createElement('li');
+    li.dataset.nickname   = entry.nickname;
     li.style.animationDelay = `${i * 0.09}s`;
     li.classList.add('lb-animate');
     if (entry.nickname === myNickname) li.classList.add('me');
+
+    // ── Rank number ──
+    const rankEl = document.createElement('span');
+    rankEl.className   = 'lb-rank';
+    rankEl.textContent = i + 1;
+
+    // ── Content wrapper ──
+    const content = document.createElement('div');
+    content.className = 'lb-content';
+
+    // Top row: name + total score
+    const topRow = document.createElement('div');
+    topRow.className = 'lb-top';
 
     const nameSpan = document.createElement('span');
     nameSpan.className   = 'lb-name';
     nameSpan.textContent = entry.nickname;
 
-    const statSpan = document.createElement('span');
-    statSpan.className   = 'lb-stat';
-    statSpan.textContent = formatAnswerStat(entry.lastAnswer);
-
-    const nameCol = document.createElement('div');
-    nameCol.className = 'lb-name-col';
-    nameCol.append(nameSpan, statSpan);
-
-    // Score area: counts up to total → rank reason below
-    const scoreWrap = document.createElement('div');
-    scoreWrap.className = 'lb-score-wrap';
-
-    const scoreSpan = document.createElement('span');
-    scoreSpan.className   = 'lb-score';
+    const totalSpan = document.createElement('span');
+    totalSpan.className   = 'lb-total';
     const prev = (entry.score || 0) - (entry.roundPoints || 0);
-    scoreSpan.textContent = prev.toLocaleString('en-US');
+    totalSpan.textContent = prev.toLocaleString('en-US');
 
-    // Rank reason line: explains how points were earned (e.g. "1st fastest · +10 pts")
-    const rankReasonSpan = document.createElement('span');
-    rankReasonSpan.className   = 'lb-rank-reason' + (entry.roundPoints > 0 ? '' : ' lb-rank-reason-zero');
-    rankReasonSpan.textContent = formatRoundInfo(entry, questionType);
+    topRow.append(nameSpan, totalSpan);
 
-    scoreWrap.append(scoreSpan, rankReasonSpan);
-    li.append(nameCol, scoreWrap);
+    // Detail row: metric | round points + reason
+    const detailRow = document.createElement('div');
+    detailRow.className = 'lb-detail';
+
+    const metricSpan = document.createElement('span');
+    metricSpan.className   = 'lb-metric';
+    metricSpan.textContent = formatMetric(entry.lastAnswer);
+
+    const roundSpan = document.createElement('span');
+    roundSpan.className   = 'lb-round' + (entry.roundPoints > 0 ? '' : ' lb-round-zero');
+    roundSpan.textContent = formatRoundPoints(entry, questionType);
+
+    detailRow.append(metricSpan, roundSpan);
+    content.append(topRow, detailRow);
+    li.append(rankEl, content);
     listEl.append(li);
 
+    // Score count-up: prev → new total
     const slideDelay = i * 90 + 300;
     if (entry.roundPoints > 0) {
-      setTimeout(() => animateCount(scoreSpan, entry.score), slideDelay + 400);
+      setTimeout(() => animateCount(totalSpan, prev, entry.score), slideDelay + 400);
     }
   });
+
+  // Phase 2: re-sort to total-score order after entries have settled
+  if (entries.length > 1) {
+    const flipDelay = Math.max(entries.length - 1, 0) * 90 + 1400 + 2500;
+    flipTimeout = setTimeout(() => flipToTotalOrder(listEl, entries), flipDelay);
+  }
 }
 
-// Builds the final-results leaderboard with per-player game stats instead of
-// round-by-round details (since the game is over, rank info is less relevant).
+// FLIP animation: re-sorts leaderboard rows from round order to total-score order.
+function flipToTotalOrder(listEl, entries) {
+  flipTimeout = null;
+  const lis = Array.from(listEl.children);
+  if (lis.length < 2) return;
+
+  // Target: total-score order (as the server sent it)
+  const totalOrder = [...entries].sort((a, b) => b.score - a.score);
+  const targetOrder = totalOrder.map(e => e.nickname);
+  const currentOrder = lis.map(li => li.dataset.nickname);
+  if (JSON.stringify(currentOrder) === JSON.stringify(targetOrder)) {
+    // Already in the right order — just update the label
+    const sortLabel = document.getElementById('lb-sort-label');
+    if (sortLabel) { sortLabel.textContent = 'Overall standing'; }
+    return;
+  }
+
+  // FLIP step 1: record old positions
+  const oldTops = new Map();
+  lis.forEach(li => oldTops.set(li.dataset.nickname, li.getBoundingClientRect().top));
+
+  // FLIP step 2: reorder DOM + update rank numbers
+  targetOrder.forEach((nickname, i) => {
+    const li = lis.find(l => l.dataset.nickname === nickname);
+    listEl.append(li);
+    li.querySelector('.lb-rank').textContent = i + 1;
+  });
+
+  // FLIP step 3: apply inverse transform so rows appear in old positions
+  const newLis = Array.from(listEl.children);
+  newLis.forEach(li => {
+    const oldTop = oldTops.get(li.dataset.nickname);
+    const newTop = li.getBoundingClientRect().top;
+    const dy = oldTop - newTop;
+    if (dy !== 0) {
+      li.style.transform  = `translateY(${dy}px)`;
+      li.style.transition = 'none';
+    }
+  });
+
+  // FLIP step 4: trigger reflow, then animate to final positions
+  void listEl.offsetHeight;
+  newLis.forEach(li => {
+    li.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    li.style.transform  = '';
+  });
+
+  // Update sort label with a crossfade
+  const sortLabel = document.getElementById('lb-sort-label');
+  if (sortLabel) {
+    sortLabel.style.opacity = '0';
+    setTimeout(() => { sortLabel.textContent = 'Overall standing'; sortLabel.style.opacity = '1'; }, 300);
+  }
+
+  // Clean up inline styles after animation completes
+  setTimeout(() => {
+    newLis.forEach(li => { li.style.transition = ''; li.style.transform = ''; });
+  }, 700);
+}
+
+// Builds the final-results leaderboard with per-player game stats.
 function renderFinalLeaderboard(listEl, entries) {
   listEl.innerHTML = '';
+  const sortLabel = document.getElementById('lb-sort-label');
+  if (sortLabel) sortLabel.textContent = '';
+
   entries.forEach((entry, i) => {
     const li = document.createElement('li');
     li.style.animationDelay = `${i * 0.09}s`;
     li.classList.add('lb-animate');
     if (entry.nickname === myNickname) li.classList.add('me');
 
+    const rankEl = document.createElement('span');
+    rankEl.className   = 'lb-rank';
+    rankEl.textContent = i + 1;
+
+    const content = document.createElement('div');
+    content.className = 'lb-content';
+
+    const topRow = document.createElement('div');
+    topRow.className = 'lb-top';
+
     const nameSpan = document.createElement('span');
     nameSpan.className   = 'lb-name';
     nameSpan.textContent = entry.nickname;
+
+    const totalSpan = document.createElement('span');
+    totalSpan.className   = 'lb-total';
+    totalSpan.textContent = (entry.score || 0).toLocaleString('en-US');
+
+    topRow.append(nameSpan, totalSpan);
 
     const stats = entry.stats || {};
     const parts = [];
@@ -183,19 +296,20 @@ function renderFinalLeaderboard(listEl, entries) {
     if (stats.roundsFirst)    parts.push(`${stats.roundsFirst}× 1st place`);
     if (stats.bestRound)      parts.push(`best round: +${stats.bestRound} pts`);
 
-    const statSpan = document.createElement('span');
-    statSpan.className   = 'lb-stat';
-    statSpan.textContent = parts.join(' · ') || '';
+    if (parts.length) {
+      const detailRow = document.createElement('div');
+      detailRow.className = 'lb-detail';
+      const statSpan = document.createElement('span');
+      statSpan.className = 'lb-metric';
+      statSpan.style.borderRight = 'none';
+      statSpan.textContent = parts.join(' · ');
+      detailRow.append(statSpan);
+      content.append(topRow, detailRow);
+    } else {
+      content.append(topRow);
+    }
 
-    const nameCol = document.createElement('div');
-    nameCol.className = 'lb-name-col';
-    nameCol.append(nameSpan, statSpan);
-
-    const scoreSpan = document.createElement('span');
-    scoreSpan.className   = 'lb-score';
-    scoreSpan.textContent = (entry.score || 0).toLocaleString('en-US');
-
-    li.append(nameCol, scoreSpan);
+    li.append(rankEl, content);
     listEl.append(li);
   });
 }
@@ -209,27 +323,27 @@ function formatYear(y) {
   return String(n);
 }
 
-function formatAnswerStat(ans) {
+// Returns the key performance metric for a player's answer (left column of detail row).
+function formatMetric(ans) {
   if (!ans) return 'No answer';
   if (ans.type === 'map') {
-    return `📍 ${ans.distanceKm.toLocaleString('en-US')} km away`;
+    return ans.distanceKm < 5 ? 'Pinpoint!' : `${ans.distanceKm.toLocaleString('en-US')} km away`;
   }
   if (ans.type === 'timeline') {
-    // Timeline (years): BCE/CE formatting for the value; diff is a plain magnitude in years
-    const diff = ans.diff === 0 ? 'exact!' : `off by ${Math.round(ans.diff)} years`;
-    return `${formatYear(ans.value)} — ${diff}`;
+    if (ans.diff === 0) return 'Exact!';
+    return `Off by ${Math.round(ans.diff)} years`;
   }
   if (ans.type === 'slider') {
+    if (ans.diff === 0) return 'Exact!';
     const u = ans.unit ? ` ${ans.unit}` : '';
-    const diff = ans.diff === 0 ? 'exact!' : `off by ${ans.diff.toLocaleString('en-US')}${u}`;
-    return `${ans.value.toLocaleString('en-US')}${u} — ${diff}`;
+    return `Off by ${ans.diff.toLocaleString('en-US')}${u}`;
   }
   if (ans.type === 'sequence') {
-    return `${ans.correctCount} / ${ans.correctOrder.length} in correct position`;
+    return `${ans.correctCount}/${ans.correctOrder.length} correct`;
   }
   // MC / flag
-  if (ans.isCorrect) return `✓ ${ans.answerText}`;
-  return `✗ ${ans.answerText}  →  ${ans.correctText}`;
+  if (ans.isCorrect) return '✓ Correct';
+  return `✗ ${ans.answerText}`;
 }
 
 // Converts a number to its ordinal string: 1 → "1st", 2 → "2nd", etc.
@@ -239,59 +353,32 @@ function ordinalStr(n) {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-// Returns a one-line summary of how many points a player earned this round
-// and why (e.g. "Correct · 1st fastest · +10 pts" or "Incorrect · 0 pts").
-function formatRoundInfo(entry, questionType) {
+// Returns the round scoring summary (right column of detail row).
+// e.g. "+10 · 1st fastest", "+8 · 2nd", "0 pts"
+function formatRoundPoints(entry, questionType) {
   const pts  = entry.roundPoints || 0;
   const rank = entry.roundRank;
 
-  if (!entry.lastAnswer) return 'No answer · 0 pts';
-  if ('isCorrect' in entry.lastAnswer && !entry.lastAnswer.isCorrect) return 'Incorrect · 0 pts';
-  if (pts === 0) return '0 pts this round';
+  if (pts === 0) return '0 pts';
 
-  const rankStr = rank ? ordinalStr(rank) : null;
-  const isProximity = (questionType === 'slider' || questionType === 'timeline' || questionType === 'map');
-  const isMC        = !isProximity && questionType !== 'sequence';
+  const isMC = questionType !== 'slider' && questionType !== 'timeline'
+            && questionType !== 'map'    && questionType !== 'sequence';
 
-  let label;
-  if (isMC) {
-    // MC/flag: always ranked by speed
-    label = rankStr ? `Correct · ${rankStr} fastest` : 'Correct';
-  } else if (questionType === 'sequence') {
-    const allCorrect = entry.lastAnswer &&
-      entry.lastAnswer.correctCount === entry.lastAnswer.correctOrder?.length;
-    if (allCorrect) {
-      label = entry.speedTiebreak      ? `Correct · faster ⚡`
-            : entry.speedTiebreakedOut ? `Correct · slower`
-            :                            `Correct`;
+  let reason = '';
+  if (rank) {
+    const pos = ordinalStr(rank);
+    if (isMC) {
+      reason = `${pos} fastest`;
+    } else if (entry.speedTiebreak) {
+      reason = `${pos} · faster ⚡`;
+    } else if (entry.speedTiebreakedOut) {
+      reason = `Tied · slower`;
     } else {
-      label = rankStr
-        ? entry.speedTiebreak      ? `${rankStr} · faster ⚡`
-        : entry.speedTiebreakedOut ? `Tied · slower`
-        :                            `${rankStr} · most correct`
-        : null;
-    }
-  } else {
-    // Proximity (slider / timeline / map): ranked by closeness; speed breaks ties
-    const isExact = entry.lastAnswer && (
-      questionType === 'map'
-        ? entry.lastAnswer.distanceKm === 0
-        : entry.lastAnswer.diff === 0
-    );
-    if (isExact) {
-      label = entry.speedTiebreak      ? `Correct · faster ⚡`
-            : entry.speedTiebreakedOut ? `Correct · slower`
-            :                            `Correct`;
-    } else {
-      label = rankStr
-        ? entry.speedTiebreak      ? `${rankStr} closest · faster ⚡`
-        : entry.speedTiebreakedOut ? `Tied · slower`
-        :                            `${rankStr} closest`
-        : null;
+      reason = pos;
     }
   }
 
-  return label ? `${label} · +${pts} pts` : `+${pts} pts`;
+  return reason ? `+${pts} · ${reason}` : `+${pts}`;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -1431,6 +1518,7 @@ socket.on('show-leaderboard', ({ leaderboard, correctAnswer, questionType, quest
   stopTimer();
   gamePaused = false;
   clearTimeout(resultTimeout);
+  if (flipTimeout) { clearTimeout(flipTimeout); flipTimeout = null; }
   soundLeaderboard();
   // Switch pause button from question screen to leaderboard screen
   setPauseBtns('⏸ Pause', false);

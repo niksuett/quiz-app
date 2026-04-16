@@ -1057,59 +1057,100 @@ h3 {
   font-size: .9rem;
   text-align: center;
 }
-.leaderboard-list { list-style: none; counter-reset: rank; }
+.leaderboard-list { list-style: none; }
 .leaderboard-list li {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 10px;
   background: var(--parchment-mid);
   border: 1px solid var(--parchment-dark);
   border-radius: 3px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   margin-bottom: 6px;
-  counter-increment: rank;
   font-family: var(--font-lora);
   font-size: .95rem;
 }
-.leaderboard-list li::before {
-  content: counter(rank);
+
+/* ── Rank number (explicit element, updated during re-sort) ── */
+.lb-rank {
   font-family: var(--font-cinzel);
   font-weight: 900;
   font-size: .85rem;
   color: var(--aged);
-  min-width: 24px;
+  min-width: 20px;
+  padding-top: 2px;
+  flex-shrink: 0;
 }
+
+/* ── Content area: top row (name + total) and detail row (metric + round) ── */
+.lb-content { flex: 1; min-width: 0; }
+.lb-top     { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.lb-name    { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-total   {
+  font-family: var(--font-cinzel);
+  font-weight: 700;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ── Detail row: metric | round points + reason ── */
+.lb-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  font-size: .76rem;
+}
+.lb-metric {
+  color: var(--aged);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+  margin-right: 8px;
+  border-right: 1px solid var(--parchment-dark);
+}
+.lb-round {
+  color: var(--correct);
+  font-family: var(--font-cinzel);
+  font-weight: 600;
+  font-size: .68rem;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.lb-round-zero { color: var(--aged); }
+
 /* Gold / silver / bronze */
 .leaderboard-list li:nth-child(1) {
   background: linear-gradient(to right, rgba(200,146,42,.12), var(--parchment-mid));
   border-color: rgba(200,146,42,.4);
   border-left: 3px solid var(--gold-bright);
 }
-.leaderboard-list li:nth-child(1)::before { color: var(--gold); }
+.leaderboard-list li:nth-child(1) .lb-rank { color: var(--gold); }
 .leaderboard-list li:nth-child(2) {
   background: linear-gradient(to right, rgba(140,155,175,.1), var(--parchment-mid));
   border-left: 3px solid #8090a8;
 }
-.leaderboard-list li:nth-child(2)::before { color: #6a7a90; }
+.leaderboard-list li:nth-child(2) .lb-rank { color: #6a7a90; }
 .leaderboard-list li:nth-child(3) {
   background: linear-gradient(to right, rgba(150,90,30,.09), var(--parchment-mid));
   border-left: 3px solid #96572a;
 }
-.leaderboard-list li:nth-child(3)::before { color: #7a4020; }
+.leaderboard-list li:nth-child(3) .lb-rank { color: #7a4020; }
 
-.lb-name-col { flex: 1; padding-left: 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.lb-name  { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lb-stat  { font-size: .72rem; color: var(--aged); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
-.lb-rank-reason {
-  font-size: .68rem;
-  color: var(--correct);
+/* ── Sort-phase label ── */
+.lb-sort-label {
+  text-align: center;
+  font-size: .7rem;
+  color: var(--aged);
   font-family: var(--font-cinzel);
-  font-weight: 600;
-  letter-spacing: .04em;
-  white-space: nowrap;
-  text-align: right;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin: -4px 0 10px;
+  opacity: 0.7;
+  transition: opacity .3s;
 }
-.lb-rank-reason-zero { color: var(--aged); }
 
 /* ─── Correct-reveal tag + answer ────────────────────────────────────────── */
 .cr-tag {
@@ -1132,14 +1173,6 @@ h3 {
   font-weight: 600;
   color: var(--correct);
   vertical-align: middle;
-}
-
-.lb-score-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
-.lb-score {
-  font-family: var(--font-cinzel);
-  font-weight: 700;
-  color: var(--gold);
-  font-variant-numeric: tabular-nums;
 }
 
 .leaderboard-list li.me {
