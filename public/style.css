@@ -729,6 +729,7 @@ h3 {
   padding: 10px 32px;
   margin-bottom: 28px;
   min-width: 160px;
+  max-width: 100%;
   text-align: center;
   outline: none;
   cursor: text;
@@ -1804,4 +1805,14 @@ h3 {
   .card           { padding: 24px 18px; }
   .category-grid  { grid-template-columns: 1fr 1fr; }
   .round-selector { gap: 5px; }
+
+  /* Slider / timeline: reduce input sizing so long strings like "3000 BCE"
+     fit comfortably inside the narrow container */
+  .timeline-year-input {
+    font-size: 2rem;
+    padding: 8px 16px;
+    letter-spacing: 1px;
+  }
+  .slider-number-input { font-size: 2rem; }
+  .slider-unit-label   { font-size: 1.1rem; }
 }
