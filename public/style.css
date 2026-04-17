@@ -560,7 +560,11 @@ h3 {
 .pause-btn.paused      { border-color: var(--correct); color: var(--correct); }
 
 /* ─── Slider ──────────────────────────────────────────────────────────────── */
-.answers-grid.slider-mode { grid-template-columns: 1fr; }
+.answers-grid.slider-mode {
+  grid-template-columns: 1fr;
+  padding-left: 0;
+  padding-right: 0;
+}
 
 .slider-wrap {
   background: var(--parchment);
@@ -571,6 +575,7 @@ h3 {
   width: 100%;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  overflow: hidden;
 }
 .slider-current-value {
   font-family: var(--font-cinzel);
@@ -669,6 +674,7 @@ h3 {
   width: 100%;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  overflow: hidden;
 }
 .timeline-year-badge {
   display: inline-block;
@@ -1232,7 +1238,7 @@ h3 {
 }
 .tl-track {
   position: relative;
-  height: 80px;
+  height: 54px;
   margin: 0 14px;
 }
 .tl-axis-line {
@@ -1328,6 +1334,24 @@ h3 {
   white-space: nowrap;
   line-height: 1;
   letter-spacing: .03em;
+}
+.tl-correct-row {
+  position: relative;
+  margin: 6px 14px 0;
+  height: 20px;
+}
+.tl-correct-label {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--font-cinzel);
+  font-size: .65rem;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+  line-height: 1;
+  letter-spacing: .04em;
+  opacity: 0;
+  animation: tlPinAppear .35s ease 0.2s forwards;
 }
 
 /* ─── Sequence drag-to-order — question screen ───────────────────────────── */
