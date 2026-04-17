@@ -1222,27 +1222,19 @@ function showLeaderboardScale(timelineData) {
     labelsRow.appendChild(lbl);
   }
 
-  // Row below tick labels that shows the correct answer value
-  const correctRow = document.createElement('div');
-  correctRow.className = 'tl-correct-row';
-  wrap.appendChild(correctRow);
-
-  // Correct answer pin (just a star dot) + correct label below axis
+  // Correct answer pin — gold pointed pin
   setTimeout(() => {
     const pin = document.createElement('div');
     pin.className  = 'tl-pin-wrap tl-correct-pin';
     pin.style.left = pct(correctValue) + '%';
-    pin.innerHTML  = `<div class="tl-pin-dot">★</div>`;
+    pin.innerHTML  = `
+      <div class="tl-pin-dot">★</div>
+      <div class="tl-pin-stem"></div>
+      <div class="tl-pin-tip"></div>`;
     track.appendChild(pin);
-
-    const correctLbl = document.createElement('div');
-    correctLbl.className  = 'tl-correct-label';
-    correctLbl.style.left = pct(correctValue) + '%';
-    correctLbl.textContent = `★ ${fmt(correctValue)}`;
-    correctRow.appendChild(correctLbl);
   }, 250);
 
-  // Player pins — just initial dots, animate in one by one
+  // Player pins — pointed pins with initial, animate in one by one
   playerGuesses.forEach((guess, i) => {
     const isMe    = guess.nickname === myNickname;
     const initial = guess.nickname.charAt(0).toUpperCase();
@@ -1250,7 +1242,10 @@ function showLeaderboardScale(timelineData) {
       const pin = document.createElement('div');
       pin.className  = 'tl-pin-wrap tl-player-pin' + (isMe ? ' tl-me-pin' : '');
       pin.style.left = pct(guess.value) + '%';
-      pin.innerHTML  = `<div class="tl-pin-dot">${initial}</div>`;
+      pin.innerHTML  = `
+        <div class="tl-pin-dot">${initial}</div>
+        <div class="tl-pin-stem"></div>
+        <div class="tl-pin-tip"></div>`;
       track.appendChild(pin);
     }, 550 + i * 350);
   });

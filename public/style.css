@@ -1238,33 +1238,36 @@ h3 {
 }
 .tl-track {
   position: relative;
-  height: 54px;
+  height: 70px;
   margin: 0 14px;
 }
 .tl-axis-line {
   position: absolute;
-  bottom: 26px;
+  bottom: 14px;
   left: 0; right: 0;
-  height: 2px;
-  background: var(--parchment-dark);
-  border-radius: 1px;
+  height: 3px;
+  background: var(--ink-mid);
+  border-radius: 2px;
 }
 .tl-tick-mark {
   position: absolute;
-  bottom: 18px;
-  width: 1px;
-  height: 16px;
-  background: var(--parchment-dark);
+  bottom: 8px;
+  width: 2px;
+  height: 13px;
+  background: var(--ink-mid);
   transform: translateX(-50%);
+  border-radius: 1px;
 }
+/* Pin = circle bubble (dot) + narrow stem + downward-pointing triangle tip.
+   The tip bottom sits at the top edge of the axis line (bottom: 17px). */
 .tl-pin-wrap {
   position: absolute;
-  bottom: 26px;
+  bottom: 17px;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 0;
   opacity: 0;
   animation: tlPinAppear .35s ease forwards;
 }
@@ -1272,86 +1275,61 @@ h3 {
   from { opacity: 0; transform: translateX(-50%) translateY(8px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
 }
-.tl-pin-name {
-  font-family: var(--font-cinzel);
-  font-size: .56rem;
-  font-weight: 700;
-  color: var(--aged);
-  white-space: nowrap;
-  line-height: 1.1;
-  max-width: 70px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: .03em;
-  text-transform: uppercase;
-}
-.tl-pin-value {
-  font-size: .6rem;
-  color: var(--aged);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  line-height: 1.1;
-  font-family: var(--font-cinzel);
-}
 .tl-pin-dot {
-  width: 20px; height: 20px;
+  width: 22px; height: 22px;
   border-radius: 50%;
   background: var(--lapis);
   border: 2px solid var(--parchment);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-cinzel);
-  font-size: 8px; font-weight: 700; color: var(--parchment);
-  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  font-size: 9px; font-weight: 700; color: var(--parchment);
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
   flex-shrink: 0;
 }
-.tl-correct-pin .tl-pin-name { color: var(--gold-muted); font-size: .6rem; }
-.tl-correct-pin .tl-pin-value { color: var(--gold); font-weight: 700; font-size: .65rem; }
+.tl-pin-stem {
+  width: 2px;
+  height: 8px;
+  background: var(--lapis);
+  flex-shrink: 0;
+}
+.tl-pin-tip {
+  width: 0; height: 0;
+  border-left:  5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top:   7px solid var(--lapis);
+  flex-shrink: 0;
+}
 .tl-correct-pin .tl-pin-dot {
-  width: 24px; height: 24px;
+  width: 26px; height: 26px;
   background: var(--gold-bright);
   color: var(--ink);
-  font-size: 12px;
+  font-size: 13px;
   border-color: var(--parchment);
-  box-shadow: 0 0 10px rgba(200,146,42,.6), 0 2px 6px rgba(0,0,0,.3);
+  box-shadow: 0 0 12px rgba(200,146,42,.55), 0 2px 8px rgba(0,0,0,.3);
 }
-.tl-me-pin .tl-pin-name { color: var(--lapis); }
+.tl-correct-pin .tl-pin-stem { background: var(--gold-bright); }
+.tl-correct-pin .tl-pin-tip  { border-top-color: var(--gold-bright); }
 .tl-me-pin .tl-pin-dot {
   background: var(--lapis-light);
-  box-shadow: 0 0 8px rgba(30,58,110,.55), 0 2px 6px rgba(0,0,0,.3);
+  box-shadow: 0 0 8px rgba(30,58,110,.55), 0 2px 8px rgba(0,0,0,.3);
 }
+.tl-me-pin .tl-pin-stem { background: var(--lapis-light); }
+.tl-me-pin .tl-pin-tip  { border-top-color: var(--lapis-light); }
 .tl-year-labels {
   position: relative;
   margin: 4px 14px 0;
-  height: 16px;
+  height: 20px;
 }
 .tl-tick-label {
   position: absolute;
   transform: translateX(-50%);
   font-family: var(--font-cinzel);
-  font-size: .56rem;
-  color: var(--aged);
+  font-size: .72rem;
+  color: var(--ink-light);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   line-height: 1;
   letter-spacing: .03em;
-}
-.tl-correct-row {
-  position: relative;
-  margin: 6px 14px 0;
-  height: 20px;
-}
-.tl-correct-label {
-  position: absolute;
-  transform: translateX(-50%);
-  font-family: var(--font-cinzel);
-  font-size: .65rem;
-  font-weight: 700;
-  color: var(--gold);
-  white-space: nowrap;
-  line-height: 1;
-  letter-spacing: .04em;
-  opacity: 0;
-  animation: tlPinAppear .35s ease 0.2s forwards;
 }
 
 /* ─── Sequence drag-to-order — question screen ───────────────────────────── */
