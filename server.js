@@ -1,24 +1,39 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// server.js — backend: game logic, scoring, Socket.io events
+// server.js — backend: lobby, game loop, reconnect, host controls, Socket.io
+//
+// Game-type specific logic (what a question looks like, how an answer is
+// judged) lives in games/<type>.js. This file only orchestrates:
+//   create game → players join → intro → question → result → leaderboard → … → game over
+// Scoring rules live in scoring.js.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const express      = require('express');
 const http         = require('http');
-const { Server }   = require('socket.io');
 const path         = require('path');
+const crypto       = require('crypto');
+const { Server }   = require('socket.io');
 const cookieParser = require('cookie-parser');
-const { db, rowToQuestion, questionToRow, getQuestionById } = require('./db');
+const compression  = require('compression');
+const QRCode       = require('qrcode');
+
+const registry = require('./games');
+const scoring  = require('./scoring');
+const { db, questionToRow, loadAllQuestions, getQuestionById, countsByCategory } = require('./db');
 
 const app    = express();
 const server = http.createServer(app);
-const io     = new Server(server);
+const io     = new Server(server, { maxHttpBufferSize: 2e6 });
 
-app.use(express.json());
+const IS_TEST = process.env.QUIZ_TEST === '1';
+
+app.use(compression());
+app.use(express.json({ limit: '25mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/data', express.static(path.join(__dirname, 'data'), { maxAge: '1h' }));
 
-// ── Admin auth endpoints ───────────────────────────────────────────────────────
-const ADMIN_PASSWORD = 'ilikehistory99';
+// ── Admin auth ────────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ilikehistory99';
 
 app.get('/admin-auth', (req, res) => {
   if (req.query.pw === ADMIN_PASSWORD) {
@@ -28,658 +43,596 @@ app.get('/admin-auth', (req, res) => {
     res.redirect('/admin-login.html?error=1');
   }
 });
+app.get('/admin-logout', (req, res) => { res.clearCookie('adminAuth'); res.redirect('/'); });
 
-app.get('/admin-logout', (req, res) => {
-  res.clearCookie('adminAuth');
-  res.redirect('/');
-});
-
-// ── Question bank ─────────────────────────────────────────────────────────────
-function loadQuestions() {
-  return db.prepare('SELECT * FROM questions').all().map(rowToQuestion);
+function requireAdmin(req, res, next) {
+  if (req.cookies && req.cookies.adminAuth === ADMIN_PASSWORD) return next();
+  res.status(401).json({ error: 'Not authorised' });
 }
 
 // ── Admin API ─────────────────────────────────────────────────────────────────
-app.get('/admin/questions', (req, res) => {
-  res.json(loadQuestions());
-});
+app.get('/admin/questions', requireAdmin, (req, res) => res.json(loadAllQuestions()));
 
-app.post('/admin/questions', (req, res) => {
+app.post('/admin/questions', requireAdmin, (req, res) => {
   const questions = req.body;
   if (!Array.isArray(questions)) return res.status(400).json({ error: 'Expected an array' });
+  const errors = [];
+  questions.forEach((q, i) => {
+    const mod = registry.get(q.type || 'mc');
+    if (!mod) { errors.push(`#${i + 1}: unknown type "${q.type}"`); return; }
+    if (!registry.categoryById[q.category]) errors.push(`#${i + 1}: unknown category "${q.category}"`);
+    for (const e of mod.validate({ ...q, type: q.type || 'mc' })) errors.push(`#${i + 1}: ${e}`);
+  });
+  if (errors.length) return res.status(400).json({ error: 'Validation failed', details: errors.slice(0, 50) });
 
   const deleteAll = db.prepare('DELETE FROM questions');
-  const insert    = db.prepare(`
-    INSERT INTO questions (category, type, question, correct, image_url, extra)
-    VALUES (@category, @type, @question, @correct, @image_url, @extra)
-  `);
-
-  const replaceAll = db.transaction(qs => {
+  const insert    = db.prepare(`INSERT INTO questions (id, category, type, question, correct, image_url, extra)
+                                VALUES (@id, @category, @type, @question, @correct, @image_url, @extra)`);
+  db.transaction(qs => {
     deleteAll.run();
-    for (const q of qs) insert.run(questionToRow(q));
-  });
-
-  replaceAll(questions);
+    for (const q of qs) insert.run({ id: Number.isInteger(q.id) ? q.id : null, ...questionToRow(q) });
+  })(questions);
   res.json({ ok: true, count: questions.length });
 });
 
-let ALL_QUESTIONS = loadQuestions();
+// ── Public API: what games exist (config screen is built from this) ──────────
+app.get('/api/games', (req, res) => {
+  const counts = countsByCategory();
+  res.json({
+    types: registry.all().map(m => ({ type: m.type, timeLimit: m.timeLimit, speedScored: m.speedScored, usesRegion: m.usesRegion })),
+    categories: registry.categories.map(c => ({ ...c, count: counts[c.id] || 0 })),
+    groups:  registry.GROUPS,
+    regions: registry.REGIONS,
+    presets: registry.PRESETS,
+  });
+});
 
-// ── Fisher-Yates shuffle (returns a new array, never mutates the original) ────
-function shuffleArray(arr) {
+// QR code for the join link (SVG). Players scan it in the lobby.
+app.get('/qr/:gameId', async (req, res) => {
+  const gameId = String(req.params.gameId || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  const origin = `${req.protocol}://${req.get('host')}`;
+  try {
+    const svg = await QRCode.toString(`${origin}/?join=${gameId}`, { type: 'svg', margin: 1, color: { dark: '#1a1208', light: '#00000000' } });
+    res.set('Content-Type', 'image/svg+xml').set('Cache-Control', 'public, max-age=3600').send(svg);
+  } catch (e) { res.status(500).end(); }
+});
+
+// Extra routes provided by game modules (e.g. the satellite tile proxy)
+for (const mod of registry.all()) if (typeof mod.routes === 'function') mod.routes(app, { getGame: id => games[id] });
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function shuffle(arr) {
   const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 }
-
-// ── Haversine distance ────────────────────────────────────────────────────────
-function haversineKm(lat1, lng1, lat2, lng2) {
-  const R     = 6371;
-  const toRad = deg => deg * Math.PI / 180;
-  const dLat  = toRad(lat2 - lat1);
-  const dLng  = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2
-          + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-// ── Game settings ─────────────────────────────────────────────────────────────
-const LEADERBOARD_PAUSE = 5; // seconds leaderboard auto-advances (for MC/flag)
-
-// ── Scoring constants ─────────────────────────────────────────────────────────
-//
-// Single scoring mode: Rank + Speed
-//   MC/Flag  : ranked by answer speed (fastest correct = 1st), wrong = 0
-//   Proximity: ranked by closeness (slider/timeline/map) or correctCount (sequence)
-//   Points by rank position: 1st=10, 2nd=8, 3rd=6, 4th=4, 5th=2, 6th+=1
-
-const RANK_POINTS = [10, 8, 6, 4, 2, 1]; // by rank position (0-indexed: 0 = 1st place)
-
-// ── Active games ──────────────────────────────────────────────────────────────
-const games = {};
-
 function generateGameId() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let id = '';
   for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)];
   return id;
 }
+function newToken() { return crypto.randomBytes(12).toString('hex'); }
+function categoryMeta(catId) {
+  const c = registry.categoryById[catId];
+  return c ? { id: c.id, label: c.label, emoji: c.emoji, group: c.group, howTo: c.howTo, blurb: c.blurb }
+           : { id: catId, label: catId, emoji: '❔', group: 'classic', howTo: '', blurb: '' };
+}
+
+// Pick the questions for a game: round-robin across the chosen categories so a
+// game is varied, filtered by region / difficulty when the host asked for it.
+function pickQuestions(all, { categories, regions, difficulty, rounds }) {
+  const pools = {};
+  for (const cat of categories) {
+    let pool = all.filter(q => q.category === cat);
+    if (regions && regions.length) pool = pool.filter(q => !q.region || regions.includes(q.region));
+    if (difficulty === 'casual') pool = pool.filter(q => (q.difficulty || 2) <= 2);
+    if (difficulty === 'expert') pool = pool.filter(q => (q.difficulty || 2) >= 2);
+    if (pool.length) pools[cat] = shuffle(pool);
+  }
+  const active = Object.keys(pools);
+  if (!active.length) return [];
+  const target = rounds === 'infinite' ? Infinity : rounds;
+  const picked = [];
+  let last = null;
+  while (picked.length < target) {
+    let cycle = shuffle(active.filter(c => pools[c].length));
+    if (!cycle.length) break;
+    // avoid repeating the previous category at a cycle boundary when we can
+    if (cycle.length > 1 && cycle[0] === last) cycle.push(cycle.shift());
+    for (const cat of cycle) {
+      if (picked.length >= target) break;
+      const q = pools[cat].pop();
+      if (q) { picked.push(q); last = cat; }
+    }
+  }
+  return picked;
+}
+
+// ── Game state ────────────────────────────────────────────────────────────────
+const games  = {};   // gameId → game
+const tokens = {};   // token → { gameId, role: 'host'|'player', nickname }
+
+function makePlayer(socketId, nickname) {
+  return { id: socketId, token: newToken(), nickname, score: 0, streak: 0, connected: true,
+           answer: null, round: scoring.newRound(), stats: scoring.newStats() };
+}
 
 function buildLeaderboard(game) {
   return game.players
     .map(p => ({
-      nickname:     p.nickname,
-      score:        p.score,
-      roundPoints:  p.roundPoints  || 0,
-      roundRank:    p.roundRank    || null,
-      lastAnswer:   p.lastAnswer   || null,
-      stats:        p.stats        || null,
-      speedTiebreak:       p.speedTiebreak       || false,
-      speedTiebreakedOut:  p.speedTiebreakedOut  || false,
+      nickname: p.nickname, score: p.score, connected: p.connected, streak: p.streak,
+      roundPoints: p.round.roundPoints, roundRank: p.round.roundRank,
+      accuracyPts: p.round.accuracyPts, rankBonus: p.round.rankBonus, streakBonus: p.round.streakBonus,
+      speedTiebreak: p.round.speedTiebreak, speedTiebreakedOut: p.round.speedTiebreakedOut,
+      quality: p.answer ? p.answer.quality : null,
+      detail:  p.answer ? p.answer.detail  : null,
+      elapsed: p.answer ? Math.round(p.answer.elapsed * 10) / 10 : null,
+      stats: { answered: p.stats.answered, firsts: p.stats.firsts, bestRound: p.stats.bestRound,
+               avgAccuracy: p.stats.answered ? Math.round(p.stats.sumAccuracy / p.stats.answered) : 0,
+               perfects: p.stats.perfects, longestStreak: p.stats.longestStreak },
     }))
     .sort((a, b) => b.score - a.score);
 }
 
-// ── Rank-based scoring — called at leaderboard time ───────────────────────────
-// Calculates roundPoints for every player and adds them to player.score.
-// Must be called AFTER all answers are stored on player objects.
-function applyRoundScores(game, question) {
-  const qType = question.type || 'text';
+function lobbyPlayers(game) { return game.players.map(p => ({ nickname: p.nickname, connected: p.connected })); }
+function emitLobby(game)    { io.to(game.id).emit('lobby-update', { players: lobbyPlayers(game) }); }
+function connectedPlayers(game) { return game.players.filter(p => p.connected); }
 
-  if (qType === 'map') {
-    // ── Map: rank by distance ascending; speed is tiebreaker on equal distance ─
-    const answered = game.players
-      .filter(p => p.mapAnswer)
-      .sort((a, b) => {
-        const diff = a.mapAnswer.effectiveDist - b.mapAnswer.effectiveDist;
-        if (diff !== 0) return diff;
-        return (a.answerTime || 999) - (b.answerTime || 999);
-      });
-
-    answered.forEach((p, i) => {
-      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].mapAnswer.effectiveDist === p.mapAnswer.effectiveDist;
-      p.speedTiebreakedOut = i > 0             && answered[i - 1].mapAnswer.effectiveDist === p.mapAnswer.effectiveDist;
-    });
-
-    answered.forEach((p, rank) => {
-      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      p.roundPoints = pts;
-      p.roundRank   = rank + 1;
-      p.score      += pts;
-      p.stats.roundsAnswered++;
-      if (rank === 0) p.stats.roundsFirst++;
-      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
-    });
-    game.players.filter(p => !p.mapAnswer).forEach(p => { p.roundPoints = 0; p.roundRank = null; });
-
-  } else if (qType === 'slider' || qType === 'timeline') {
-    // ── Proximity: rank by absolute error ascending; speed is tiebreaker ──────
-    const answered = game.players
-      .filter(p => p.lastAnswer && p.lastAnswer.type === qType && p.lastAnswer.diff !== undefined)
-      .sort((a, b) => {
-        const diff = a.lastAnswer.diff - b.lastAnswer.diff;
-        if (diff !== 0) return diff;
-        return (a.answerTime || 999) - (b.answerTime || 999);
-      });
-
-    answered.forEach((p, i) => {
-      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].lastAnswer.diff === p.lastAnswer.diff;
-      p.speedTiebreakedOut = i > 0             && answered[i - 1].lastAnswer.diff === p.lastAnswer.diff;
-    });
-
-    answered.forEach((p, rank) => {
-      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      p.roundPoints = pts;
-      p.roundRank   = rank + 1;
-      p.score      += pts;
-      p.stats.roundsAnswered++;
-      if (rank === 0) p.stats.roundsFirst++;
-      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
-    });
-    game.players
-      .filter(p => !p.lastAnswer || p.lastAnswer.type !== qType)
-      .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
-
-  } else if (qType === 'sequence') {
-    // ── Sequence: rank by correctCount desc; speed is tiebreaker when tied ────
-    const answered = game.players
-      .filter(p => p.lastAnswer && p.lastAnswer.type === 'sequence')
-      .sort((a, b) => {
-        const diff = b.lastAnswer.correctCount - a.lastAnswer.correctCount;
-        if (diff !== 0) return diff;
-        return (a.answerTime || 999) - (b.answerTime || 999);
-      });
-
-    answered.forEach((p, i) => {
-      p.speedTiebreak      = i + 1 < answered.length && answered[i + 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
-      p.speedTiebreakedOut = i > 0             && answered[i - 1].lastAnswer.correctCount === p.lastAnswer.correctCount;
-    });
-
-    answered.forEach((p, rank) => {
-      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      p.roundPoints = pts;
-      p.roundRank   = rank + 1;
-      p.score      += pts;
-      p.stats.roundsAnswered++;
-      if (rank === 0) p.stats.roundsFirst++;
-      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
-    });
-    game.players
-      .filter(p => !p.lastAnswer || p.lastAnswer.type !== 'sequence')
-      .forEach(p => { p.roundPoints = 0; p.roundRank = null; });
-
-  } else {
-    // ── MC / Flag: rank by answer speed (fastest correct = most points) ───────
-    const correct = game.players
-      .filter(p => p.lastAnswer && p.lastAnswer.isCorrect)
-      .sort((a, b) => (a.answerTime || 999) - (b.answerTime || 999));
-    const wrong = game.players.filter(p => !p.lastAnswer || !p.lastAnswer.isCorrect);
-
-    correct.forEach((p, rank) => {
-      const pts = RANK_POINTS[Math.min(rank, RANK_POINTS.length - 1)];
-      p.roundPoints = pts;
-      p.roundRank   = rank + 1;
-      p.score      += pts;
-      p.stats.roundsAnswered++;
-      if (rank === 0) p.stats.roundsFirst++;
-      if (pts > p.stats.bestRound) p.stats.bestRound = pts;
-    });
-    wrong.forEach(p => {
-      p.roundPoints = 0; p.roundRank = null;
-      if (p.lastAnswer) p.stats.roundsAnswered++;
-    });
-  }
-}
+function clearGameTimer(game) { if (game.timer) { clearTimeout(game.timer); game.timer = null; } }
+function scaleMs(game, ms)    { return game.options.fast ? Math.min(ms, 150) : ms; }
 
 // ── Socket.io ─────────────────────────────────────────────────────────────────
 io.on('connection', (socket) => {
-  console.log('Browser connected:', socket.id);
 
-  // ── HOST creates a game ────────────────────────────────────────────────────
-  socket.on('create-game', ({ rounds, categories, autoplay, gameMode, testIds } = {}) => {
-    rounds     = rounds     || '5';
-    categories = categories || ['facts'];
-    autoplay   = autoplay   !== false; // default true
-    gameMode   = (gameMode === 'tv') ? 'tv' : 'mobile'; // 'mobile' | 'tv'
+  // HOST creates a game ───────────────────────────────────────────────────────
+  socket.on('create-game', (opts = {}) => {
+    const rounds     = opts.rounds === 'infinite' ? 'infinite' : Math.max(1, Math.min(100, parseInt(opts.rounds, 10) || 10));
+    const categories = (Array.isArray(opts.categories) ? opts.categories : []).filter(c => registry.categoryById[c]);
+    const regions    = Array.isArray(opts.regions) ? opts.regions.filter(r => registry.REGIONS.some(x => x.id === r)) : null;
+    const difficulty = ['casual', 'normal', 'expert', 'mixed'].includes(opts.difficulty) ? opts.difficulty : 'mixed';
+    const options = {
+      autoplay:    opts.autoplay !== false,
+      gameMode:    opts.gameMode === 'tv' ? 'tv' : 'mobile',
+      finalDouble: opts.finalDouble !== false,
+      intros:      opts.intros !== false,
+      fast:        IS_TEST && !!opts.testFast,
+    };
+
+    let questions;
+    if (opts.testIds) {
+      const ids = String(opts.testIds).split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+      questions = ids.map(getQuestionById).filter(Boolean);
+      if (!questions.length) return socket.emit('create-error', 'No valid question IDs found in testIds.');
+    } else {
+      if (!categories.length) return socket.emit('create-error', 'Please pick at least one category.');
+      questions = pickQuestions(loadAllQuestions(), { categories, regions, difficulty, rounds });
+      if (!questions.length) return socket.emit('create-error', 'No questions match those categories and filters. Try widening the geographic focus.');
+    }
 
     let gameId;
     do { gameId = generateGameId(); } while (games[gameId]);
 
-    let questions;
-
-    if (testIds) {
-      // ?testIds= mode: load specific questions by ID, skip shuffle and category filter
-      const ids = String(testIds).split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
-      questions = ids.map(id => getQuestionById(id)).filter(q => q !== null);
-      if (questions.length === 0) {
-        return socket.emit('create-error', 'No valid question IDs found in testIds.');
-      }
-    } else {
-      ALL_QUESTIONS = loadQuestions();
-
-      const pool = ALL_QUESTIONS
-        .filter(q => categories.includes(q.category))
-        .sort(() => Math.random() - 0.5);
-
-      if (pool.length === 0) {
-        return socket.emit('create-error', 'No questions found for the selected categories.');
-      }
-
-      const numRounds = rounds === 'infinite'
-        ? pool.length
-        : Math.min(parseInt(rounds, 10), pool.length);
-
-      questions = pool.slice(0, numRounds);
-    }
-
-    games[gameId] = {
-      id:                gameId,
-      hostId:            socket.id,
-      players:           [],
-      questions,
-      currentIndex:      -1,
-      state:             'lobby',
-      autoplay,
-      gameMode,
-      timer:             null,
-      questionStartTime: null,
+    const game = {
+      id: gameId, hostId: socket.id, hostToken: newToken(), hostConnected: true, hostGraceTimer: null,
+      players: [], questions, currentIndex: -1, state: 'lobby', options,
+      timer: null, timerEndAt: 0, isPaused: false, pausedRemainingMs: 0, pauseStartedAt: 0, pausedAccumMs: 0,
+      questionStartTime: 0, seenCategories: new Set(), lastLeaderboard: null, lastGameOver: null,
+      currentModule: null, currentPayload: null, createdAt: Date.now(),
+      setup: { rounds, categories, regions, difficulty },
     };
+    games[gameId] = game;
+    tokens[game.hostToken] = { gameId, role: 'host', nickname: null };
 
-    socket.gameId = gameId;
-    socket.role   = 'host';
+    socket.gameId = gameId; socket.role = 'host';
     socket.join(gameId);
-
-    socket.emit('game-created', { gameId, gameMode, autoplay });
-    console.log(`Game ${gameId} | ${questions.length} rounds | categories: ${testIds ? 'testIds=' + testIds : categories.join(',')} | autoplay: ${autoplay} | mode: ${gameMode}`);
+    socket.emit('game-created', { gameId, gameMode: options.gameMode, autoplay: options.autoplay, hostToken: game.hostToken, totalQuestions: questions.length });
+    console.log(`Game ${gameId} | ${questions.length} rounds | ${opts.testIds ? 'testIds' : categories.join(',')} | regions: ${regions && regions.length ? regions.join(',') : 'all'} | ${difficulty} | ${options.gameMode}`);
   });
 
-  // ── PLAYER joins ───────────────────────────────────────────────────────────
-  socket.on('join-game', ({ gameId, nickname }) => {
-    gameId   = (gameId   || '').trim().toUpperCase();
-    nickname = (nickname || '').trim();
-
+  // PLAYER joins ──────────────────────────────────────────────────────────────
+  socket.on('join-game', ({ gameId, nickname } = {}) => {
+    gameId   = String(gameId || '').trim().toUpperCase();
+    nickname = String(nickname || '').trim().replace(/\s+/g, ' ');
     const game = games[gameId];
-    if (!game)
-      return socket.emit('join-error', 'Game not found. Double-check the Game ID.');
-    if (game.state !== 'lobby')
-      return socket.emit('join-error', 'Sorry, this game has already started.');
-    if (!nickname)
-      return socket.emit('join-error', 'Please enter a nickname.');
-    if (nickname.length > 16)
-      return socket.emit('join-error', 'Nickname must be 16 characters or less.');
+    if (!game)                          return socket.emit('join-error', 'Game not found. Double-check the Game ID.');
+    if (game.state !== 'lobby')         return socket.emit('join-error', 'Sorry, this game has already started.');
+    if (!nickname)                      return socket.emit('join-error', 'Please enter a nickname.');
+    if (nickname.length > 16)           return socket.emit('join-error', 'Nickname must be 16 characters or less.');
     if (game.players.find(p => p.nickname.toLowerCase() === nickname.toLowerCase()))
-      return socket.emit('join-error', 'That nickname is already taken. Try another.');
+                                        return socket.emit('join-error', 'That nickname is already taken. Try another.');
+    if (game.players.length >= 60)      return socket.emit('join-error', 'This game is full.');
 
-    game.players.push({
-      id: socket.id, nickname, score: 0, answered: false,
-      stats: { roundsAnswered: 0, roundsFirst: 0, bestRound: 0 },
-    });
-    socket.gameId = gameId;
-    socket.role   = 'player';
+    const player = makePlayer(socket.id, nickname);
+    game.players.push(player);
+    tokens[player.token] = { gameId, role: 'player', nickname };
+    socket.gameId = gameId; socket.role = 'player';
     socket.join(gameId);
-
-    socket.emit('join-success', { gameId, nickname });
-    io.to(game.hostId).emit('lobby-update', {
-      players: game.players.map(p => p.nickname),
-    });
+    socket.emit('join-success', { gameId, nickname, playerToken: player.token });
+    emitLobby(game);
     console.log(`"${nickname}" joined ${gameId}`);
   });
 
-  // ── HOST starts the game ───────────────────────────────────────────────────
+  // Anyone reconnects with a token (page refresh, lost connection) ────────────
+  socket.on('rejoin', ({ token } = {}) => {
+    const t = tokens[token];
+    const game = t && games[t.gameId];
+    if (!t || !game) return socket.emit('rejoin-error', 'That game is no longer running.');
+
+    socket.gameId = game.id;
+    socket.join(game.id);
+    let nickname = t.nickname;
+
+    if (t.role === 'host') {
+      socket.role = 'host';
+      game.hostId = socket.id; game.hostConnected = true;
+      if (game.hostGraceTimer) { clearTimeout(game.hostGraceTimer); game.hostGraceTimer = null; }
+      // In mobile mode the host is also a player — re-link that player record too
+      const hp = game.players.find(p => p.token === game.hostPlayerToken);
+      if (hp) { hp.id = socket.id; hp.connected = true; nickname = hp.nickname; }
+    } else {
+      const p = game.players.find(pl => pl.token === token);
+      if (!p) return socket.emit('rejoin-error', 'You are no longer part of that game.');
+      socket.role = 'player';
+      p.id = socket.id; p.connected = true;
+    }
+
+    socket.emit('rejoin-success', { role: socket.role, gameId: game.id, nickname, gameMode: game.options.gameMode,
+                                    autoplay: game.options.autoplay, state: game.state, totalQuestions: game.questions.length });
+    emitLobby(game);
+    sendStateSnapshot(socket, game);
+  });
+
+  // HOST starts ───────────────────────────────────────────────────────────────
   socket.on('start-game', ({ hostNickname } = {}) => {
     const game = games[socket.gameId];
-    if (!game || socket.role !== 'host') return;
+    if (!game || socket.role !== 'host' || game.state !== 'lobby') return;
 
-    if (game.gameMode === 'mobile') {
-      // In mobile mode the host joins as a player with their own nickname
-      hostNickname = (hostNickname || '').trim();
-      if (!hostNickname)
-        return socket.emit('start-error', 'Enter your nickname to join the game.');
-      if (hostNickname.length > 16)
-        return socket.emit('start-error', 'Nickname must be 16 characters or less.');
+    const hostAlreadyIn = !!(game.hostPlayerToken && game.players.find(p => p.token === game.hostPlayerToken));
+    if (game.options.gameMode === 'mobile' && !hostAlreadyIn) {
+      hostNickname = String(hostNickname || '').trim().replace(/\s+/g, ' ');
+      if (!hostNickname)               return socket.emit('start-error', 'Enter your nickname to join the game.');
+      if (hostNickname.length > 16)    return socket.emit('start-error', 'Nickname must be 16 characters or less.');
       if (game.players.find(p => p.nickname.toLowerCase() === hostNickname.toLowerCase()))
-        return socket.emit('start-error', 'That nickname is already taken. Try another.');
-      game.players.push({
-        id: socket.id, nickname: hostNickname, score: 0, answered: false,
-        stats: { roundsAnswered: 0, roundsFirst: 0, bestRound: 0 },
-      });
-      console.log(`Host "${hostNickname}" joined ${game.id} as a player (mobile mode)`);
-    } else {
-      // TV mode: need at least one player on their own device
-      if (game.players.length === 0)
-        return socket.emit('start-error', 'You need at least 1 player to start!');
+                                       return socket.emit('start-error', 'That nickname is already taken. Try another.');
+      const hp = makePlayer(socket.id, hostNickname);
+      game.players.push(hp);
+      game.hostPlayerToken = hp.token;
+      tokens[game.hostToken].nickname = hostNickname;
+    } else if (!connectedPlayers(game).length) {
+      return socket.emit('start-error', 'You need at least 1 player to start!');
     }
-
-    sendNextQuestion(game);
+    startQuestion(game);
   });
 
-  // ── PLAYER submits an answer ───────────────────────────────────────────────
-  // NOTE: Scoring is NOT applied here. We store raw answer data (accuracy, timing)
-  // and defer all point calculations to showLeaderboard(), once all answers are in.
-  socket.on('submit-answer', ({ answerIndex, answerValue, answerLat, answerLng, answerSequence }) => {
+  // PLAYER answers ────────────────────────────────────────────────────────────
+  socket.on('submit-answer', ({ answer } = {}) => {
     const game = games[socket.gameId];
-    if (!game || game.state !== 'question') return;
-
+    if (!game || game.state !== 'question' || game.isPaused) return;
     const player = game.players.find(p => p.id === socket.id);
-    if (!player || player.answered) return;
+    if (!player || player.answer) return;
 
-    player.answered   = true;
-    player.lastAnswer = null;
-    player.accuracyRaw = null;
+    const q   = game.questions[game.currentIndex];
+    const mod = game.currentModule;
+    const elapsed = Math.max(0, (Date.now() - game.questionStartTime - game.pausedAccumMs) / 1000);
 
-    const question = game.questions[game.currentIndex];
-    const elapsed  = (Date.now() - game.questionStartTime) / 1000;
-    const qType    = question.type || 'text';
+    let out = null;
+    try { out = mod.evaluate(q, answer, { elapsed, timeLimit: mod.timeLimit, game }); }
+    catch (e) { console.error(`evaluate() failed for ${mod.type}:`, e.message); }
+    if (!out) return socket.emit('answer-rejected', 'That answer could not be read — try again.');
 
-    player.answerTime = elapsed;
+    const quality = (typeof out.quality === 'number' && !Number.isNaN(out.quality)) ? Math.max(0, Math.min(1, out.quality)) : null;
+    player.answer = { quality, detail: out.detail || {}, result: out.result || {}, elapsed };
 
-    if (qType === 'slider' || qType === 'timeline') {
-      const range      = question.max - question.min;
-      const error      = Math.abs(answerValue - question.correct);
-      const accuracyRaw = Math.max(0, 1 - (error / (range * 0.5)));
-
-      player.accuracyRaw = accuracyRaw;
-      player.lastAnswer  = {
-        type:    qType,
-        value:   answerValue,
-        correct: question.correct,
-        diff:    error,
-        unit:    question.unit || '',
-      };
-
-      socket.emit('answer-result', {
-        type:        qType,
-        soundCorrect: accuracyRaw > 0,
-        accuracyPct:  Math.round(accuracyRaw * 100),
-        yourAnswer:   answerValue,
-        correctValue: question.correct,
-        unit:         question.unit,
-      });
-
-    } else if (qType === 'map') {
-      const dist        = haversineKm(answerLat, answerLng, question.correctLat, question.correctLng);
-      const effectiveDist = Math.max(0, dist - (question.toleranceKm || 0));
-      const accuracyRaw = Math.exp(-Math.pow(effectiveDist / 50, 0.6));
-
-      player.accuracyRaw = accuracyRaw;
-      player.mapAnswer   = { lat: answerLat, lng: answerLng, distanceKm: Math.round(dist), effectiveDist };
-      player.lastAnswer  = { type: 'map', distanceKm: Math.round(dist) };
-
-      socket.emit('answer-result', {
-        type:        'map',
-        soundCorrect: effectiveDist < 2000,
-        distanceKm:   Math.round(dist),
-        locationName: question.locationName,
-      });
-
-    } else if (qType === 'sequence') {
-      const correctOrder  = question.items;
-      const playerOrder   = answerSequence || [];
-      const correctCount  = playerOrder.filter((item, i) => item === correctOrder[i]).length;
-      const accuracyRaw   = correctCount / correctOrder.length;
-
-      player.accuracyRaw = accuracyRaw;
-      player.lastAnswer  = {
-        type:         'sequence',
-        playerOrder,
-        correctCount,
-        correctOrder,
-      };
-
-      socket.emit('answer-result', {
-        type:         'sequence',
-        soundCorrect: correctCount >= Math.ceil(correctOrder.length / 2),
-        correctCount,
-        totalItems:   correctOrder.length,
-        correctOrder,
-        playerOrder,
-      });
-
-    } else {
-      // Multiple choice / flag — binary correct / wrong
-      const isCorrect = (answerIndex === question.correct);
-
-      player.lastAnswer = {
-        type:        qType,
-        isCorrect,
-        answerText:  (question.answers || [])[answerIndex] || '—',
-        correctText: (question.answers || [])[question.correct] || '—',
-      };
-
-      // Points depend on final speed rank — deferred to leaderboard time
-      socket.emit('answer-result', {
-        type:         qType,
-        soundCorrect: isCorrect,
-        isCorrect,
-        correctIndex: question.correct,
-        correctText:  (question.answers || [])[question.correct] || '—',
-        yourText:     (question.answers || [])[answerIndex]      || '—',
-      });
-    }
-
-    // Tell host how many players have answered
-    const answeredCount = game.players.filter(p => p.answered).length;
-    io.to(game.hostId).emit('answer-progress', {
-      answered: answeredCount,
-      total:    game.players.length,
+    socket.emit('answer-result', {
+      type: mod.type, quality, elapsed: Math.round(elapsed * 10) / 10,
+      soundCorrect: out.result && out.result.soundCorrect !== undefined ? out.result.soundCorrect : (quality !== null && quality >= 0.5),
+      ...(out.result || {}),
     });
 
-    // All answered → advance early
-    if (answeredCount === game.players.length) {
-      const earlyPause = game.currentQuestionType === 'map'                                                    ? 5000
-                       : (game.currentQuestionType === 'slider' || game.currentQuestionType === 'timeline')    ? 4000
-                       : game.currentQuestionType === 'sequence'                                               ? 4000
-                       : 3000;
-      clearTimeout(game.timer);
-      game.timerEndAt = Date.now() + earlyPause;
-      game.timer = setTimeout(() => showLeaderboard(game), earlyPause);
+    const answered = game.players.filter(p => p.answer).length;
+    io.to(game.hostId).emit('answer-progress', { answered, total: game.players.length, connected: connectedPlayers(game).length });
+
+    // Everyone (who is still connected) has answered → show results early
+    if (connectedPlayers(game).every(p => p.answer)) {
+      clearGameTimer(game);
+      const wait = scaleMs(game, mod.earlyPause);
+      game.timerEndAt = Date.now() + wait;
+      game.timer = setTimeout(() => showLeaderboard(game), wait);
     }
   });
 
-  // ── HOST manually advances (autoplay off) ──────────────────────────────────
+  // HOST controls ─────────────────────────────────────────────────────────────
   socket.on('next-question', () => {
     const game = games[socket.gameId];
-    if (!game || socket.role !== 'host') return;
-    sendNextQuestion(game);
+    if (!game || socket.role !== 'host' || game.state !== 'leaderboard' || game.options.autoplay) return;
+    startQuestion(game);
   });
 
-  // ── HOST pauses / resumes ──────────────────────────────────────────────────
+  socket.on('skip-question', () => {
+    const game = games[socket.gameId];
+    if (!game || socket.role !== 'host') return;
+    if (game.state === 'question' || game.state === 'intro') { game.isPaused = false; showLeaderboard(game); }
+    else if (game.state === 'leaderboard') { startQuestion(game); }
+  });
+
+  socket.on('end-game', () => {
+    const game = games[socket.gameId];
+    if (!game || socket.role !== 'host' || game.state === 'gameover') return;
+    if (game.state === 'question') { game.isPaused = false; scoring.applyRoundScores(game, game.questions[game.currentIndex], game.currentModule); }
+    endGame(game);
+  });
+
+  socket.on('kick-player', ({ nickname } = {}) => {
+    const game = games[socket.gameId];
+    if (!game || socket.role !== 'host' || game.state !== 'lobby') return;
+    const idx = game.players.findIndex(p => p.nickname === nickname);
+    if (idx < 0) return;
+    const [p] = game.players.splice(idx, 1);
+    delete tokens[p.token];
+    io.to(p.id).emit('kicked');
+    const s = io.sockets.sockets.get(p.id);
+    if (s) { s.leave(game.id); s.gameId = null; }
+    emitLobby(game);
+  });
+
+  // Rematch: same players, same settings, fresh questions — nobody re-enters a code
+  socket.on('rematch', () => {
+    const old = games[socket.gameId];
+    if (!old || socket.role !== 'host' || old.state !== 'gameover') return;
+    const questions = pickQuestions(loadAllQuestions(), { ...old.setup, rounds: old.setup.rounds });
+    if (!questions.length) return socket.emit('start-error', 'No questions available for a rematch.');
+    let gameId;
+    do { gameId = generateGameId(); } while (games[gameId]);
+    const game = {
+      ...old, id: gameId, questions, currentIndex: -1, state: 'lobby', timer: null, timerEndAt: 0, isPaused: false,
+      pausedRemainingMs: 0, pauseStartedAt: 0, pausedAccumMs: 0, questionStartTime: 0, seenCategories: new Set(),
+      lastLeaderboard: null, lastGameOver: null, currentModule: null, currentPayload: null, createdAt: Date.now(), hostGraceTimer: null,
+      players: old.players.map(p => ({ ...p, score: 0, streak: 0, answer: null, round: scoring.newRound(), stats: scoring.newStats() })),
+    };
+    games[gameId] = game;
+    tokens[game.hostToken] = { gameId, role: 'host', nickname: tokens[old.hostToken] ? tokens[old.hostToken].nickname : null };
+    for (const p of game.players) tokens[p.token] = { gameId, role: 'player', nickname: p.nickname };
+    // Move every socket into the new room
+    for (const s of io.sockets.adapter.rooms.get(old.id) ? [...io.sockets.adapter.rooms.get(old.id)] : []) {
+      const sock = io.sockets.sockets.get(s);
+      if (sock) { sock.leave(old.id); sock.join(gameId); sock.gameId = gameId; }
+    }
+    delete games[old.id];
+    io.to(gameId).emit('rematch', { gameId, gameMode: game.options.gameMode, autoplay: game.options.autoplay, totalQuestions: questions.length, players: lobbyPlayers(game) });
+    console.log(`Rematch: ${old.id} → ${gameId}`);
+  });
+
   socket.on('pause-game', () => {
     const game = games[socket.gameId];
-    if (!game || socket.role !== 'host' || (game.state !== 'question' && game.state !== 'leaderboard') || game.isPaused || !game.timer) return;
-
-    game.pausedRemainingMs = Math.max(1000, game.timerEndAt - Date.now());
-    clearTimeout(game.timer);
-    game.timer    = null;
+    if (!game || socket.role !== 'host' || game.isPaused || !game.timer) return;
+    if (game.state !== 'question' && game.state !== 'leaderboard') return;
+    game.pausedRemainingMs = Math.max(500, game.timerEndAt - Date.now());
+    clearGameTimer(game);
     game.isPaused = true;
-
-    io.to(game.id).emit('game-paused', { remainingMs: game.pausedRemainingMs });
-    console.log(`Game ${game.id} paused (${Math.round(game.pausedRemainingMs / 1000)}s remaining)`);
+    game.pauseStartedAt = Date.now();
+    io.to(game.id).emit('game-paused', { remainingMs: game.pausedRemainingMs, state: game.state });
   });
 
   socket.on('resume-game', () => {
     const game = games[socket.gameId];
     if (!game || socket.role !== 'host' || !game.isPaused) return;
-
-    game.isPaused   = false;
-    const remaining = game.pausedRemainingMs || 5000;
+    game.isPaused = false;
+    if (game.state === 'question') game.pausedAccumMs += Date.now() - game.pauseStartedAt;
+    const remaining = game.pausedRemainingMs || 3000;
     game.timerEndAt = Date.now() + remaining;
-    game.timer      = setTimeout(() => showLeaderboard(game), remaining);
-
-    io.to(game.id).emit('game-resumed', { remainingMs: remaining });
-    console.log(`Game ${game.id} resumed (${Math.round(remaining / 1000)}s remaining)`);
+    game.timer = setTimeout(() => game.state === 'question' ? showLeaderboard(game) : startQuestion(game), remaining);
+    io.to(game.id).emit('game-resumed', { remainingMs: remaining, state: game.state });
   });
 
-  // ── Disconnect ─────────────────────────────────────────────────────────────
+  // Disconnect ────────────────────────────────────────────────────────────────
   socket.on('disconnect', () => {
-    console.log('Browser disconnected:', socket.id);
     const game = games[socket.gameId];
     if (!game) return;
 
-    if (socket.role === 'host') {
-      clearTimeout(game.timer);
-      delete games[game.id];
-      io.to(game.id).emit('host-left');
+    if (socket.role === 'host' && game.hostId === socket.id) {
+      game.hostConnected = false;
+      const hp = game.players.find(p => p.token === game.hostPlayerToken);
+      if (hp) hp.connected = false;
+      // Give the host a grace period to come back (page refresh, flaky wifi)
+      game.hostGraceTimer = setTimeout(() => {
+        if (game.hostConnected || !games[game.id]) return;
+        clearGameTimer(game);
+        io.to(game.id).emit('host-left');
+        destroyGame(game);
+      }, IS_TEST ? 2000 : 90 * 1000);
+      if (game.state === 'lobby') emitLobby(game);
+      return;
+    }
+
+    const p = game.players.find(pl => pl.id === socket.id);
+    if (!p) return;
+    if (game.state === 'lobby') {
+      // In the lobby just drop them — they can join again
+      game.players = game.players.filter(pl => pl !== p);
+      delete tokens[p.token];
     } else {
-      game.players = game.players.filter(p => p.id !== socket.id);
-      if (game.state === 'lobby') {
-        io.to(game.hostId).emit('lobby-update', {
-          players: game.players.map(p => p.nickname),
-        });
+      p.connected = false;   // keep their score; they can rejoin with their token
+      // If everyone else already answered, don't wait for a ghost
+      if (game.state === 'question' && !game.isPaused && connectedPlayers(game).length && connectedPlayers(game).every(pl => pl.answer)) {
+        clearGameTimer(game);
+        const wait = scaleMs(game, game.currentModule.earlyPause);
+        game.timerEndAt = Date.now() + wait;
+        game.timer = setTimeout(() => showLeaderboard(game), wait);
       }
     }
+    emitLobby(game);
   });
 });
 
-// ── Game flow ─────────────────────────────────────────────────────────────────
-
-function sendNextQuestion(game) {
-  game.currentIndex++;
-
-  if (game.currentIndex >= game.questions.length) {
-    game.state = 'gameover';
-    io.to(game.id).emit('game-over', { leaderboard: buildLeaderboard(game) });
-    setTimeout(() => delete games[game.id], 60 * 1000);
-    return;
+// ── Snapshot for reconnecting clients ────────────────────────────────────────
+function sendStateSnapshot(socket, game) {
+  if (game.state === 'lobby') return;
+  if (game.state === 'intro' || game.state === 'question') {
+    const q   = game.questions[game.currentIndex];
+    const mod = game.currentModule;
+    const me  = game.players.find(p => p.id === socket.id);
+    const remainingMs = game.isPaused ? game.pausedRemainingMs : Math.max(0, game.timerEndAt - Date.now());
+    if (game.state === 'intro') {
+      socket.emit('question-intro', { questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
+                                      category: categoryMeta(q.category), firstTime: false, durationMs: remainingMs });
+      return;
+    }
+    socket.emit('new-question', {
+      questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
+      category: categoryMeta(q.category), timeLimit: mod.timeLimit, remainingMs, paused: game.isPaused,
+      payload: game.currentPayload,
+      answered: !!(me && me.answer),
+      myResult: me && me.answer ? { type: mod.type, quality: me.answer.quality, ...me.answer.result } : null,
+    });
+    if (socket.role === 'host') socket.emit('answer-progress', { answered: game.players.filter(p => p.answer).length, total: game.players.length, connected: connectedPlayers(game).length });
+  } else if (game.state === 'leaderboard' && game.lastLeaderboard) {
+    socket.emit('show-leaderboard', { ...game.lastLeaderboard, leaderboard: buildLeaderboard(game), remainingMs: game.isPaused ? game.pausedRemainingMs : Math.max(0, game.timerEndAt - Date.now()), paused: game.isPaused });
+    if (socket.role === 'host' && !game.options.autoplay) socket.emit('waiting-for-host');
+  } else if (game.state === 'gameover' && game.lastGameOver) {
+    socket.emit('game-over', game.lastGameOver);
   }
+}
+
+// ── Game flow ─────────────────────────────────────────────────────────────────
+function startQuestion(game) {
+  clearGameTimer(game);
+  game.isPaused = false;
+  game.currentIndex++;
+  if (game.currentIndex >= game.questions.length) return endGame(game);
+
+  const q   = game.questions[game.currentIndex];
+  const mod = registry.get(q.type);
+  if (!mod) { console.error(`No module for type "${q.type}" — skipping question ${q.id}`); return startQuestion(game); }
+  game.currentModule = mod;
+
+  for (const p of game.players) { p.answer = null; p.round = scoring.newRound(); }
+
+  const firstTime = !game.seenCategories.has(q.category);
+  game.seenCategories.add(q.category);
+
+  if (game.options.intros) {
+    game.state = 'intro';
+    const durationMs = scaleMs(game, firstTime ? 4000 : 1800);
+    game.timerEndAt = Date.now() + durationMs;
+    io.to(game.id).emit('question-intro', {
+      questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
+      category: categoryMeta(q.category), firstTime, durationMs,
+    });
+    game.timer = setTimeout(() => beginQuestion(game), durationMs);
+  } else {
+    beginQuestion(game);
+  }
+}
+
+function beginQuestion(game) {
+  clearGameTimer(game);
+  const q   = game.questions[game.currentIndex];
+  const mod = game.currentModule;
+  let payload;
+  try { payload = mod.payload(q, game); }
+  catch (e) { console.error(`payload() failed for ${mod.type} (question ${q.id}):`, e.message); return startQuestion(game); }
 
   game.state             = 'question';
   game.questionStartTime = Date.now();
-  game.players.forEach(p => {
-    p.answered    = false;
-    p.answerTime  = null;
-    p.accuracyRaw = null;
-    delete p.mapAnswer;
-    delete p.lastAnswer;
-    delete p.roundPoints;
-  });
-
-  const q     = game.questions[game.currentIndex];
-  const qType = q.type || 'text';
-  const timeLimit = qType === 'map'                              ? 35
-                  : (qType === 'slider' || qType === 'timeline') ? 20
-                  : qType === 'sequence'                         ? 30
-                  : 15;
-
-  game.currentTimeLimit    = timeLimit;
-  game.currentQuestionType = qType;
-  game.isPaused            = false;
-  game.timerEndAt          = Date.now() + timeLimit * 1000;
+  game.pausedAccumMs     = 0;
+  game.currentPayload    = payload;
+  const timeLimitMs = scaleMs(game, mod.timeLimit * 1000);
+  game.timerEndAt = Date.now() + timeLimitMs;
 
   io.to(game.id).emit('new-question', {
-    questionNumber: game.currentIndex + 1,
-    totalQuestions: game.questions.length,
-    question:       q.question,
-    answers:        q.answers,
-    timeLimit,
-    type:           qType,
-    // Slider/timeline fields:
-    min:  q.min,
-    max:  q.max,
-    step: q.step || 1,
-    unit: q.unit,
-    // Optional photo:
-    imageUrl: q.imageUrl || null,
-    // Sequence: items shuffled so correct order isn't obvious
-    items: qType === 'sequence' ? shuffleArray(q.items) : undefined,
+    questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
+    category: categoryMeta(q.category), timeLimit: mod.timeLimit, remainingMs: timeLimitMs, payload,
+    isLast: game.currentIndex === game.questions.length - 1,
+    multiplier: (game.options.finalDouble && game.currentIndex === game.questions.length - 1) ? 2 : 1,
   });
-
-  game.timer = setTimeout(() => showLeaderboard(game), timeLimit * 1000);
+  io.to(game.hostId).emit('answer-progress', { answered: 0, total: game.players.length, connected: connectedPlayers(game).length });
+  game.timer = setTimeout(() => showLeaderboard(game), timeLimitMs);
 }
 
 function showLeaderboard(game) {
-  clearTimeout(game.timer);
-  game.timer = null;
-  game.state = 'leaderboard';
+  clearGameTimer(game);
+  if (game.state === 'leaderboard' || game.state === 'gameover') return;
+  game.state    = 'leaderboard';
+  game.isPaused = false;
 
   const q      = game.questions[game.currentIndex];
-  const isLast = (game.currentIndex === game.questions.length - 1);
+  const mod    = game.currentModule;
+  const isLast = game.currentIndex === game.questions.length - 1;
 
-  // Apply rank-based scores now that all answers are in
-  applyRoundScores(game, q);
+  const { multiplier } = scoring.applyRoundScores(game, q, mod);
 
-  // Format a year for the leaderboard banner: negative = BCE, 1–999 = "X CE", 1000+ = plain.
-  const fmtYear = y => {
-    const n = Math.round(y);
-    if (n < 0)    return `${Math.abs(n)} BCE`;
-    if (n < 1000) return `${n} CE`;
-    return String(n);
+  // Remember mid-game ranks for the "Comeback Kid" award
+  if (game.currentIndex === Math.floor(game.questions.length / 2) - 1 && game.questions.length >= 4) {
+    [...game.players].sort((a, b) => b.score - a.score).forEach((p, i) => { p.stats.midRank = i + 1; });
+  }
+
+  const answers = game.players
+    .filter(p => p.answer && p.answer.quality !== null)
+    .map(p => ({ nickname: p.nickname, detail: p.answer.detail, quality: p.answer.quality, elapsed: p.answer.elapsed, roundPoints: p.round.roundPoints }));
+  let reveal = null;
+  try { reveal = mod.reveal(q, answers, game); } catch (e) { console.error(`reveal() failed for ${mod.type}:`, e.message); }
+
+  const revealPause = Math.min(25, mod.revealPause + Math.max(0, connectedPlayers(game).length - 1) * 0.5);
+  const payload = {
+    leaderboard: buildLeaderboard(game),
+    correctText: safe(() => mod.correctText(q), ''),
+    type: mod.type, category: categoryMeta(q.category),
+    questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length,
+    isLast, multiplier, reveal, autoplay: game.options.autoplay, revealSeconds: revealPause,
   };
+  game.lastLeaderboard = payload;
+  io.to(game.id).emit('show-leaderboard', payload);
 
-  const correctAnswer = q.type === 'sequence'
-    ? q.items.map((item, i) => `${i + 1}. ${item}`).join(' → ')
-    : q.type === 'timeline'
-      ? fmtYear(q.correct)
-      : q.type === 'slider'
-        ? (q.unit ? `${q.correct.toLocaleString('en-US')} ${q.unit}` : `${q.correct}`)
-        : q.type === 'map'
-          ? q.locationName
-          : q.answers[q.correct];
-
-  const mapData = q.type === 'map' ? {
-    playerPins:   game.players
-                    .filter(p => p.mapAnswer)
-                    .map(p => ({ nickname: p.nickname, lat: p.mapAnswer.lat, lng: p.mapAnswer.lng, distanceKm: p.mapAnswer.distanceKm })),
-    correctLat:   q.correctLat,
-    correctLng:   q.correctLng,
-    locationName: q.locationName,
-    toleranceKm:  q.toleranceKm || 0,
-  } : null;
-
-  const sequenceData = q.type === 'sequence' ? {
-    correctOrder:  q.items,
-    playerAnswers: game.players
-      .filter(p => p.lastAnswer && p.lastAnswer.type === 'sequence')
-      .map(p => ({
-        nickname:     p.nickname,
-        playerOrder:  p.lastAnswer.playerOrder,
-        correctCount: p.lastAnswer.correctCount,
-      })),
-  } : null;
-
-  const timelineData = (q.type === 'timeline' || q.type === 'slider') ? {
-    type:          q.type,
-    correctValue:  q.correct,
-    unit:          q.unit || '',
-    playerGuesses: game.players
-                     .filter(p => p.lastAnswer && (p.lastAnswer.type === 'timeline' || p.lastAnswer.type === 'slider'))
-                     .map(p => ({ nickname: p.nickname, value: p.lastAnswer.value, diff: p.lastAnswer.diff })),
-  } : null;
-
-  io.to(game.id).emit('show-leaderboard', {
-    leaderboard:      buildLeaderboard(game),
-    correctAnswer,
-    questionType:     q.type || 'text',
-    questionNumber:   game.currentIndex + 1,
-    totalQuestions:   game.questions.length,
-    questionCategory: q.category || '',
-    isLastQuestion:   isLast,
-    mapData,
-    timelineData,
-    sequenceData,
-  });
-
-  const baseLeaderboardPause = q.type === 'map'                               ? 10
-                             : (q.type === 'slider' || q.type === 'timeline') ? 8
-                             : q.type === 'sequence'                          ? 8
-                             : LEADERBOARD_PAUSE;
-  const leaderboardPause = Math.min(20, baseLeaderboardPause + (game.players.length - 1) * 0.5);
-
-  if (game.autoplay) {
-    game.timerEndAt = Date.now() + leaderboardPause * 1000;
-    game.timer = setTimeout(() => sendNextQuestion(game), leaderboardPause * 1000);
+  if (game.options.autoplay) {
+    const wait = scaleMs(game, revealPause * 1000);
+    game.timerEndAt = Date.now() + wait;
+    game.timer = setTimeout(() => startQuestion(game), wait);
   } else {
     io.to(game.hostId).emit('waiting-for-host');
   }
 }
 
+function endGame(game) {
+  clearGameTimer(game);
+  game.state = 'gameover';
+  const payload = { leaderboard: buildLeaderboard(game), awards: safe(() => scoring.computeAwards(game), []), totalQuestions: game.currentIndex + 1 };
+  game.lastGameOver = payload;
+  io.to(game.id).emit('game-over', payload);
+  // Keep the game around so players can reload and still see the results
+  setTimeout(() => destroyGame(game), IS_TEST ? 500 : 10 * 60 * 1000);
+}
+
+function destroyGame(game) {
+  if (!games[game.id]) return;
+  clearGameTimer(game);
+  if (game.hostGraceTimer) clearTimeout(game.hostGraceTimer);
+  delete tokens[game.hostToken];
+  for (const p of game.players) delete tokens[p.token];
+  delete games[game.id];
+}
+
+function safe(fn, fallback) { try { return fn(); } catch (e) { console.error(e.message); return fallback; } }
+
+// Stale-game sweeper: drop lobbies nobody used for 3 hours
+setInterval(() => {
+  const now = Date.now();
+  for (const g of Object.values(games)) if (g.state === 'lobby' && now - g.createdAt > 3 * 60 * 60 * 1000) destroyGame(g);
+}, 10 * 60 * 1000).unref();
+
 // ── Start ─────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log('\n✅ Quiz app is running!');
-  console.log(`   Open your browser and go to: http://localhost:${PORT}`);
-  console.log('   Press Ctrl+C to stop the server.\n');
-});
+function start(port) {
+  return new Promise(resolve => server.listen(port, () => resolve(server.address().port)));
+}
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  start(PORT).then(p => {
+    console.log('\n✅ QuizBlast is running!');
+    console.log(`   Open your browser and go to: http://localhost:${p}`);
+    console.log(`   ${registry.categories.length} categories across ${registry.all().length} game types loaded.`);
+    console.log('   Press Ctrl+C to stop the server.\n');
+  });
+}
+
+module.exports = { app, server, io, start, games, registry };

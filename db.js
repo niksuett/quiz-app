@@ -1,22 +1,23 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // db.js — SQLite database setup and question row conversion helpers
 //
-// Opens (or creates) quiz.db in the project root.
-// All questions live in a single `questions` table.
-// Variable fields (answers, items, coordinates, etc.) are stored as a JSON
-// blob in the `extra` column so the schema stays simple regardless of type.
+// Opens (or creates) quiz.db in the project root. All questions live in one
+// `questions` table. Type-specific fields (answers, coordinates, items, …) are
+// stored as a JSON blob in the `extra` column; each game module in games/
+// knows how to pack and unpack its own fields (toRow / fromRow), so this file
+// only deals with the columns every question shares.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const path    = require('path');
+const path     = require('path');
 const Database = require('better-sqlite3');
+const registry = require('./games');
 
-const DB_PATH = path.join(__dirname, 'quiz.db');
+const DB_PATH = process.env.QUIZ_DB || path.join(__dirname, 'quiz.db');
 const db      = new Database(DB_PATH);
 
-// Enable WAL mode — faster writes, safe for concurrent reads
+// WAL mode — faster writes, safe for concurrent reads
 db.pragma('journal_mode = WAL');
 
-// ── Create tables if they don't exist yet ─────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS questions (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,97 +28,70 @@ db.exec(`
     image_url TEXT,
     extra     TEXT    NOT NULL DEFAULT '{}'
   );
-
   CREATE INDEX IF NOT EXISTS idx_questions_category ON questions (category);
   CREATE INDEX IF NOT EXISTS idx_questions_type     ON questions (type);
 `);
 
 // ── rowToQuestion ─────────────────────────────────────────────────────────────
-// Converts a database row back into the plain JS object shape that the rest of
-// the app (server.js, scoring logic) already expects.
+// Database row → plain question object (the shape game modules work with).
 function rowToQuestion(row) {
-  const extra = JSON.parse(row.extra);
-  const type  = row.type;
+  let extra = {};
+  try { extra = JSON.parse(row.extra || '{}'); } catch (e) { extra = {}; }
+  const type = row.type || 'mc';
+  const q = { id: row.id, category: row.category, type, question: row.question };
+  if (row.image_url)   q.imageUrl   = row.image_url;
+  if (extra.region)     q.region     = extra.region;
+  if (extra.difficulty) q.difficulty = extra.difficulty;
 
-  const q = {
-    id:       row.id,
-    category: row.category,
-    type:     type === 'mc' ? undefined : type,  // MC questions have no `type` field in original JSON
-    question: row.question,
-  };
-
-  // Remove undefined type so it matches the original JSON structure
-  if (q.type === undefined) delete q.type;
-
-  if (row.image_url) q.imageUrl = row.image_url;
-
-  if (type === 'mc' || type === 'flag') {
-    q.answers = extra.answers;
-    q.correct = parseInt(row.correct, 10);
-    if (type === 'flag') q.type = 'flag';
-
-  } else if (type === 'slider' || type === 'timeline') {
-    q.min     = extra.min;
-    q.max     = extra.max;
-    q.step    = extra.step;
-    q.unit    = extra.unit;
-    q.correct = parseFloat(row.correct);
-
-  } else if (type === 'map') {
-    q.correctLat   = extra.correctLat;
-    q.correctLng   = extra.correctLng;
-    q.locationName = extra.locationName;
-    if (extra.toleranceKm) q.toleranceKm = extra.toleranceKm;
-    // map questions have no `correct` scalar value
-
-  } else if (type === 'sequence') {
-    q.items = extra.items;
-    // sequence questions have no `correct` scalar value
+  const mod = registry.get(type);
+  if (mod) {
+    Object.assign(q, mod.fromRow(row, extra));
+  } else {
+    // Unknown type (module not installed) — keep the raw fields so nothing is lost
+    Object.assign(q, extra);
+    if (row.correct !== null) q.correct = row.correct;
   }
-
   return q;
 }
 
 // ── questionToRow ─────────────────────────────────────────────────────────────
-// Converts a plain JS question object into a row ready for INSERT.
+// Plain question object → row ready for INSERT.
 function questionToRow(q) {
   const type = q.type || 'mc';
-  let correct   = null;
-  let extraObj  = {};
-
-  if (type === 'mc' || type === 'flag') {
-    extraObj = { answers: q.answers };
-    correct  = String(q.correct);
-
-  } else if (type === 'slider' || type === 'timeline') {
-    extraObj = { min: q.min, max: q.max, step: q.step, unit: q.unit || '' };
-    correct  = String(q.correct);
-
-  } else if (type === 'map') {
-    extraObj = { correctLat: q.correctLat, correctLng: q.correctLng, locationName: q.locationName || '' };
-    if (q.toleranceKm) extraObj.toleranceKm = q.toleranceKm;
-    correct  = null;
-
-  } else if (type === 'sequence') {
-    extraObj = { items: q.items };
-    correct  = null;
+  const mod  = registry.get(type);
+  let correct = null, extra = {};
+  if (mod) {
+    ({ correct, extra } = mod.toRow(q));
+  } else {
+    const { id, category, question, imageUrl, region, difficulty, type: _t, ...rest } = q;
+    extra = rest;
+    correct = rest.correct !== undefined ? String(rest.correct) : null;
   }
-
+  if (q.region)     extra.region     = q.region;
+  if (q.difficulty) extra.difficulty = q.difficulty;
   return {
     category:  q.category,
     type,
     question:  q.question,
-    correct,
+    correct:   correct === undefined ? null : correct,
     image_url: q.imageUrl || null,
-    extra:     JSON.stringify(extraObj),
+    extra:     JSON.stringify(extra),
   };
 }
 
-// ── getQuestionById ───────────────────────────────────────────────────────────
-// Fetches a single question by its numeric ID. Returns null if not found.
+function loadAllQuestions() {
+  return db.prepare('SELECT * FROM questions ORDER BY id').all().map(rowToQuestion);
+}
+
 function getQuestionById(id) {
   const row = db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
   return row ? rowToQuestion(row) : null;
 }
 
-module.exports = { db, rowToQuestion, questionToRow, getQuestionById };
+function countsByCategory() {
+  const out = {};
+  for (const r of db.prepare('SELECT category, COUNT(*) AS n FROM questions GROUP BY category').all()) out[r.category] = r.n;
+  return out;
+}
+
+module.exports = { db, rowToQuestion, questionToRow, loadAllQuestions, getQuestionById, countsByCategory };
