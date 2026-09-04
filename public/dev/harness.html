@@ -187,11 +187,14 @@ const SAMPLES = {
     const bbox  = [-1, -1, 11, 7];
     const mine  = [[4.6, 0], [4.9, 2], [5.0, 4], [5.2, 6]];
     return {
+      // tier: 'casual' — the fullest payload. Try 'mixed' (drop lengthKm) or
+      // 'expert' (drop endpoints/closed too, per games/trace.js tierFor()) by
+      // editing this object, or pass a real payload via ?payload= (see below).
       payload: { mode: 'border', question: 'Draw the border between Westland and Eastland', bbox,
                  blob: [[[0, 0], [10, 0], [10, 6], [0, 6]]],
                  outline: [[[5, 0], [0, 0], [0, 6], [5.3, 6]], [[5, 0], [10, 0], [10, 6], [5.3, 6]]],
-                 known: [], names: { a: 'Westland', b: 'Eastland' },
-                 endpoints: [[5, 0], [5.3, 6]], closed: false, clipped: false, lengthKm: 511 },
+                 known: [], names: { a: 'Westland', b: 'Eastland' }, clipped: false, tier: 'casual',
+                 endpoints: [[5, 0], [5.3, 6]], closed: false, lengthKm: 511 },
       result:  { type: 'trace', quality: .66, score: 66, errKm: 73.1, rating: 'Border Guard', truth, bbox, mode: 'border' },
       reveal:  { mode: 'border', bbox, truth,
                  shapes: { a: [[[0, 0], [5, 0], [5.2, 1], [4.8, 2], [5.4, 3], [5.1, 4], [5.6, 5], [5.3, 6], [0, 6]]],

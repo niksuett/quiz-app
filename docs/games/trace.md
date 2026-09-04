@@ -113,6 +113,31 @@ Rebuild either file with `node tools/build-borders.js` / `node tools/build-river
 **Contains no part of the hidden line.** Verified by `test/simulate.js`'s leak check and by a
 vertex-level check in the build: not one interior vertex of `border` appears in `blob`/`outline`.
 
+### Difficulty tiers
+
+How much of the answer's *shape* is given away — never the truth or the scoring, which are
+identical at every difficulty — depends on `game.setup.difficulty` via `tierFor()` in
+`games/trace.js`. The payload carries the result as `tier: 'casual' | 'mixed' | 'expert'` so the
+client can word its hint, and the fields below are added or omitted per tier:
+
+| Field         | casual | mixed (and the internal `'normal'`) | expert |
+|---------------|:------:|:------------------------------------:|:------:|
+| `endpoints` *(border)* | ✅ | ✅ | ❌ |
+| `closed` *(border)*    | ✅ | ✅ | ❌ — meaningless with no marks to draw it on, so it isn't sent unused |
+| `mouth` *(river)*      | ✅ | ✅ | ✅ — a river must reach the sea *somewhere*, so this stays even at expert |
+| `source` *(river)*     | ✅ | ✅ | ❌ |
+| `lengthKm` *(both)*    | ✅ | ❌ | ❌ |
+
+Everything else (`blob`/`outline`/`known`/`names`/`clipped` for borders; `context`/`name` for
+rivers) is unaffected by difficulty — hiding the two blended countries or the river's shape would
+make the question unanswerable, not harder.
+
+**The client module must treat every optional field above as possibly absent** — no gold marks
+for a missing `endpoints`/`source`, no "≈ N km" hint for a missing `lengthKm`, and the tier hint
+described in §9 stands in for them instead. `evaluate()` / `reveal()` are untouched: they read the
+geometry straight from `data/borders.json` / `data/rivers.json`, never from the payload, so the
+truth and every point value are identical regardless of what the player was shown.
+
 ### `mode: 'border'` (7–25 KB)
 
 ```jsonc
@@ -124,10 +149,11 @@ vertex-level check in the build: not one interior vertex of `border` appears in 
   "outline": [[[lng,lat]…], …],   // open polylines → stroke these (the real coast)
   "known":   [[[lng,lat]…], …],   // parts of this border that are shown solid (often empty)
   "names":   { "a": "Germany", "b": "Poland" },
-  "endpoints": [[14.2589,53.7296],[14.8094,50.859]],   // where the missing border starts/ends
-  "closed": false,     // true → the border is a closed loop; endpoints are the same point
   "clipped": false,    // true → a huge neighbour was cropped; don't draw a frame around it
-  "lengthKm": 361      // fair hint: how long the missing border is
+  "tier": "casual",    // 'casual' | 'mixed' | 'expert' — see the table above
+  "endpoints": [[14.2589,53.7296],[14.8094,50.859]],   // OPTIONAL — absent at 'expert'
+  "closed": false,      // OPTIONAL — absent at 'expert'. true → endpoints are the same point
+  "lengthKm": 361        // OPTIONAL — only present at 'casual'. Fair hint: how long the missing border is
 }
 ```
 
@@ -140,9 +166,10 @@ vertex-level check in the build: not one interior vertex of `border` appears in 
   "name": "the Nile",
   "bbox": [29.856, 13.896, 34.432, 31.863],
   "context": [[[lng,lat]…], …],   // closed land rings → fill as land
-  "mouth":  [31.237, 30.124],
-  "source": [32.49, 15.635],
-  "lengthKm": 2744
+  "mouth":  [31.237, 30.124],     // always present, at every tier
+  "tier": "casual",               // 'casual' | 'mixed' | 'expert' — see the table above
+  "source": [32.49, 15.635],      // OPTIONAL — absent at 'expert'
+  "lengthKm": 2744                // OPTIONAL — only present at 'casual'
 }
 ```
 
@@ -268,6 +295,25 @@ canvas is fine too. Either way put `touch-action: none` on the drawing surface.
 * Ink look: stroke `var(--gold)` at ~3 px with round caps/joins while drawing.
 * TV / host-passive view (`api.isHost && api.tvMode`): draw the map, the markers and the prompt,
   but no drawing surface — just the "N of M have drawn" progress the core already renders.
+* The live "your line: N km" readout (the length of what the player has drawn so far) is always
+  shown, at every tier — only the pre-drawn scaffolding (gold marks, the "≈ N km" length hint)
+  varies by difficulty.
+
+### Difficulty hint (`payload.tier`)
+
+Draw the gold `endpoints` / river `source` marker only when the field is present in the payload
+(§3), and swap the idle hint (shown before the player has drawn anything) for one that names the
+tier instead of pointing at marks that may not be there:
+
+| `payload.tier` | Border idle hint | River idle hint |
+|----------------|-------------------|------------------|
+| `casual`       | "Drag one stroke between the two gold marks" | "Drag from the mouth 💧 to the source ○ in one stroke" |
+| `mixed`        | "Start and end are marked" | "Start and end are marked" |
+| `expert`       | "Expert: nobody shows you where it starts and ends — draw the whole border from memory" | "Expert: only the mouth is marked — find the source yourself" |
+
+The result screen and the leaderboard reveal are unaffected: both come from `evaluate()` /
+`reveal()` on the server, which always carry the full truth regardless of what the player was
+shown while drawing.
 
 ### `mode: 'border'`
 

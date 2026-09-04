@@ -503,17 +503,27 @@ const TOPICS = ['facts', 'science', 'sports', 'entertainment', 'other'];
 // for types without a dedicated editor, is edited as raw JSON.
 const COMMON_FIELDS = ['id', 'category', 'type', 'question', 'imageUrl', 'region', 'difficulty'];
 
-// Starting JSON for the generic editor (from docs/ARCHITECTURE.md §9).
+// Starting JSON for the generic editor (from docs/ARCHITECTURE.md §9), keyed by TYPE.
+// trace is the one type whose shape depends on the CATEGORY (borders → pairId,
+// rivers → riverId — see docs/games/trace.md §2 and games/trace.js validate()),
+// so a category-specific override lives in GENERIC_TEMPLATES_BY_CATEGORY and
+// templateFor() below checks that first, falling back to the type here.
 const GENERIC_TEMPLATES = {
-  trace:      { pairId: 'FRA-ESP' },
-  sizeup:     { target: { name: 'Eiffel Tower', icon: 'tower', sizeM: 330, dim: 'height' }, reference: { name: 'Blue whale', icon: 'whale', sizeM: 30, dim: 'length' } },
+  trace:      { pairId: 'ESP-FRA' },                     // borders default; rivers overridden below
+  sizeup:     { target: { name: 'Blue whale', icon: 'whale', sizeM: 30, dim: 'length' }, reference: { name: 'City bus', icon: 'bus', sizeM: 12, dim: 'length' } },
   halves:     { regionId: 'FRA' },
-  curve:      { series: [[2000, 10], [2010, 20], [2020, 30]], xLabel: 'Year', yLabel: 'Value', yMin: 0, yMax: 50, unit: '', source: '', knownFraction: 0.5 },
+  curve:      { series: [[2000, 10], [2005, 14], [2010, 20], [2015, 26], [2020, 30]], xLabel: 'Year', yLabel: 'Value', yMin: 0, yMax: 36, unit: '', source: '', knownFraction: 0.5 },
   compass:    { from: { name: 'Paris', lat: 48.8566, lng: 2.3522 }, to: { name: 'Berlin', lat: 52.52, lng: 13.405 } },
-  tune:       { notes: [[60, 1], [62, 1], [64, 1], [65, 1]], bpm: 120, wave: 'square', answers: ['', '', '', ''], correct: 0 },
+  tune:       { notes: [[66, 1], [66, 1], [67, 1], [69, 1], [69, 1], [67, 1], [66, 1], [64, 1], [62, 1], [62, 1], [64, 1], [66, 1], [66, 1.5], [64, 0.5], [64, 2]], bpm: 120, wave: 'square', answers: ['', '', '', ''], correct: 0 },
   silhouette: { iso3: 'FRA', answers: ['France', 'Spain', 'Italy', 'Germany'], correct: 0 },
   fakes:      { items: [{ text: '', fake: false }, { text: '', fake: false }, { text: '', fake: false }, { text: '', fake: true }, { text: '', fake: true }, { text: '', fake: true }] },
 };
+const GENERIC_TEMPLATES_BY_CATEGORY = {
+  rivers: { riverId: 'nile' },
+};
+function templateFor(category, type) {
+  return GENERIC_TEMPLATES_BY_CATEGORY[category] || GENERIC_TEMPLATES[type] || {};
+}
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Small helpers
@@ -763,7 +773,7 @@ function openAddForm() {
   if (!cat) cat = catalog.categories[0].id;
   const type = typeForCat(cat);
   const q = { category: cat, type };
-  if (!hasEditor(type)) Object.assign(q, JSON.parse(JSON.stringify(GENERIC_TEMPLATES[type] || {})));
+  if (!hasEditor(type)) Object.assign(q, JSON.parse(JSON.stringify(templateFor(cat, type))));
   renderForm(q);
   $('form-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -977,7 +987,7 @@ function onTypeChange(type) {
   const cats = catsForType(type);
   if (!cats.find(c => c.id === partial.category)) partial.category = cats[0] ? cats[0].id : partial.category;
   if (!hasEditor(type) && !Object.keys(partial).some(k => !COMMON_FIELDS.includes(k))) {
-    Object.assign(partial, JSON.parse(JSON.stringify(GENERIC_TEMPLATES[type] || {})));
+    Object.assign(partial, JSON.parse(JSON.stringify(templateFor(partial.category, type))));
   }
   destroyAdminMap();
   renderForm(partial);

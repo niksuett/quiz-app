@@ -119,6 +119,33 @@ function truthLine(q) {
   return q.category === 'rivers' ? s.path : s.border;
 }
 
+// ── Difficulty tiers ────────────────────────────────────────────────────────
+// How much of the answer's shape the payload gives away, driven by the host's
+// difficulty pick (game.setup.difficulty). The truth and the scoring never
+// change — evaluate()/reveal() read the geometry straight from data/*.json,
+// not from the payload — only what the player sees before they draw changes.
+//
+//   casual          → everything we show today: start/end marks (or mouth +
+//                      source), and the lengthKm hint.
+//   mixed | normal   → the marks stay (the player still knows where to start
+//                      and finish) but the lengthKm hint is dropped.
+//   expert           → borders: no start/end marks at all — draw the whole
+//                      thing from memory. `closed` (a full-loop border) is a
+//                      fact ABOUT the two marks, so with no marks to draw it
+//                      would say nothing the player could act on — it is
+//                      dropped too, rather than sent unused.
+//                      rivers: only the mouth stays (a river has to reach the
+//                      sea *somewhere*, so that much is always fair to show);
+//                      the source and the length are hidden.
+// 'normal' exists in the type system (§2 of ARCHITECTURE.md) but is not
+// offered on the config screen; it is treated the same as 'mixed'.
+function tierFor(game) {
+  const d = game && game.setup && game.setup.difficulty;
+  if (d === 'casual') return 'casual';
+  if (d === 'expert') return 'expert';
+  return 'mixed';
+}
+
 // Fun name for the accuracy reached, shown big on the result screen.
 function ratingFor(score) {
   if (score >= 90) return 'Master Cartographer';
@@ -173,22 +200,28 @@ module.exports = {
   // `blob` — the same rings, but with the shared border flattened to a straight
   // chord — so filling them all in one colour draws the correct silhouette while
   // the border's real shape is nowhere in the payload.
-  payload(q) {
+  //
+  // `endpoints` / `source` / `lengthKm` are now OPTIONAL — see tierFor() above.
+  // The client module must cope with any of them being absent (docs/games/trace.md §3).
+  payload(q, game) {
     const s = subjectOf(q);
     if (!s) throw new Error(`trace: no geometry for ${q.pairId || q.riverId}`);
+    const tier = tierFor(game);
     if (q.category === 'rivers') {
-      return {
+      const out = {
         mode: 'river',
         question: q.question,
         name: s.name,
         bbox: s.bbox,
         context: s.context,
-        mouth: s.mouth,
-        source: s.source,
-        lengthKm: s.lengthKm,
+        mouth: s.mouth,                   // always shown — a river must reach the sea somewhere
+        tier,
       };
+      if (tier !== 'expert') out.source = s.source;
+      if (tier === 'casual') out.lengthKm = s.lengthKm;
+      return out;
     }
-    return {
+    const out = {
       mode: 'border',
       question: q.question,
       bbox: s.bbox,
@@ -196,11 +229,15 @@ module.exports = {
       outline: s.outline,                 // real coast / third-country edges — stroke these
       known: s.known,                     // parts of this border that are given away
       names: { a: s.a.name, b: s.b.name },
-      endpoints: s.endpoints,             // where the missing border starts and ends
-      closed: !!s.closed,                 // true = the border is a full loop (Lesotho)
       clipped: !!s.clipped,               // the giant neighbour was cropped to the window
-      lengthKm: s.lengthKm,
+      tier,
     };
+    if (tier !== 'expert') {
+      out.endpoints = s.endpoints;        // where the missing border starts and ends
+      out.closed = !!s.closed;            // true = the border is a full loop (Lesotho)
+    }
+    if (tier === 'casual') out.lengthKm = s.lengthKm;
+    return out;
   },
 
   // ── Score one drawn line ────────────────────────────────────────────────────
@@ -303,10 +340,18 @@ module.exports = {
 
   // ── A plausible random answer, used by test/simulate.js ─────────────────────
   // A wobbly line from one marker to the other: what a hurried player would draw.
+  // At the expert tier some markers are missing from the payload (see tierFor
+  // above): a border with no endpoints falls all the way back to a bbox
+  // diagonal below; a river still has its mouth, so it gets a wobbly line from
+  // the mouth to a random point in the bbox instead of losing the mouth too.
   sampleAnswer(p) {
-    const from = p.mode === 'river' ? p.mouth : (p.endpoints && p.endpoints[0]);
-    const to   = p.mode === 'river' ? p.source : (p.endpoints && p.endpoints[1]);
     const box  = p.bbox || [-10, -10, 10, 10];
+    const isRiver = p.mode === 'river';
+    const from = isRiver ? p.mouth : (p.endpoints && p.endpoints[0]);
+    let to     = isRiver ? p.source : (p.endpoints && p.endpoints[1]);
+    if (isRiver && from && !to) {
+      to = [box[0] + Math.random() * (box[2] - box[0]), box[1] + Math.random() * (box[3] - box[1])];
+    }
     const jitter = Math.max(0.05, 0.06 * Math.hypot(box[2] - box[0], box[3] - box[1]));
     if (!from || !to) return { line: [[box[0], box[1]], [box[2], box[3]]] };
     const n = 10 + Math.floor(Math.random() * 12);

@@ -96,7 +96,7 @@ module.exports = {
     return {
       quality,
       detail: { lat, lng, distanceKm: Math.round(dist), effectiveKm: Math.round(effectiveDist) },
-      result: { distanceKm: Math.round(dist), insideTolerance: effectiveDist === 0 && (q.toleranceKm || 0) > 0,
+      result: { lat, lng, distanceKm: Math.round(dist), insideTolerance: effectiveDist === 0 && (q.toleranceKm || 0) > 0,
                 locationName: q.locationName, correctLat: q.correctLat, correctLng: q.correctLng, accuracyPct: Math.round(quality * 100) },
     };
   },

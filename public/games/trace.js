@@ -156,8 +156,9 @@
 
     if (payload.mode === 'river') {
       svgEl('path', { d: ringsPath(payload.context, f), 'fill-rule': 'evenodd', class: 'trace-land' }, svg);
-      drawMouth(svg, f.to(payload.mouth), f, 'Mouth');
-      drawSource(svg, f.to(payload.source), f, 'Source');
+      if (payload.mouth) drawMouth(svg, f.to(payload.mouth), f, 'Mouth');
+      // Expert tier drops the source marker — see games/trace.js tierFor().
+      if (payload.source) drawSource(svg, f.to(payload.source), f, 'Source');
       return;
     }
 
@@ -257,19 +258,24 @@
 
     const isRiver = payload.mode === 'river';
     const passive = api.role === 'host';          // TV host: watches, never draws
+    const tier    = payload.tier || 'casual';      // casual | mixed | expert — see games/trace.js tierFor()
     const f = makeFrame(payload.bbox);
 
     // ── Chrome around the map ────────────────────────────────────────────────
     const wrap = document.createElement('div');
     wrap.className = 'trace-wrap' + (api.tvMode ? ' is-tv' : '') + (isRiver ? ' is-river' : ' is-border');
     const names = payload.names || {};
+    // The distance hint only exists in the payload at the casual tier — omit it
+    // (rather than showing "0 km") when the server left it out.
+    const lenChip = payload.lengthKm != null
+      ? `<span class="trace-len">${isRiver ? `about ${esc(fmtKm(payload.lengthKm))} to trace`
+                                            : `missing border ≈ ${esc(fmtKm(payload.lengthKm))}`}</span>`
+      : '';
     const head = isRiver
-      ? `<span class="trace-chip">🌊 ${esc(payload.name || 'the river')}</span>
-         <span class="trace-len">about ${esc(fmtKm(payload.lengthKm || 0))} to trace</span>`
+      ? `<span class="trace-chip">🌊 ${esc(payload.name || 'the river')}</span>${lenChip}`
       : `<span class="trace-chip">${esc(names.a || '?')}</span>
          <span class="trace-fuse" aria-hidden="true">✚</span>
-         <span class="trace-chip">${esc(names.b || '?')}</span>
-         <span class="trace-len">missing border ≈ ${esc(fmtKm(payload.lengthKm || 0))}</span>`;
+         <span class="trace-chip">${esc(names.b || '?')}</span>${lenChip}`;
 
     wrap.innerHTML = `
       <div class="trace-head">${head}</div>
@@ -303,9 +309,17 @@
     const scaler = makeScaler(svg, f);
 
     // ── Hints ────────────────────────────────────────────────────────────────
+    // The idle hint doubles as the difficulty tell: casual/mixed name what is
+    // marked on the map, expert warns that nothing is.
+    const idleHint = tier === 'expert'
+      ? (isRiver ? 'Expert: only the mouth is marked — find the source yourself'
+                 : 'Expert: nobody shows you where it starts and ends — draw the whole border from memory')
+      : tier === 'mixed'
+        ? 'Start and end are marked'
+        : (isRiver ? 'Drag from the mouth 💧 to the source ○ in one stroke'
+                   : 'Drag one stroke between the two gold marks');
     const HINTS = {
-      idle:  isRiver ? 'Drag from the mouth 💧 to the source ○ in one stroke'
-                     : 'Drag one stroke between the two gold marks',
+      idle:  idleHint,
       drawn: 'Drawing again replaces your line',
       lock:  'Locked in — waiting for the others',
       host:  'Players are drawing…',

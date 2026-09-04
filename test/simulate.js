@@ -20,6 +20,7 @@ const categories = opt('categories', null) ? opt('categories').split(',') : regi
 const rounds     = parseInt(opt('rounds', String(categories.length)), 10);
 const bots       = parseInt(opt('bots', '3'), 10);
 const testIds    = opt('ids', null);
+const difficulty = opt('difficulty', null);   // optional: 'casual' | 'mixed' | 'expert' | 'normal' — passed straight through to create-game
 const verbose    = args.includes('--verbose');
 
 let failures = 0;
@@ -54,7 +55,7 @@ function answerFingerprints(q) {
   const botSockets = [];
   for (let i = 0; i < bots; i++) botSockets.push(await connect(port));
 
-  host.emit('create-game', { rounds, categories, autoplay: true, gameMode: 'tv', finalDouble: true, intros: true, testFast: true, testIds });
+  host.emit('create-game', { rounds, categories, autoplay: true, gameMode: 'tv', finalDouble: true, intros: true, testFast: true, testIds, ...(difficulty ? { difficulty } : {}) });
   const created = await Promise.race([once(host, 'game-created'), once(host, 'create-error').then(m => { throw new Error('create-error: ' + m); })]);
   ok(`game ${created.gameId} with ${created.totalQuestions} questions`);
   if (created.totalQuestions === 0) fail('no questions');

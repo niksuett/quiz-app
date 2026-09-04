@@ -105,7 +105,19 @@
       const canvas  = body.querySelector('.map-canvas');
       const hint    = body.querySelector('.map-hint');
       const lockBtn = body.querySelector('.map-lock');
-      let map = null, pin = null, coords = null, unwatch = null, raf = null, destroyed = false;
+      let map = null, pin = null, coords = null, unwatch = null, raf = null, destroyed = false, pendingResult = null;
+
+      // Drops the player's own pin from a stored server result (used both live,
+      // once the map exists, and after a RECONNECT via onResult()).
+      function placeResultPin(result) {
+        const lat = result && Number(result.lat), lng = result && Number(result.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || !map || pin) return;
+        const ll = L.latLng(lat, lng);
+        coords = { lat, lng };
+        pin = L.marker(ll, { icon: pinIcon('map-pin', '<i></i>', 28), keyboard: false }).addTo(map);
+        map.panTo(ll, { animate: false });
+        hint.textContent = 'Locked in — waiting for the others';
+      }
 
       // Leaflet must measure a visible container, so build it on the next frame.
       raf = QG.util.nextFrame(() => {
@@ -120,6 +132,7 @@
         unwatch = watchSize(canvas, map);
 
         if (!passive && !api.locked) attachClickHandler();
+        if (pendingResult) { placeResultPin(pendingResult); pendingResult = null; }
       });
 
       // Registers the map's click-to-drop-pin handler. Pulled out of mount so
@@ -170,12 +183,18 @@
         },
         // Called by the core with the server's answer-result. Live, the pin is
         // already on the map and nothing needs doing. After a RECONNECT the map
-        // is rebuilt empty, and the server's result does not carry the player's
-        // own lat/lng (only the distance), so the pin cannot be restored — say
-        // so instead of leaving a blank map under a "Locked in" banner.
-        // (Adding lat/lng to games/map.js's `result` would let us redraw it.)
-        onResult() {
-          if (!passive && !pin) hint.textContent = 'Locked in — your pin appears on the leaderboard';
+        // is rebuilt empty (and may not even exist yet — Leaflet is built on its
+        // own next frame, after this fires), so we put the player's own pin back
+        // on it from the server's copy of lat/lng (games/map.js's `result`
+        // carries it), deferring until the map is ready if it isn't yet.
+        onResult(result) {
+          if (passive || pin) return;
+          const lat = result && Number(result.lat), lng = result && Number(result.lng);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            hint.textContent = 'Locked in — your pin appears on the leaderboard';
+            return;
+          }
+          if (map) placeResultPin(result); else pendingResult = result;
         },
       };
     },
