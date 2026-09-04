@@ -6,12 +6,16 @@
 .map-wrap { width: 100%; opacity: 0; animation: mapIn .3s ease forwards; }
 @keyframes mapIn { to { opacity: 1; } }
 
+/* Shared "module panel" look — same gold hairline, radius and shadow every
+   other game type uses, so the answer panels feel like one family. */
 .map-body {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: var(--parchment);
   border: 1px solid var(--parchment-dark);
-  border-radius: 4px;
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
   text-align: center;
 }
 .map-hint {
@@ -35,6 +39,8 @@
   touch-action: none;
 }
 .map-wrap.is-tv .map-canvas { height: min(62vh, 620px); cursor: default; }
+/* On a shared screen the hint is read from across the room */
+.map-wrap.is-tv .map-hint { font-size: 1.15rem; letter-spacing: .1em; margin-bottom: 14px; }
 
 .map-lock { margin-top: 12px; width: auto !important; display: inline-block; padding: 14px 40px; min-height: 48px; }
 .map-lock:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
@@ -116,16 +122,25 @@
 .map-cmp-sm { font-family: var(--font-lora); font-size: .88rem; font-weight: 600; color: var(--gold-bright); overflow-wrap: anywhere; }
 
 /* ─── Leaderboard reveal ─────────────────────────────────────────────────── */
-.map-reveal { width: 100%; }
+.map-reveal {
+  width: 100%;
+  padding: 14px 16px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+}
 .map-rv-canvas {
   width: 100%;
   height: min(50vh, 380px);
   min-height: 220px;
-  border-radius: 4px;
+  border-radius: var(--panel-radius);
   overflow: hidden;
   background: #cfe0ea;
   box-shadow: 0 3px 16px rgba(0,0,0,.3);
 }
+/* On the TV leaderboard the reveal gets its own column — fill it. */
+body.tv .map-rv-canvas { height: min(58vh, 560px); }
 .map-rv-label { margin: 10px 0 0; text-align: center; font-family: var(--font-garamond); font-style: italic; color: var(--ink-light); font-size: 1rem; }
 .map-rv-label strong { font-style: normal; color: var(--ink); }
 

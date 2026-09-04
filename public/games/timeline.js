@@ -53,7 +53,7 @@
       const ticks = Array.from({ length: 5 }, (_, i) => formatYear(Math.round(min + (i / 4) * (max - min))));
       const hint  = min < 1 ? 'Type a year, e.g. <strong>44 BCE</strong> or <strong>1969</strong>' : null;
 
-      let ui = null, destroyed = false;
+      let ui = null, destroyed = false, pendingResult = null;
       getKit().then(kit => {
         if (destroyed) return;
         ui = kit.buildRangeUI(holder, {
@@ -65,9 +65,15 @@
           hostHint: 'Players are pinning the year…',
         }, api);
         holder.classList.add('tl-ready');
+        // A result that arrived before the shared slider kit finished loading
+        // (the reconnect case) is replayed as soon as the UI exists.
+        if (pendingResult && ui.onResult) { ui.onResult(pendingResult); pendingResult = null; }
       }).catch(err => { holder.textContent = err.message; });
 
-      return { destroy() { destroyed = true; if (ui) ui.destroy(); holder.remove(); } };
+      return {
+        destroy() { destroyed = true; if (ui) ui.destroy(); holder.remove(); },
+        onResult(data) { if (ui && ui.onResult) ui.onResult(data); else pendingResult = data; },
+      };
     },
 
     result(data) {

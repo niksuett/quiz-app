@@ -53,3 +53,23 @@ content borders(250) compass(88) silhouettes(132) difficulty-tags(1088) delete-i
 Running: wave 1 (wf_b614029e-925: trace, sizeup, tune, halves-finish, curve-finish → scratch smoke test) and the client
 integration/review (wf_ac2c2ada-a41). Prepared next: workflows/scripts/quizblast-wave2.js (fakes/emoji/birdseye/content-upgrade
 content + verification of all content + REAL import into quiz.db), then quizblast-new-games-client.js (browser modules for the new types).
+
+## Update 2026-09-04 ~08:00 — server + content + classic client DONE (commits 76f6970, 8aa86e6, 6cd07fb)
+- quiz.db: 2158 questions / 20 categories; all new server modules pass test/simulate.js.
+- Client v2 verified end to end for the 6 classic types (TV + mobile mode, pause/skip/end, reconnect, rematch, mobile viewport).
+- Basemap: CARTO Voyager now needs an API key → client falls back to Esri World_Physical (no borders). Options: free CARTO key in
+  `CARTO_KEY` (public/client.js) or try Esri `Canvas/World_Light_Gray_Base` (keyless, label-free) — to be checked in wave 3.
+- NOT YET: browser modules for trace/halves/sizeup/curve/compass/tune/silhouette/fakes → run workflows/scripts/quizblast-new-games-client.js
+  (8 module agents → integrate → review → polish). Until then do NOT push: Party Mix would select categories the client cannot render.
+
+## Update 2026-09-04 — wave 3 launched (run wf_3a528b80-035)
+Browser modules for the 8 new types → integrate → review/fix → polish. Models: opus for trace/halves/sizeup/curve, sonnet for
+compass/tune/silhouette/fakes, sonnet review+fix, opus integrate+polish. If cut off: check public/games/ for which of
+{trace,halves,sizeup,curve,compass,tune,silhouette,fakes}.js|css exist, then resume with
+Workflow({scriptPath: …/quizblast-new-games-client.js, resumeFromRunId: 'wf_3a528b80-035'}).
+
+## TODO after wave 3 (user request 2026-09-04): trace difficulty tiers
+Game-level difficulty (game.setup.difficulty, available in payload(q, game)) should change what the Border Draw / River Run
+payload gives away: casual = endpoints + lengthKm + known segments; mixed = endpoints, no lengthKm; expert = NO endpoints,
+no lengthKm (rivers: mouth only, no source). Client (public/games/trace.js) must handle missing endpoints/lengthKm/source
+(no gold dots, hint text "find where it starts and ends yourself"). Update docs/games/trace.md §3 + §UI. Small sonnet agent.

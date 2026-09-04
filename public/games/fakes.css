@@ -1,0 +1,226 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/fakes.css — 🕵️ Spot the Fakes (type "fakes")
+   Prefix: .fk-
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Answering screen ───────────────────────────────────────────────────── */
+.fk-wrap { width: 100%; }
+
+/* This line sits directly on the question screen's DARK background (#16100a),
+   not on a parchment card — so it must use the light "aged/gold" tokens.
+   The ink tokens it used before were black-on-black and effectively invisible. */
+.fk-head {
+  margin: 0 0 10px;
+  font-family: var(--font-garamond);
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--aged-light);
+  text-align: center;
+}
+.fk-head b { font-style: normal; font-weight: 700; color: var(--gold-pale); }
+
+/* 2×3 grid of toggle tiles */
+.fk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+@media (max-width: 380px) { .fk-grid { grid-template-columns: 1fr; gap: 8px; } }
+
+.fk-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 14px 34px 14px 16px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-radius: var(--panel-radius);
+  font-family: var(--font-lora);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.7) inset;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, background .2s ease, border-color .2s ease, opacity .24s ease;
+  opacity: 0;
+  animation: fkEnter .32s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes fkEnter {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+.fk-tile:hover:not(:disabled)  { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.7) inset; }
+.fk-tile:active:not(:disabled) { transform: scale(.96); }
+.fk-tile:disabled { cursor: default; }
+.fk-tile:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.fk-tile-text { overflow-wrap: anywhere; }
+
+/* The ✗ "marked as fake" stamp, shown once a tile is picked */
+.fk-tile-badge {
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--wrong);
+  color: #fff;
+  font-size: .82rem; font-weight: 700;
+  opacity: 0;
+  transform: scale(.4) rotate(-20deg);
+  transition: opacity .16s ease, transform .16s cubic-bezier(.34,1.56,.64,1);
+}
+
+.fk-tile.is-picked {
+  background: #fbf0ee;
+  border-color: var(--wrong);
+  box-shadow: 0 0 0 2px var(--wrong) inset, 0 4px 14px rgba(122,31,31,.2);
+}
+.fk-tile.is-picked .fk-tile-text { text-decoration: line-through; text-decoration-color: rgba(122,31,31,.55); }
+.fk-tile.is-picked .fk-tile-badge { opacity: 1; transform: scale(1) rotate(0deg); }
+
+.fk-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.fk-counter {
+  font-family: var(--font-cinzel);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  /* This row sits on the DARK question background, so it needs a light token —
+     --aged was almost invisible there. */
+  color: var(--aged-light);
+}
+.fk-lock { flex: 0 0 auto; }
+/* On a phone the full-width Lock in button wraps onto its own line anyway, so
+   stack the row properly instead of leaving the counter stranded on the left. */
+@media (max-width: 520px) {
+  .fk-footer { flex-direction: column; align-items: stretch; gap: 8px; }
+  .fk-counter { text-align: center; }
+}
+
+.fk-host-hint {
+  margin-top: 14px;
+  text-align: center;
+  font-family: var(--font-garamond);
+  font-style: italic;
+  color: var(--aged-light);
+  font-size: 1rem;
+}
+body.tv .fk-host-hint { font-size: 1.4rem; }
+
+/* Post-answer feedback (handle.onResult), still on the question screen */
+.fk-tile.is-real { border-color: var(--correct); }
+.fk-tile.is-fake { border-color: var(--wrong); }
+.fk-tile.is-real .fk-tile-badge,
+.fk-tile.is-fake .fk-tile-badge { display: none; }
+.fk-tile.is-fake .fk-tile-text { text-decoration: line-through; text-decoration-color: rgba(122,31,31,.5); }
+.fk-tile.is-correct-call,
+.fk-tile.is-wrong-call { opacity: 1 !important; }
+.fk-tile.is-correct-call { background: var(--correct-bg); }
+.fk-tile.is-wrong-call   { background: var(--wrong-bg); }
+.fk-tile.is-correct-call::after,
+.fk-tile.is-wrong-call::after {
+  content: '';
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700; color: #fff;
+}
+.fk-tile.is-correct-call::after { content: '✓'; background: var(--correct); }
+.fk-tile.is-wrong-call::after   { content: '✗'; background: var(--wrong); }
+
+/* TV mode: bigger everything */
+.fk-wrap.is-tv .fk-head { font-size: 1.25rem; }
+.fk-grid.is-tv,
+.fk-wrap.is-tv .fk-grid { gap: 14px; }
+.fk-wrap.is-tv .fk-tile { min-height: 84px; padding: 20px 40px 20px 20px; font-size: 1.3rem; }
+.fk-wrap.is-tv .fk-tile-badge { width: 28px; height: 28px; font-size: 1rem; }
+
+/* ─── Result screen compare list (dark ink panel, uses shared .compare-*) ─── */
+.fk-cmp-tick { flex: 0 0 auto; width: 18px; text-align: center; font-weight: 700; }
+.compare-row.match .fk-cmp-tick { color: rgba(100,200,130,.9); }
+.compare-row.miss  .fk-cmp-tick { color: rgba(230,140,140,.9); }
+.fk-cmp-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.fk-cmp-tag {
+  flex: 0 0 auto;
+  font-family: var(--font-cinzel);
+  font-size: .58rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 8px;
+  background: rgba(245,237,224,.1);
+  color: rgba(200,180,140,.8);
+}
+.fk-cmp-tag.is-fake { background: rgba(230,140,140,.22); color: #f0b8b8; }
+
+/* ─── Leaderboard reveal ─────────────────────────────────────────────────── */
+.fk-reveal {
+  width: 100%;
+  padding: 14px 16px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+}
+.fk-rv-title {
+  font-family: var(--font-cinzel);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ink-light);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.fk-rv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 420px) { .fk-rv-grid { grid-template-columns: 1fr; } }
+
+.fk-rv-cell {
+  padding: 8px 10px;
+  border-radius: 4px;
+  border-left: 4px solid var(--parchment-dark);
+  background: var(--parchment);
+  opacity: 0;
+  animation: fkRvIn .32s ease forwards;
+}
+@keyframes fkRvIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.fk-rv-cell.is-fake { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(200,146,42,.12), var(--parchment) 60%); }
+.fk-rv-cell.is-real { border-left-color: var(--correct); }
+
+.fk-rv-head { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.fk-rv-mark { color: var(--gold); font-size: .9rem; width: 12px; flex: 0 0 auto; }
+.fk-rv-text { font-family: var(--font-lora); font-size: .9rem; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.fk-rv-cell.is-fake .fk-rv-text { color: var(--gold-muted); }
+
+.fk-rv-names { display: flex; flex-wrap: wrap; gap: 4px 6px; min-height: 14px; }
+.fk-rv-name {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-garamond); font-size: .82rem; color: var(--ink-light);
+  padding: 1px 8px 1px 5px; border-radius: 10px;
+  background: rgba(26,18,8,.05);
+}
+.fk-rv-name i { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.fk-rv-name.is-me { font-weight: 700; color: var(--lapis); }
+.fk-rv-nobody { font-family: var(--font-garamond); font-style: italic; font-size: .8rem; color: var(--aged); }
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .fk-tile, .fk-rv-cell { animation: none !important; opacity: 1; }
+  .fk-tile { transition: none !important; }
+}

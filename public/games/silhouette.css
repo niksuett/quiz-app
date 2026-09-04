@@ -1,0 +1,127 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/silhouette.css — "Shape of Nations" (type "silhouette")
+   The answer buttons and bar-chart reveal are styled by mc.css (imported here
+   so silhouette questions look right even if the core loads this file first).
+   Prefix: .silh-
+══════════════════════════════════════════════════════════════════════════ */
+@import url('/games/mc.css');
+
+.silh-wrap { width: 100%; text-align: center; }
+
+.silh-prompt {
+  font-family: var(--font-lora);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--parchment);
+  margin: 0 0 14px;
+  opacity: 0;
+  animation: silhFade .3s ease forwards;
+}
+@keyframes silhFade { to { opacity: 1; } }
+
+/* Parchment card the shape sits on — square-ish, capped so the four buttons
+   always stay on screen without scrolling on a phone. */
+.silh-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(340px, 82vw);
+  height: min(340px, 48vh);
+  margin: 0 auto 18px;
+  padding: 14px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-radius: var(--panel-radius);
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  opacity: 0;
+  transform: scale(.96);
+  animation: silhPop .38s cubic-bezier(.22,1,.36,1) .05s forwards;
+}
+@keyframes silhPop { to { opacity: 1; transform: scale(1); } }
+
+.silh-svg { width: 100%; height: 100%; overflow: visible; }
+.silh-ring {
+  fill: var(--ink);
+  stroke: var(--gold);
+  stroke-width: var(--silh-stroke, 2);
+  stroke-linejoin: round;
+}
+
+/* Short "draw-on" flourish on the question screen only — kept brief because
+   speed is scored. Falls back to a plain fade when reduced motion is set. */
+.silh-svg.silh-anim .silh-ring {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: silhDraw .6s ease-out forwards, silhFill .5s ease .35s forwards;
+}
+@keyframes silhDraw { to { stroke-dashoffset: 0; } }
+@keyframes silhFill { from { fill-opacity: 0; } to { fill-opacity: 1; } }
+
+.silh-choices { width: 100%; }
+.silh-error { color: var(--wrong); font-family: var(--font-garamond); }
+
+/* TV mode: bigger shape, no buttons (mc.js already renders the host hint) */
+.silh-wrap.is-tv .silh-prompt { font-size: 1.5rem; }
+.silh-wrap.is-tv .silh-frame  { width: min(480px, 44vw); height: min(480px, 52vh); }
+
+/* ── Result screen (rendered inside the dark ink panel, see mc.css .mc-cmp) ── */
+.silh-res-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 12px;
+}
+.silh-res-shape {
+  width: 84px; height: 84px;
+  flex: 0 0 auto;
+  padding: 6px;
+  background: var(--parchment);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.silh-res-flag {
+  width: 52px; height: auto;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.35);
+}
+/* Small shape thumbnails already carry a shape-relative --silh-stroke from JS
+   (see shapeSvg in silhouette.js) — no manual stroke-width override needed. */
+
+/* ── Leaderboard reveal ────────────────────────────────────────────────────── */
+.silh-reveal { width: 100%; text-align: center; }
+.silh-reveal .mc-reveal { text-align: left; }
+
+.silh-rv-shape-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.silh-rv-shape {
+  width: 96px; height: 96px;
+  flex: 0 0 auto;
+  padding: 8px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+.silh-rv-caption { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.silh-rv-flag {
+  width: 56px; height: auto;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.35);
+}
+.silh-rv-name {
+  font-family: var(--font-cinzel);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .silh-prompt, .silh-frame { animation: none !important; opacity: 1; transform: none; }
+  .silh-svg.silh-anim .silh-ring { animation: none !important; stroke-dashoffset: 0; fill-opacity: 1; }
+}

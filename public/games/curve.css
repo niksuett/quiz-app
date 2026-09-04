@@ -1,0 +1,209 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/curve.css — "Draw the Curve" (type "curve")
+   Prefix: .curve-
+
+   Three places use these rules:
+     · the question screen  (.curve-wrap)   — parchment card, you draw here
+     · the result screen    (.curve-cmp)    — small chart on the dark ink panel
+     · the leaderboard      (.curve-reveal) — everyone's lines at once
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Shared chart look ──────────────────────────────────────────────────── */
+.curve-svg { display: block; width: 100%; height: auto; touch-action: none; }
+
+.curve-grid line        { stroke: rgba(74,56,40,.16); stroke-width: 1; }
+.curve-grid .curve-grid-v { stroke: rgba(74,56,40,.08); }
+.curve-axes line        { stroke: var(--ink-light); stroke-width: 1.5; }
+.curve-ticklabels text  { fill: var(--ink-light); font-family: var(--font-cinzel); font-variant-numeric: tabular-nums; }
+.curve-ticklabels .curve-axis-title { fill: var(--aged); font-family: var(--font-garamond); font-style: italic; }
+
+/* The part of the chart the player has to fill in */
+.curve-band  { fill: rgba(30,58,110,.045); }
+.curve-split { stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 4 5; opacity: .55; }
+
+/* The real, already-revealed data */
+.curve-known     { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.curve-known-dot { fill: var(--gold-bright); stroke: var(--ink); stroke-width: 1.5; }
+
+/* The player's own line — lapis blue with a soft glow */
+.curve-you {
+  fill: none; stroke: var(--lapis); stroke-width: 3.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 5px rgba(30,58,110,.45));
+}
+/* The dot that follows the finger */
+.curve-pen { fill: var(--lapis); stroke: var(--parchment); stroke-width: 2; opacity: .55; transition: opacity .2s; }
+.curve-pen.is-drawing { opacity: 1; }
+
+/* The truth, in gold */
+.curve-truth { fill: none; stroke: var(--gold-bright); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ─── Question screen card ───────────────────────────────────────────────── */
+.curve-wrap {
+  width: 100%;
+  padding: 14px 14px 16px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  opacity: 0;
+  animation: curveIn .3s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes curveIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.curve-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  margin-bottom: 6px; min-height: 20px;
+}
+.curve-ylabel {
+  font-family: var(--font-cinzel); font-size: .68rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--aged);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Live "1998 · 6.20 bn" readout while dragging */
+.curve-readout {
+  flex-shrink: 0;
+  font-family: var(--font-cinzel); font-size: 1.05rem; font-weight: 900;
+  color: var(--lapis); font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity .2s;
+}
+.curve-readout.is-on { opacity: 1; }
+
+/* The drawing surface. touch-action:none so a drag never scrolls the page. */
+.curve-chart {
+  width: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.curve-wrap.is-passive .curve-chart,
+.curve-wrap.is-locked  .curve-chart { cursor: default; }
+
+.curve-hint {
+  margin: 8px 0 0; text-align: center; min-height: 1.4em;
+  font-family: var(--font-cinzel); font-size: .68rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--aged);
+  transition: color .24s;
+}
+.curve-wrap.is-locked .curve-hint { color: var(--correct); }
+
+.curve-actions { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+.curve-actions .btn { width: auto !important; display: inline-block; min-height: var(--tap); }
+.curve-lock  { padding: 14px 40px; }
+.curve-clear { padding: 12px 20px; font-size: .78rem; }
+.curve-actions .btn:disabled { opacity: .4; cursor: default; transform: none !important; box-shadow: none !important; }
+.curve-wrap.is-locked .curve-lock { background: var(--correct-bg); color: var(--correct); opacity: 1; }
+
+/* TV mode: bigger text on a shared screen across the room */
+.curve-wrap.is-tv { padding: 20px 22px 22px; }
+.curve-wrap.is-tv .curve-ylabel  { font-size: .82rem; }
+.curve-wrap.is-tv .curve-readout { font-size: 1.5rem; }
+.curve-wrap.is-tv .curve-hint    { font-size: 1.15rem; letter-spacing: .1em; }
+
+/* Passive TV-host view: the "players are drawing…" hint gently pulses */
+.curve-wrap.is-passive .curve-hint { animation: curvePulse 2.2s ease-in-out infinite; }
+@keyframes curvePulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* ─── Result screen (dark ink panel) ─────────────────────────────────────── */
+.curve-cmp {
+  width: 100%; margin-bottom: 10px; padding: 8px 6px 4px;
+  background: rgba(245,237,224,.06);
+  border: 1px solid rgba(245,237,224,.12);
+  border-radius: var(--radius);
+}
+/* On the dark panel the ink/aged colours would disappear — lighten them. */
+.curve-cmp .curve-grid line       { stroke: rgba(245,237,224,.12); }
+.curve-cmp .curve-axes line       { stroke: rgba(245,237,224,.35); }
+.curve-cmp .curve-ticklabels text { fill: rgba(200,180,140,.75); }
+.curve-cmp .curve-known           { stroke: rgba(245,237,224,.55); stroke-width: 2; }
+.curve-cmp .curve-known-dot       { fill: var(--gold-pale); stroke: none; }
+.curve-cmp .curve-truth           { stroke: var(--gold-bright); stroke-width: 2.5; }
+.curve-cmp .curve-you             { stroke: #7fa9e8; stroke-width: 2.5; filter: none; }
+
+.curve-key { display: flex; gap: 14px; justify-content: center; margin-bottom: 8px; }
+.curve-key-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-cinzel); font-size: .58rem; font-weight: 700;
+  letter-spacing: .09em; text-transform: uppercase; color: rgba(200,180,140,.75);
+}
+.curve-key-item::before { content: ''; width: 16px; height: 3px; border-radius: 2px; }
+.curve-key-item.is-truth::before { background: var(--gold-bright); }
+.curve-key-item.is-you::before   { background: #7fa9e8; }
+
+/* ─── Leaderboard reveal ─────────────────────────────────────────────────── */
+.curve-reveal {
+  width: 100%;
+  padding: 14px 16px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+}
+.curve-rv-title {
+  text-align: center; margin-bottom: 10px;
+  font-family: var(--font-cinzel); font-size: .64rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--aged);
+}
+.curve-rv-chart { width: 100%; }
+
+/* Each player's line draws itself on: pathLength="1" lets us animate the dash
+   offset from 1 (fully hidden) to 0 (fully drawn) without measuring anything. */
+.curve-rv-line {
+  fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+  opacity: .9;
+  stroke-dasharray: 1; stroke-dashoffset: 0;
+  transition: stroke-dashoffset .75s ease-out;
+}
+.curve-rv-line.is-me { stroke-width: 4; opacity: 1; }
+.curve-rv-truth {
+  fill: none; stroke: var(--gold-bright); stroke-width: 4.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(200,146,42,.55));
+  stroke-dasharray: 1; stroke-dashoffset: 0;
+  transition: stroke-dashoffset .9s ease-out;
+}
+.curve-rv-star {
+  fill: var(--gold-bright); font-size: 20px;
+  paint-order: stroke; stroke: var(--parchment-mid); stroke-width: 3px;
+  animation: curveStarIn .45s cubic-bezier(.34,1.56,.64,1) both;
+  transform-box: fill-box; transform-origin: center;
+}
+@keyframes curveStarIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+.curve-rv-legend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+.curve-rv-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--parchment); border: 1px solid var(--parchment-dark);
+  font-family: var(--font-lora); font-size: .82rem; color: var(--ink-light);
+  opacity: 0; animation: curveChipIn .3s ease forwards;
+}
+@keyframes curveChipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.curve-rv-chip i { width: 12px; height: 3px; border-radius: 2px; background: var(--aged); flex-shrink: 0; }
+.curve-rv-chip.is-truth { border-color: var(--gold); background: rgba(200,146,42,.14); }
+.curve-rv-chip.is-truth i { background: var(--gold-bright); height: 4px; }
+.curve-rv-chip.is-me { border-color: var(--lapis); box-shadow: 0 0 0 1px var(--lapis) inset; }
+.curve-rv-chip b { font-family: var(--font-cinzel); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.curve-rv-nobody { font-family: var(--font-garamond); font-style: italic; color: var(--aged); }
+
+.curve-rv-source {
+  margin: 10px 0 0; text-align: center;
+  font-family: var(--font-garamond); font-style: italic; font-size: .82rem; color: var(--aged);
+}
+
+/* ─── Small phones ───────────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .curve-wrap { padding: 12px 10px 14px; }
+  .curve-reveal { padding: 12px 10px 10px; }
+  .curve-readout { font-size: .95rem; }
+  .curve-lock { padding: 14px 28px; }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .curve-wrap, .curve-rv-chip, .curve-rv-star { animation: none !important; opacity: 1; }
+  .curve-wrap.is-passive .curve-hint { animation: none !important; opacity: 1; }
+  .curve-rv-line, .curve-rv-truth { transition: none !important; stroke-dashoffset: 0 !important; }
+}

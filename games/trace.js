@@ -256,12 +256,18 @@ module.exports = {
 
     const score = Math.round(quality * 100);
     const rounded = +errKm.toFixed(1);
+    const thinLine = thin(line, 100);
     return {
       quality,
-      detail: { errKm: rounded, line: thin(line, 100), score },
+      detail: { errKm: rounded, line: thinLine, score },
       result: {
         score, errKm: rounded, rating: ratingFor(score),
         truth, bbox: subject.bbox, mode: q.category === 'rivers' ? 'river' : 'border',
+        // The player's own line goes back to them as well. The browser module
+        // keeps the drawn stroke in memory, but that memory is gone after a
+        // reconnect (page reload mid-question) — this is what lets it redraw
+        // the line on the frozen question screen and on the result screen.
+        line: thinLine,
       },
     };
   },

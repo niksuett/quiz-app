@@ -1,0 +1,241 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/halves.css — "Population Split" (type "halves")
+   Prefix: .hv-      Theme tokens come from /style.css.
+
+   Sections
+     1. Answering UI  (parchment panel, map, line handles, toolbar, lock)
+     2. Result screen (rendered inside the DARK left panel → light text)
+     3. Leaderboard reveal (heat map, player lines, legend)
+     4. TV mode + reduced motion
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Answering UI ────────────────────────────────────────────────────── */
+.hv-wrap { width: 100%; opacity: 0; animation: hvIn .3s ease forwards; }
+@keyframes hvIn { to { opacity: 1; } }
+
+/* Shared "module panel" look (gold hairline + radius + shadow) — see style.css */
+.hv-body {
+  width: 100%;
+  padding: 14px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  text-align: center;
+}
+
+.hv-hint {
+  font-family: var(--font-cinzel);
+  font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--aged);
+  margin: 0 0 10px; min-height: 1.4em;
+  transition: color .24s;
+}
+.hv-wrap.is-locked .hv-hint { color: var(--correct); }
+
+/* The map. touch-action:none so a finger drags the LINE instead of scrolling. */
+.hv-canvas {
+  width: 100%;
+  height: min(56vh, 420px);
+  min-height: 260px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #cfe0ea;                        /* sea colour while the tiles load */
+  box-shadow: 0 2px 16px rgba(0,0,0,.3);
+  touch-action: none;
+  cursor: grab;
+}
+.hv-wrap.is-pan .hv-canvas    { cursor: move; }
+.hv-wrap.is-dragging .hv-canvas { cursor: grabbing; }
+.hv-wrap.is-locked .hv-canvas { cursor: default; }
+.hv-wrap.is-passive .hv-canvas { cursor: default; }
+
+/* Leaflet div icons come with a white box by default — remove it. */
+.hv-icon-reset { background: none; border: none; }
+
+/* The two draggable ends. The icon box is 46 px (a comfortable tap target),
+   the visible knob is smaller and sits in its middle. */
+.hv-handle {
+  width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  cursor: grab;
+}
+.hv-handle i {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--lapis);
+  border: 3px solid var(--parchment);
+  box-shadow: 0 2px 10px rgba(0,0,0,.45);
+  transition: transform .16s var(--spring);
+}
+.hv-handle b {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-cinzel); font-size: 12px; font-weight: 700;
+  color: var(--parchment); pointer-events: none;
+}
+.hv-handle::after {                            /* soft halo so it reads on any terrain */
+  content: ''; position: absolute; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid rgba(30,58,110,.35);
+}
+.leaflet-marker-icon:hover .hv-handle i,
+.leaflet-marker-dragging .hv-handle i { transform: scale(1.14); }
+.hv-wrap.is-locked .hv-handle i { background: var(--correct); }
+.hv-wrap.is-locked .hv-handle { cursor: default; }
+
+/* Capital city marker: dot + name to the right of it. */
+.hv-capital { position: relative; width: 12px; height: 12px; }
+.hv-capital i {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: var(--ink); border: 2px solid var(--parchment);
+  box-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+.hv-capital b {
+  position: absolute; left: 16px; top: -3px; white-space: nowrap;
+  font-family: var(--font-cinzel); font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  color: var(--ink);
+  text-shadow: 0 0 3px var(--parchment), 0 0 6px var(--parchment), 0 0 9px var(--parchment);
+}
+
+/* Toolbar: Line/Pan toggle on the left, zoom buttons on the right. */
+.hv-tools {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-top: 10px;
+}
+.hv-seg, .hv-zoom { display: flex; gap: 0; border: 1px solid var(--parchment-dark); border-radius: var(--radius); overflow: hidden; background: var(--parchment-mid); }
+.hv-seg button, .hv-zoom button {
+  min-height: var(--tap); min-width: 56px; padding: 8px 14px;
+  font-family: var(--font-cinzel); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-light);
+  transition: background .16s, color .16s;
+}
+.hv-zoom button { min-width: var(--tap); font-size: 1.1rem; padding: 8px 12px; }
+.hv-seg button + button, .hv-zoom button + button { border-left: 1px solid var(--parchment-dark); }
+.hv-seg button:hover:not(:disabled), .hv-zoom button:hover { background: rgba(200,146,42,.14); }
+/* The :hover rule above is more specific than a plain .active, so the active
+   state repeats :hover to stay readable while the pointer sits on it. */
+.hv-seg button.active,
+.hv-seg button.active:hover { background: var(--lapis); color: var(--parchment); }
+.hv-seg button:disabled { opacity: .45; cursor: default; }
+
+.hv-lock { margin-top: 12px; width: auto !important; display: inline-block; padding: 14px 40px; min-height: 48px; }
+.hv-lock:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
+.hv-wrap.is-locked .hv-lock { background: var(--correct-bg); color: var(--correct); opacity: 1; box-shadow: none; }
+
+/* ─── 2. Result screen (dark panel → light text) ─────────────────────────── */
+.hv-r { width: 100%; max-width: 380px; margin-top: 14px; }
+
+/* Two-tone bar: side A on the left, side B on the right, a hairline at 50 %. */
+.hv-r-bar {
+  position: relative; display: flex; width: 100%; height: 26px;
+  border-radius: 3px; overflow: hidden;
+  border: 1px solid rgba(245,237,224,.22);
+  background: rgba(245,237,224,.06);
+}
+.hv-r-a { background: linear-gradient(180deg, var(--lapis-light), var(--lapis)); }
+.hv-r-b { background: linear-gradient(180deg, var(--gold-bright), var(--gold-muted)); }
+.hv-r-a, .hv-r-b { display: block; height: 100%; transition: width .6s var(--ease-out); }
+.hv-r-mid {
+  position: absolute; left: 50%; top: -2px; bottom: -2px; width: 0;
+  border-left: 2px dashed var(--parchment); opacity: .85;
+}
+
+.hv-r-legend { display: flex; gap: 10px; margin-top: 8px; }
+.hv-r-side {
+  flex: 1; min-width: 0; text-align: left;
+  font-family: var(--font-lora); font-size: .78rem; color: rgba(245,237,224,.8);
+  display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap;
+}
+.hv-r-side i { width: 10px; height: 10px; border-radius: 2px; flex: none; align-self: center; }
+.hv-r-side i.a { background: var(--lapis-light); }
+.hv-r-side i.b { background: var(--gold); }
+.hv-r-side b { font-family: var(--font-cinzel); font-size: .95rem; color: var(--parchment); font-variant-numeric: tabular-nums; }
+.hv-r-side small { opacity: .6; font-size: .72rem; }
+
+.hv-r-ideal {
+  margin-top: 10px; text-align: left;
+  font-family: var(--font-garamond); font-style: italic; font-size: .92rem;
+  color: var(--gold-pale);
+}
+.hv-r-pending {
+  margin-top: 4px; text-align: left;
+  font-family: var(--font-cinzel); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(200,180,140,.55);
+}
+
+/* ─── 3. Leaderboard reveal ──────────────────────────────────────────────── */
+.hv-reveal {
+  width: 100%;
+  padding: 14px 16px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+}
+
+.hv-rv-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.hv-rv-title {
+  font-family: var(--font-cinzel); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold-muted);
+}
+.hv-rv-scale { display: flex; align-items: center; gap: 6px; font-size: .6rem; color: var(--aged); }
+.hv-rv-ramp {
+  display: block; width: 74px; height: 8px; border-radius: 4px;
+  /* same four stops as the heat overlay in halves.js */
+  background: linear-gradient(90deg, #7a4a22, #c8922a 33%, #d0642a 66%, #961c1c);
+  border: 1px solid var(--parchment-dark);
+}
+
+.hv-rv-canvas {
+  width: 100%;
+  height: min(50vh, 380px);
+  min-height: 220px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #cfe0ea;
+  box-shadow: 0 3px 16px rgba(0,0,0,.3);
+}
+/* The population grid fades in — this is the moment of the round. */
+.hv-heat { animation: hvHeatIn .7s ease both; }
+@keyframes hvHeatIn { from { opacity: 0; } }
+
+.hv-rv-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; justify-content: center; }
+.hv-rv-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--parchment-mid); border: 1px solid var(--parchment-dark);
+  font-size: .8rem; color: var(--ink-light);
+  animation: hvChipIn .3s var(--ease-out) both;
+}
+.hv-rv-chip i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.hv-rv-chip i.gold { background: var(--gold); }
+.hv-rv-chip b { font-family: var(--font-cinzel); font-size: .82rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hv-rv-chip.is-me { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.hv-rv-chip.is-ideal { background: rgba(200,146,42,.18); border-color: var(--gold); }
+.hv-rv-nobody { font-family: var(--font-garamond); font-style: italic; color: var(--aged); }
+@keyframes hvChipIn { from { opacity: 0; transform: translateY(6px); } }
+
+/* Leaflet tooltips in theme colours */
+.hv-reveal .leaflet-tooltip {
+  background: var(--parchment); color: var(--ink);
+  border: 1px solid var(--parchment-dark); border-radius: 3px;
+  font-family: var(--font-lora); font-size: .8rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,.3);
+}
+
+/* ─── 4. TV mode + reduced motion ────────────────────────────────────────── */
+.hv-wrap.is-tv .hv-canvas { height: min(62vh, 620px); }
+.hv-wrap.is-tv .hv-hint   { font-size: 1.15rem; letter-spacing: .1em; margin-bottom: 14px; }
+body.screen-leaderboard.tv .hv-rv-canvas { height: min(58vh, 560px); }
+
+@media (max-width: 420px) {
+  .hv-canvas { height: 48vh; }
+  .hv-seg button { min-width: 48px; padding: 8px 10px; font-size: .64rem; }
+  .hv-r-legend { flex-direction: column; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv-wrap, .hv-heat, .hv-rv-chip { animation: none !important; opacity: 1; }
+  .hv-r-a, .hv-r-b, .hv-handle i { transition: none !important; }
+}

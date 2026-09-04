@@ -44,13 +44,16 @@
     const start  = clamp(round(min + margin + Math.random() * (max - min - 2 * margin)), min, max);
 
     const wrap = document.createElement('div');
-    wrap.className = 'sl-wrap' + (api.tvMode ? ' is-tv' : '');
+    wrap.className = 'sl-wrap' + (api.tvMode ? ' is-tv' : '') + (passive ? ' is-passive' : '');
+    // On the TV host screen nobody is guessing, so the box shows a dash rather
+    // than the random start value — a big gold "1963" up there reads like the
+    // answer to everyone in the room.
     wrap.innerHTML = `
       <div class="sl-value-row">
-        <input class="sl-number" type="${cfg.inputType || 'number'}" inputmode="${cfg.inputType === 'text' ? 'text' : 'decimal'}"
-               ${cfg.inputType === 'text' ? '' : `min="${min}" max="${max}" step="${step}"`}
-               value="${esc(cfg.format(start))}" aria-label="Your guess" autocomplete="off">
-        ${cfg.unit ? `<span class="sl-unit">${esc(cfg.unit)}</span>` : ''}
+        <input class="sl-number" type="${passive ? 'text' : (cfg.inputType || 'number')}" inputmode="${cfg.inputType === 'text' ? 'text' : 'decimal'}"
+               ${cfg.inputType === 'text' || passive ? '' : `min="${min}" max="${max}" step="${step}"`}
+               value="${passive ? '—' : esc(cfg.format(start))}" aria-label="Your guess" autocomplete="off">
+        ${cfg.unit && !passive ? `<span class="sl-unit">${esc(cfg.unit)}</span>` : ''}
       </div>
       ${cfg.hint ? `<p class="sl-hint">${cfg.hint}</p>` : ''}
       <div class="sl-track-wrap">
@@ -69,8 +72,9 @@
     const lockBtn = wrap.querySelector('.sl-lock');
     let value = start;
 
-    // Paint the filled part of the track (CSS reads --sl-pct)
-    const paint = () => { rangeEl.style.setProperty('--sl-pct', `${((value - min) / (max - min)) * 100}%`); };
+    // Paint the filled part of the track (CSS reads --sl-pct). The passive TV
+    // view keeps it empty so the random start position gives nothing away.
+    const paint = () => { rangeEl.style.setProperty('--sl-pct', passive ? '0%' : `${((value - min) / (max - min)) * 100}%`); };
     paint();
 
     // Thumb moved → update the number box
@@ -121,7 +125,22 @@
       api.submit({ value });
     });
 
-    return { destroy() { wrap.remove(); } };
+    return {
+      destroy() { wrap.remove(); },
+      // Called by the core with the server's answer-result. The important case
+      // is a RECONNECT: a player who reloads mid-question gets the question
+      // remounted from scratch (thumb back at its random start position) plus
+      // their stored result. Putting the thumb back on `yourAnswer` is what
+      // makes the frozen screen show what they actually guessed.
+      onResult(data) {
+        if (!data || !Number.isFinite(data.yourAnswer)) return;
+        value = clamp(round(data.yourAnswer), min, max);
+        rangeEl.value = value;
+        numEl.value = cfg.format(value);
+        paint();
+        freeze('Locked in ✓');
+      },
+    };
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

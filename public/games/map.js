@@ -168,6 +168,15 @@
           if (map) { map.remove(); map = null; }
           wrap.remove();
         },
+        // Called by the core with the server's answer-result. Live, the pin is
+        // already on the map and nothing needs doing. After a RECONNECT the map
+        // is rebuilt empty, and the server's result does not carry the player's
+        // own lat/lng (only the distance), so the pin cannot be restored — say
+        // so instead of leaving a blank map under a "Locked in" banner.
+        // (Adding lat/lng to games/map.js's `result` would let us redraw it.)
+        onResult() {
+          if (!passive && !pin) hint.textContent = 'Locked in — your pin appears on the leaderboard';
+        },
       };
     },
 

@@ -1,0 +1,254 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/trace.css — Border Draw 🖊️ & River Run 🌊 (type "trace")
+   Prefix: .trace-
+
+   The map itself is an SVG. Stroke widths and marker sizes are set from
+   JavaScript (see makeScaler in trace.js) so a line is exactly as thick on a
+   360 px phone as on a 1080p TV — that is why almost nothing here sets
+   stroke-width; the colours live here, the sizes live there.
+══════════════════════════════════════════════════════════════════════════ */
+
+/* Shared palette for every trace view (question, result, reveal). Custom
+   properties do not leak between elements, so all three roots declare them. */
+.trace-wrap, .trace-reveal, .trace-res {
+  --trace-sea:   #e9e6df;                    /* cool parchment = water        */
+  --trace-land:  rgba(26, 18, 8, .155);      /* ink at low opacity = land     */
+  --trace-mine:  var(--lapis);               /* the line the player draws     */
+}
+
+/* Shared "module panel" look (gold hairline + radius + shadow) — see style.css */
+.trace-wrap {
+  width: 100%;
+  padding: 14px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  opacity: 0;
+  animation: traceIn .3s ease forwards;
+}
+@keyframes traceIn { to { opacity: 1; } }
+
+/* ─── Header: which two countries / which river, and how long the line is ─── */
+.trace-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 6px 8px;
+  margin-bottom: 8px;
+}
+.trace-chip {
+  font-family: var(--font-cinzel);
+  font-size: .82rem; font-weight: 700; letter-spacing: .03em;
+  color: var(--ink);
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  padding: 3px 10px;
+}
+.trace-fuse { color: var(--gold-muted); font-weight: 700; }
+.trace-len {
+  font-family: var(--font-garamond); font-style: italic;
+  font-size: .9rem; color: var(--aged);
+}
+
+/* ─── Hint line above the map ─────────────────────────────────────────────── */
+.trace-hint {
+  font-family: var(--font-cinzel);
+  font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--aged);
+  text-align: center;
+  margin: 0 0 8px; min-height: 1.4em;
+  transition: color .24s;
+}
+.trace-wrap.is-locked .trace-hint { color: var(--correct); }
+
+/* ─── The drawing surface ─────────────────────────────────────────────────── */
+.trace-stage {
+  width: 100%;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--trace-sea);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, .25);
+}
+.trace-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(56vh, 460px);
+  touch-action: none;                        /* the finger draws, never scrolls */
+  cursor: crosshair;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.trace-wrap.is-tv .trace-svg { max-height: min(62vh, 620px); cursor: default; }
+.trace-wrap.is-locked .trace-svg { cursor: default; pointer-events: none; }
+
+/* Map paint */
+.trace-sea     { fill: var(--trace-sea); }
+.trace-land    { fill: var(--trace-land); }
+.trace-coast   { fill: none; stroke: var(--ink-light); stroke-opacity: .75; stroke-linejoin: round; stroke-linecap: round; }
+.trace-known   { fill: none; stroke: var(--ink); stroke-linejoin: round; stroke-linecap: round; }
+
+/* Marker labels (drawn inside a scaled group → px here are real screen px) */
+.trace-mk-label {
+  font-family: var(--font-cinzel);
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  text-anchor: middle;
+  fill: var(--ink-light);
+  paint-order: stroke;                        /* halo so labels stay legible over land */
+  stroke: var(--trace-sea); stroke-width: 3px; stroke-linejoin: round;
+}
+
+/* Border endpoints: "the hidden line starts here / ends there" */
+.trace-ep-dot    { fill: var(--gold-bright); stroke: var(--ink); stroke-width: 1.5px; }
+.trace-ep-ripple { fill: none; stroke: var(--gold); stroke-width: 2px; }
+
+/* River markers: a filled droplet at the mouth, an open ring at the source */
+.trace-mouth-drop  { fill: var(--gold-bright); stroke: var(--ink); stroke-width: 1.5px; }
+.trace-source-ring { fill: none; stroke: var(--gold-bright); stroke-width: 3px; }
+.trace-source-dot  { fill: var(--ink); }
+
+/* The player's own stroke */
+.trace-ink {
+  stroke: var(--trace-mine);
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .25));
+}
+.trace-wrap.is-locked .trace-ink { stroke: var(--lapis-light); }
+
+/* ─── Bottom bar: measurement + Clear / Lock in ───────────────────────────── */
+.trace-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px; margin-top: 10px;
+}
+.trace-meas {
+  font-family: var(--font-garamond); font-style: italic;
+  font-size: .92rem; color: var(--aged); min-height: 1.3em;
+}
+.trace-actions { display: flex; gap: 8px; margin-left: auto; }
+.trace-actions .btn {
+  width: auto !important;
+  min-height: var(--tap);
+  padding: 12px 22px;
+  margin: 0;
+  white-space: nowrap;
+}
+.trace-lock { padding: 12px 34px !important; }
+.trace-actions .btn:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
+.trace-wrap.is-locked .trace-lock { background: var(--correct-bg); color: var(--correct); opacity: 1; }
+
+/* Gentle nudge in the last 5 seconds when a line is drawn but not locked in */
+.trace-wrap.is-urgent .trace-lock { animation: traceNudge 1s ease-in-out infinite; }
+@keyframes traceNudge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Result screen — a mini map inside the dark left panel
+   (static HTML, so its stroke widths are plain viewBox units)
+══════════════════════════════════════════════════════════════════════════ */
+.trace-res { width: 100%; }
+.trace-mini {
+  display: block; width: 100%; height: auto; max-height: 220px;
+  border-radius: 4px; overflow: hidden;
+  background: rgba(0, 0, 0, .25);
+}
+.trace-mini-bg    { fill: rgba(245, 237, 224, .07); }
+.trace-mini-truth { stroke: var(--gold-bright); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.trace-mini-mine  { stroke: #7fa8e0; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 5; }
+
+.trace-res-keys { display: flex; gap: 14px; justify-content: center; margin-top: 8px; }
+.trace-key {
+  font-family: var(--font-cinzel);
+  font-size: .58rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: rgba(200, 180, 140, .7);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.trace-key::before { content: ''; width: 16px; height: 3px; border-radius: 2px; background: currentColor; }
+.trace-key.is-truth { color: var(--gold-bright); }
+.trace-key.is-mine  { color: #7fa8e0; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Leaderboard reveal — the truth in gold, everyone's line in their colour
+══════════════════════════════════════════════════════════════════════════ */
+.trace-reveal {
+  width: 100%;
+  padding: 14px 16px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  animation: traceIn .3s ease forwards;
+}
+.trace-rv-title {
+  font-family: var(--font-cinzel);
+  font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold-muted);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.trace-rv-svg { max-height: min(44vh, 380px); cursor: default; }
+
+/* Two soft tints — one warm (ink), one cool (lapis) — so the two countries
+   finally read apart. Low opacity keeps them on the parchment side. */
+.trace-shape-a { fill: rgba(26, 18, 8, .13); }
+.trace-shape-b { fill: rgba(30, 58, 110, .20); }
+
+.trace-truth {
+  stroke: var(--gold-bright);
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px rgba(200, 146, 42, .55));
+}
+.trace-rv-line { stroke-linecap: round; stroke-linejoin: round; opacity: .55; }
+.trace-rv-line.is-me { opacity: 1; }
+
+.trace-rv-badge-dot { stroke: var(--parchment); stroke-width: 1.5px; }
+.trace-rv-badge-txt {
+  font-family: var(--font-cinzel); font-size: 10px; font-weight: 700;
+  text-anchor: middle; fill: #fff;
+}
+.trace-rv-badge { opacity: .8; }
+.trace-rv-badge.is-me { opacity: 1; }
+
+.trace-country-label {
+  font-family: var(--font-cinzel);
+  font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  text-anchor: middle;
+  fill: var(--ink-light);
+  paint-order: stroke;
+  stroke: var(--parchment); stroke-width: 3.5px; stroke-linejoin: round;
+}
+
+/* Legend: best score first */
+.trace-rv-legend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+.trace-rv-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .82rem; color: var(--ink);
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  padding: 3px 9px;
+  opacity: 0;
+  animation: traceChipIn .3s var(--ease-out) forwards;
+}
+.trace-rv-chip.is-me { border-color: var(--lapis); background: rgba(30, 58, 110, .08); }
+.trace-rv-chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.trace-rv-chip b { font-family: var(--font-cinzel); color: var(--gold-muted); }
+.trace-rv-chip small { color: var(--aged); font-family: var(--font-garamond); font-style: italic; }
+.trace-rv-nobody { font-family: var(--font-garamond); font-style: italic; color: var(--aged); }
+@keyframes traceChipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ─── Small phones ────────────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .trace-len { width: 100%; text-align: center; }
+  .trace-bar { justify-content: center; }
+  .trace-meas { width: 100%; text-align: center; }
+  .trace-actions { margin: 0 auto; width: 100%; }
+  .trace-actions .btn { flex: 1; padding: 12px 8px; }
+  .trace-lock { padding: 12px 12px !important; }
+}
+
+/* ─── Reduced motion: no wipes, no pulsing, everything just appears ───────── */
+@media (prefers-reduced-motion: reduce) {
+  .trace-wrap, .trace-reveal { animation: none; opacity: 1; }
+  .trace-rv-chip { animation: none; opacity: 1; }
+  .trace-wrap.is-urgent .trace-lock { animation: none; }
+}

@@ -26,8 +26,12 @@
 // ═════════════════════════════════════════════════════════════════════════════
 
 // A dozen distinct colours that sit well on parchment and on ink.
+// None of them may be gold: every reveal draws the CORRECT answer in
+// var(--gold) (#c8922a), so a player wearing that colour would be
+// indistinguishable from the truth on the map / curve / axis reveals.
+// (The 4th entry used to be exactly #c8922a — that is why it is a plum now.)
 const PLAYER_COLORS = [
-  '#b8402f', '#1e5aa8', '#2a8a5a', '#c8922a', '#7a3fa0', '#d0642a',
+  '#b8402f', '#1e5aa8', '#2a8a5a', '#8f4a6b', '#7a3fa0', '#d0642a',
   '#1f8a98', '#a8286e', '#5a7a2a', '#8a5a2a', '#3a4fb8', '#c23a5a',
 ];
 
@@ -108,6 +112,15 @@ window.QuizGames = {
       // its warm terrain colours suit the parchment theme. It only has real
       // tiles up to zoom 8, so `maxNativeZoom` tells Leaflet to stretch the z8
       // tiles for closer zooms instead of showing empty squares.
+      //
+      // Tried and REJECTED (2026-09-04) — do not switch to these:
+      //   Canvas/World_Light_Gray_Base   has borders, but its tiles are printed
+      //     WITH country and ocean names ("FRANCE", "Atlantic Ocean"), which
+      //     hands the player the answer to every pin-drop question.
+      //   World_Terrain_Base             label-free, but no borders at all and
+      //     its bright cyan sea clashes with the parchment theme.
+      // A keyless, label-free basemap that still shows borders does not seem to
+      // exist; a CARTO key stays the only way to get one back.
       streets() {
         if (CARTO_KEY) {
           return L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?api_key=${encodeURIComponent(CARTO_KEY)}`, {
@@ -231,11 +244,13 @@ const state = {
   handle: null,           // module handle from mount()
   api: null,              // api object given to the module
   revealHandle: null,
+  lbLoad: null,           // token identifying the newest leaderboard (see showLeaderboard)
   resultTimeout: null,
   flipTimeout: null,
   lbCountdown: null,      // interval for the autoplay countdown
   lbEndAt: 0,
   lbRemainingMs: 0,
+  lbTotalMs: 0,           // full length of the current leaderboard pause (for the drain bar)
   lbIsLast: false,
 };
 
@@ -308,9 +323,18 @@ function vibrate(pattern) {
   try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ignore */ }
 }
 
-function saveToken(token) { try { localStorage.setItem('qb_token', token); } catch (e) { /* ignore */ } }
-function clearToken()     { try { localStorage.removeItem('qb_token'); } catch (e) { /* ignore */ } }
+// The reconnect token, plus the game it belongs to. The game id is what lets
+// boot() tell "this player reloaded the page they are already playing on" from
+// "this player opened a join link for a different game".
+function saveToken(token) {
+  try {
+    localStorage.setItem('qb_token', token);
+    if (state.gameId) localStorage.setItem('qb_game', state.gameId);
+  } catch (e) { /* ignore */ }
+}
+function clearToken()     { try { localStorage.removeItem('qb_token'); localStorage.removeItem('qb_game'); } catch (e) { /* ignore */ } }
 function loadToken()      { try { return localStorage.getItem('qb_token'); } catch (e) { return null; } }
+function loadGameId()     { try { return localStorage.getItem('qb_game'); } catch (e) { return null; } }
 
 // ═════════════════════════════════════════════════════════════════════════════
 // 4. Module loader — /api/games tells us which game types exist; we then inject
@@ -430,15 +454,19 @@ function buildConfigScreen(cat) {
         </div>
         <div class="cat-grid">
           ${cats.map(c => `
-            <label class="cat-card ${c.count ? '' : 'disabled'}" data-cat="${esc(c.id)}">
+            <label class="cat-card ${c.count ? '' : 'disabled'}" data-cat="${esc(c.id)}" data-type="${esc(c.type)}"
+                   ${c.count ? '' : 'title="No questions for this category yet."'}>
               <input type="checkbox" value="${esc(c.id)}" ${c.count ? '' : 'disabled'}>
               <span class="cat-emoji">${c.emoji || '❔'}</span>
               <span class="cat-main">
                 <span class="cat-label">${esc(c.label)}</span>
                 <span class="cat-blurb">${esc(c.blurb || '')}</span>
+                <span class="cat-note"></span>
               </span>
-              <span class="cat-count">${c.count ? c.count : 'soon'}</span>
-              <span class="cat-check" aria-hidden="true">✓</span>
+              <span class="cat-side">
+                <span class="cat-count">${c.count ? c.count : 'soon'}</span>
+                <span class="cat-check" aria-hidden="true">✓</span>
+              </span>
             </label>`).join('')}
         </div>
       </div>`;
@@ -481,6 +509,7 @@ function buildConfigScreen(cat) {
   ['opt-autoplay', 'opt-intros', 'opt-final-double'].forEach(id => $(id).addEventListener('change', saveConfig));
 
   applyConfigToUI(cat);
+  markUnavailableModules();
   $('config-loading').classList.add('hidden');
   $('config-body').classList.remove('hidden');
   void u; // (util kept for future use)
@@ -509,9 +538,48 @@ function applyConfigToUI(cat) {
 }
 
 function refreshCategoryCards() {
+  const cat = QuizGames.catalog;
+  let picked = 0, questions = 0;
   document.querySelectorAll('#config-groups .cat-card').forEach(card => {
     const cb = card.querySelector('input');
     card.classList.toggle('checked', cb.checked);
+    if (!cb.checked) return;
+    picked++;
+    const c = cat && cat.categories.find(x => x.id === cb.value);
+    questions += (c && c.count) || 0;
+  });
+  // Live recap under the category list ("6 games · 512 questions in the pot")
+  const tally = $('config-tally');
+  if (tally) {
+    tally.textContent = picked
+      ? `${picked} game${picked === 1 ? '' : 's'} · ${questions.toLocaleString('en-US')} questions in the pot`
+      : 'Pick at least one game to start.';
+    tally.classList.toggle('empty', !picked);
+  }
+}
+
+// A game type can only be played if its browser module actually loaded. If a
+// /games/<type>.js is missing or throws, the module never registers — so grey
+// those categories out here instead of letting the host pick a game that would
+// show "not available in your browser" mid-round.
+function markUnavailableModules() {
+  loadModules().catch(() => {}).then(() => {
+    let blocked = 0;
+    document.querySelectorAll('#config-groups .cat-card[data-type]').forEach(card => {
+      const cb = card.querySelector('input');
+      if (!cb || cb.disabled) return;                 // already off (no questions yet)
+      if (QuizGames.get(card.dataset.type)) return;   // module is there — nothing to do
+      blocked++;
+      cb.checked = false;
+      cb.disabled = true;
+      card.classList.add('disabled', 'unavailable');
+      card.title = 'This game needs a browser module that could not be loaded.';
+      const note = card.querySelector('.cat-note');
+      if (note) note.textContent = 'Unavailable in this browser';
+      const count = card.querySelector('.cat-count');
+      if (count) count.textContent = 'n/a';
+    });
+    if (blocked) { refreshCategoryCards(); saveConfig(); }
   });
 }
 
@@ -587,6 +655,8 @@ function renderLobbyPlayers() {
     $('host-empty-hint').classList.toggle('hidden', players.length > 0);
   }
   renderPlayerChips($('player-lobby-chips'), players);
+  const count = $('player-lobby-count');
+  if (count) count.textContent = players.length === 1 ? '1 player in the lobby' : `${players.length} players in the lobby`;
 }
 
 function showPlayerLobby() {
@@ -705,6 +775,9 @@ function destroyQuestion() {
   stopTimer();
 }
 function destroyReveal() {
+  // Dropping the token stops a reveal that is still waiting for its module to
+  // load from painting itself into a screen that has already moved on.
+  state.lbLoad = null;
   if (state.revealHandle && typeof state.revealHandle.destroy === 'function') { try { state.revealHandle.destroy(); } catch (e) { console.warn(e); } }
   state.revealHandle = null;
   $('reveal-area').innerHTML = '';
@@ -931,12 +1004,24 @@ function showLeaderboard(data) {
   showScreen('screen-leaderboard');
 
   // Reveal (module-specific): maps, axes, grids…
-  const mod = QuizGames.get(data.type);
-  if (data.reveal != null && mod && typeof mod.reveal === 'function') {
+  // The game modules may not have finished loading yet — that happens when a
+  // player reconnects (or opens the page) straight onto a leaderboard, because
+  // the server replays show-leaderboard immediately. So wait for them the same
+  // way showQuestion() does, instead of silently skipping the reveal.
+  // `state.lbLoad` is the "is this still the newest leaderboard?" token: a newer
+  // one replaces it and the late callback then does nothing.
+  const lbToken = state.lbLoad = {};
+  if (data.reveal != null) {
     $('reveal-area').classList.add('has-reveal');
-    nextFrame(() => {
-      try { state.revealHandle = mod.reveal($('reveal-area'), data.reveal, { myNickname: state.myNickname, players: data.leaderboard, isHost: state.amHost }) || null; }
-      catch (e) { console.error(`reveal() failed for ${data.type}`, e); $('reveal-area').classList.remove('has-reveal'); }
+    loadModules().catch(() => {}).then(() => {
+      if (state.lbLoad !== lbToken) return;
+      const mod = QuizGames.get(data.type);
+      if (!mod || typeof mod.reveal !== 'function') { $('reveal-area').classList.remove('has-reveal'); return; }
+      nextFrame(() => {
+        if (state.lbLoad !== lbToken) return;
+        try { state.revealHandle = mod.reveal($('reveal-area'), data.reveal, { myNickname: state.myNickname, players: data.leaderboard, isHost: state.amHost }) || null; }
+        catch (e) { console.error(`reveal() failed for ${data.type}`, e); $('reveal-area').classList.remove('has-reveal'); }
+      });
     });
   }
 
@@ -944,10 +1029,12 @@ function showLeaderboard(data) {
 
   // Footer: host button or autoplay countdown
   $('btn-next').classList.add('hidden');
+  $('lb-countdown').hidden = !data.autoplay;
   $('btn-lb-pause').classList.toggle('hidden', !(state.amHost && data.autoplay));
   updatePauseButtons();
   if (data.autoplay) {
     const ms = typeof data.remainingMs === 'number' ? data.remainingMs : (data.revealSeconds || 8) * 1000;
+    state.lbTotalMs = ms;
     startLbCountdown(ms, data.isLast);
     if (data.paused) pauseLbCountdown();
   } else if (state.amHost) {
@@ -963,7 +1050,8 @@ function showLeaderboard(data) {
 function breakdownText(e, data) {
   if (!e.roundPoints) return e.detail ? '0 points' : '';
   const parts = [];
-  if (speedScored(data.type)) { if (e.accuracyPts) parts.push(`+${e.accuracyPts} correct & fast`); }
+  // Kept short on purpose: this line has to fit on one row of a 360 px phone.
+  if (speedScored(data.type)) { if (e.accuracyPts) parts.push(`+${e.accuracyPts} speed`); }
   else if (e.accuracyPts) parts.push(`+${e.accuracyPts} accuracy`);
   if (e.rankBonus) parts.push(`+${e.rankBonus} ${QuizGames.util.ordinal(e.roundRank)}`);
   if (e.streakBonus) parts.push(`+${e.streakBonus} streak`);
@@ -1058,10 +1146,29 @@ function flipToTotalOrder(listEl, entries) {
 }
 
 // ── Autoplay countdown on the leaderboard ────────────────────────────────────
+// The thin bar under the list drains with one CSS transition on `transform`
+// (never on `width`), so it costs no layout work while the reveal animates.
+function paintLbBar(remainingMs, animate) {
+  const bar = $('lb-countdown-fill');
+  if (!bar) return;
+  const total = state.lbTotalMs || remainingMs || 1;
+  const frac = Math.max(0, Math.min(1, remainingMs / total));
+  bar.style.transition = 'none';
+  bar.style.transform = `scaleX(${frac})`;
+  if (!animate || REDUCED_MOTION) return;
+  nextFrame(() => nextFrame(() => {
+    bar.style.transition = `transform ${Math.max(0, remainingMs)}ms linear`;
+    bar.style.transform = 'scaleX(0)';
+  }));
+}
+
 function startLbCountdown(ms, isLast) {
   stopLbCountdown();
   state.lbEndAt = Date.now() + ms;
   state.lbRemainingMs = ms;
+  if (!state.lbTotalMs || state.lbTotalMs < ms) state.lbTotalMs = ms;
+  $('lb-countdown').hidden = false;
+  paintLbBar(ms, true);
   const paint = () => {
     const left = Math.max(0, state.lbEndAt - Date.now());
     state.lbRemainingMs = left;
@@ -1075,6 +1182,7 @@ function startLbCountdown(ms, isLast) {
 function pauseLbCountdown() {
   if (state.lbCountdown) { clearInterval(state.lbCountdown); state.lbCountdown = null; }
   state.lbRemainingMs = Math.max(0, state.lbEndAt - Date.now());
+  paintLbBar(state.lbRemainingMs, false);
   $('lb-hint').textContent = '⏸ Paused by the host';
 }
 function stopLbCountdown() { if (state.lbCountdown) { clearInterval(state.lbCountdown); state.lbCountdown = null; } }
@@ -1155,10 +1263,13 @@ function confetti(canvas) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width = canvas.offsetWidth || window.innerWidth;
   const H = canvas.height = canvas.offsetHeight || window.innerHeight;
-  const colors = ['#c8922a', '#e8c97a', '#1e3a6e', '#2a6e45', '#b8402f', '#f5ede0'];
-  const bits = Array.from({ length: Math.min(220, Math.round(W / 4)) }, () => ({
-    x: Math.random() * W, y: -20 - Math.random() * H * 0.5, w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
-    vx: -1 + Math.random() * 2, vy: 2 + Math.random() * 3, rot: Math.random() * Math.PI, vr: -0.1 + Math.random() * 0.2,
+  // Gold-weighted palette (the theme colour appears three times) and a density
+  // tied to the screen area, so a phone does not get the same 220 pieces a TV does.
+  const colors = ['#c8922a', '#d4a035', '#e8c97a', '#1e3a6e', '#2a6e45', '#b8402f', '#f5ede0'];
+  const count = Math.max(70, Math.min(260, Math.round(W * H / 5200)));
+  const bits = Array.from({ length: count }, () => ({
+    x: Math.random() * W, y: -20 - Math.random() * H * 0.6, w: 5 + Math.random() * 7, h: 7 + Math.random() * 9,
+    vx: -1 + Math.random() * 2, vy: 2 + Math.random() * 3.2, rot: Math.random() * Math.PI, vr: -0.12 + Math.random() * 0.24,
     c: colors[Math.floor(Math.random() * colors.length)],
   }));
   const start = performance.now();
@@ -1280,6 +1391,9 @@ socket.on('rematch', ({ gameId, gameMode, autoplay, totalQuestions, players }) =
   state.gameId = gameId; state.gameMode = gameMode || state.gameMode; state.autoplay = autoplay !== false;
   state.totalQuestions = totalQuestions || 0; state.lobbyPlayers = players || [];
   document.body.classList.toggle('tv', isTv());
+  // A rematch keeps the token but gives everyone a NEW game id — remember it so
+  // a reload during the rematch still reconnects (see boot()).
+  const t = loadToken(); if (t) saveToken(t);
   toast('Rematch! Same players, fresh questions');
   if (state.amHost) showHostLobby(); else showPlayerLobby();
 });
@@ -1369,14 +1483,27 @@ function boot() {
   loadCatalog().catch(() => {});   // warm the cache
 
   const joinCode = new URLSearchParams(location.search).get('join');
+  const token = loadToken();
   if (joinCode) {
-    $('join-code').value = joinCode.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    const code = joinCode.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    $('join-code').value = code;
     showScreen('screen-join');
-    setTimeout(() => $('join-nickname').focus(), 300);
     loadModules();
+    // Almost everyone joins by scanning the QR code, so the join link stays in
+    // the address bar for the whole game. Reloading (or coming back after the
+    // phone locked) must therefore NOT drop the player onto an empty join form
+    // — the game has already started by then and re-joining would be refused.
+    // If the saved token belongs to THIS game, reconnect instead. A token from
+    // some other game is ignored, so a fresh join link still works normally.
+    if (token && loadGameId() === code) {
+      state.gameId = code;
+      socket.emit('rejoin', { token });
+      socket.once('rejoin-error', () => { state.gameId = null; setTimeout(() => $('join-nickname').focus(), 100); });
+    } else {
+      setTimeout(() => $('join-nickname').focus(), 300);
+    }
     return;
   }
-  const token = loadToken();
   if (token) {
     state.gameId = '?';   // so a failed rejoin does not toast "connection lost" forever
     socket.emit('rejoin', { token });

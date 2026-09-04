@@ -56,7 +56,12 @@
       e.preventDefault();
       const r = item.getBoundingClientRect();
       drag = { item, grabOffset: e.clientY - r.top, pointerId: e.pointerId };
-      item.setPointerCapture(e.pointerId);
+      // Pointer capture keeps the drag alive when the finger leaves the item.
+      // It THROWS if the browser no longer has an active pointer with that id
+      // (happens with stylus/assistive input and when a touch is cancelled), so
+      // it must never be allowed to abort the rest of the drag setup below —
+      // without the try/catch the item would stay stuck in a half-grabbed state.
+      try { item.setPointerCapture(e.pointerId); } catch (err) { /* dragging still works without capture */ }
       item.classList.add('is-grabbed');
       item.style.transition = 'none';
       snd(api, 'click');
@@ -176,7 +181,21 @@
         if (typeof api.onUnlock === 'function') api.onUnlock(unfreeze);
       }
 
-      return { destroy() { wrap.remove(); } };
+      return {
+        destroy() { wrap.remove(); },
+        // The core hands us the server's answer-result. On a RECONNECT the list
+        // is rebuilt in the payload's shuffled order, so re-apply the order the
+        // player actually locked in — otherwise the frozen list shows an order
+        // they never chose.
+        onResult(data) {
+          if (!data || !Array.isArray(data.playerOrder)) return;
+          const byText = new Map(itemsOf(list).map(li => [li.dataset.text, li]));
+          // Appending in order re-sorts the list; the position numbers are a CSS
+          // counter on .seq-item, so they follow automatically.
+          data.playerOrder.forEach(text => { const li = byText.get(text); if (li) list.appendChild(li); });
+          freeze();
+        },
+      };
     },
 
     result(data) {

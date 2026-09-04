@@ -7,12 +7,12 @@
 /* ─── Question card ──────────────────────────────────────────────────────── */
 .sl-wrap {
   width: 100%;
-  padding: 26px 22px 24px;
+  padding: 24px 22px;
   background: var(--parchment);
   border: 1px solid var(--parchment-dark);
-  border-top: 2px solid var(--gold);
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
   text-align: center;
   opacity: 0;
   animation: slIn .3s cubic-bezier(.22,1,.36,1) forwards;
@@ -80,6 +80,14 @@
 .sl-range:active::-webkit-slider-thumb, .sl-range:focus-visible::-webkit-slider-thumb { transform: scale(1.18); }
 .sl-range:disabled { cursor: default; opacity: .7; }
 
+/* TV host view: nobody guesses here, so the thumb and the filled part of the
+   track are hidden. A thumb parked at the random start position looks like a
+   hint about the answer on a screen the whole room is watching. */
+.sl-wrap.is-passive .sl-range::-webkit-slider-thumb { opacity: 0; }
+.sl-wrap.is-passive .sl-range::-moz-range-thumb     { opacity: 0; }
+.sl-wrap.is-passive .sl-range::-moz-range-progress  { background: var(--parchment-dark); }
+.sl-wrap.is-passive .sl-number { color: var(--aged); }
+
 .sl-bounds, .sl-ticks {
   display: flex; justify-content: space-between;
   margin-top: 2px; padding: 0 2px;
@@ -98,7 +106,7 @@
 /* TV mode */
 .sl-wrap.is-tv { padding: 34px 40px 30px; }
 .sl-wrap.is-tv .sl-number { font-size: 3.4rem; }
-.sl-wrap.is-tv .sl-bounds, .sl-wrap.is-tv .sl-ticks { font-size: .9rem; }
+.sl-wrap.is-tv .sl-bounds, .sl-wrap.is-tv .sl-ticks { font-size: 1rem; }
 .sl-wrap.is-tv .sl-host-hint { font-size: 1.3rem; }
 
 @media (max-width: 400px) { .sl-number { font-size: 2rem; min-width: 100px; } .sl-unit { font-size: 1rem; } }
@@ -125,8 +133,8 @@
   padding: 16px 18px 12px;
   background: var(--parchment-mid);
   border: 1px solid var(--parchment-dark);
-  border-top: 2px solid var(--gold);
-  border-radius: 4px;
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
   overflow: visible;
 }
 .sl-rv-title {

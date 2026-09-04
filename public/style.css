@@ -51,6 +51,25 @@
   --t-med:    240ms;
   --tap:      44px;                       /* minimum touch target */
   --col-max:  820px;                      /* question column width */
+
+  /* Spacing scale — everything on the 8 px grid (4 px for hairline gaps).
+     Use these instead of ad-hoc pixel values so the rhythm stays even. */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+
+  /* Shared look for the parchment "panels" the game modules draw their answer
+     UI on (see /games/<type>.css). Keeping these in one place is what makes a
+     map question and a slider question feel like the same game. */
+  --panel-radius: 6px;
+  --panel-shadow: 0 4px 18px rgba(0,0,0,.18);
+  --panel-rule:   2px solid var(--gold);   /* the gold hairline along the top  */
+
+  /* A barely-there fleck of "paper grain". It is a background-image, so it
+     costs nothing to animate over and never triggers a repaint of its own. */
+  --paper-grain:
+    radial-gradient(circle at 20% 30%, rgba(140,122,94,.05) 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 65%, rgba(140,122,94,.04) 0 1px, transparent 1px);
+  --paper-grain-size: 17px 19px, 23px 29px;
 }
 
 /* ─── 2. Reset, body, screens ────────────────────────────────────────────── */
@@ -59,6 +78,9 @@ html { -webkit-text-size-adjust: 100%; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 button:focus-visible, input:focus-visible, label:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
 img { max-width: 100%; display: block; }
+/* `display:block` above beats the browser's own rule for [hidden], which left a
+   1 px "broken image" speck at the top of every prompt card that has no photo. */
+img[hidden], [hidden] { display: none !important; }
 
 body {
   font-family: var(--font-lora);
@@ -266,6 +288,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   font-size: 1.7rem;
   font-weight: 700;
   letter-spacing: .3em;
+  text-indent: .3em;           /* optical centring: cancels the trailing letter-space */
   text-align: center;
   text-transform: uppercase;
 }
@@ -285,7 +308,10 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   color: var(--ink-light);
   transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--spring);
 }
+.chip:hover, .pill-row > button:hover { border-color: var(--gold-muted); background: #fffdf7; }
+.chip:active, .pill-row > button:active { transform: scale(.96); }
 .chip.active, .pill-row > button.active { background: var(--ink); color: var(--gold-pale); border-color: var(--ink); }
+.chip.active:hover, .pill-row > button.active:hover { background: var(--ink-mid); border-color: var(--ink-mid); }
 .pill-row > button { min-width: 52px; font-family: var(--font-cinzel); font-weight: 700; }
 .segmented {
   display: inline-flex;
@@ -305,6 +331,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   transition: background var(--t-fast), color var(--t-fast);
 }
 .segmented > button + button { border-left: 1px solid var(--parchment-dark); }
+.segmented > button:hover:not(.active) { background: var(--parchment-mid); color: var(--ink-light); }
 .segmented > button.active { background: var(--ink); color: var(--gold-pale); }
 
 /* Toggle switch rows */
@@ -335,12 +362,16 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   box-shadow: 0 1px 3px rgba(0,0,0,.3);
   transition: transform var(--t-med) var(--spring);
 }
+.toggle-row:hover .toggle-track { box-shadow: 0 0 0 3px rgba(200,146,42,.14); }
+.toggle-row input:focus-visible + .toggle-track { outline: 2px solid var(--gold); outline-offset: 3px; }
 .toggle-row input:checked + .toggle-track { background: var(--gold); }
 .toggle-row input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
 
 /* ─── 5. Cards, chips, avatars ───────────────────────────────────────────── */
 .card {
   background: var(--parchment);
+  background-image: var(--paper-grain);
+  background-size: var(--paper-grain-size);
   border: 1px solid var(--parchment-dark);
   border-radius: var(--radius-lg);
   padding: 28px 24px;
@@ -348,6 +379,16 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   max-width: 680px;
   box-shadow: var(--shadow-card);
   position: relative;
+}
+/* A gold hairline along the top edge of every card — the same rule the module
+   panels carry, so cards and answer panels read as one family. */
+.card::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: linear-gradient(90deg, transparent, var(--gold) 18%, var(--gold-bright) 50%, var(--gold) 82%, transparent);
+  opacity: .75;
+  pointer-events: none;
 }
 .card-wide   { max-width: 820px; }
 .card-narrow { max-width: 440px; }
@@ -368,8 +409,9 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .avatar-lg { width: 40px; height: 40px; font-size: 1.05rem; }
 .avatar-xl { width: 64px; height: 64px; font-size: 1.7rem; margin: 0 auto 12px; }
 
-.chip-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
-.chip-cloud-center { justify-content: center; margin-top: 18px; }
+.chip-cloud { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-2) 0 var(--sp-3); }
+.chip-cloud-center { justify-content: center; margin-top: var(--sp-2); }
+.lobby-here { margin-top: var(--sp-5); text-align: center; }
 .pchip {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 5px 8px 5px 5px;
@@ -386,12 +428,12 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--correct); box-shadow: 0 0 0 2px rgba(42,110,69,.2); }
 .pchip.offline .conn-dot { background: var(--aged-light); box-shadow: none; }
 .pchip-kick {
-  width: 30px; height: 30px; border-radius: 50%;
-  color: var(--aged);
-  font-size: 1.1rem; line-height: 1;
-  transition: background var(--t-fast), color var(--t-fast);
+  width: 32px; height: 32px; border-radius: 50%;
+  color: var(--aged-light);
+  font-size: 1.15rem; line-height: 1;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--spring);
 }
-.pchip-kick:hover { background: var(--wrong-bg); color: var(--wrong); }
+.pchip-kick:hover { background: var(--wrong-bg); color: var(--wrong); transform: scale(1.12); }
 .count-badge {
   display: inline-block;
   min-width: 22px; padding: 1px 7px;
@@ -453,7 +495,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .globe-spin { transform-origin: 80px 80px; animation: globeSpin 22s linear infinite; }
 @keyframes globeSpin { to { transform: rotate(360deg); } }
 .logo {
-  font-size: 2.5rem; font-weight: 900; letter-spacing: .06em;
+  font-size: clamp(2.1rem, 5.6vw, 3rem); font-weight: 900; letter-spacing: .06em;
   color: var(--gold-bright);
   text-shadow: 0 0 28px rgba(200,146,42,.35);
   position: relative; z-index: 1;
@@ -465,7 +507,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 }
 .home-panel { background: var(--parchment); padding: 40px 32px; display: flex; flex-direction: column; justify-content: center; }
 .home-prompt { font-family: var(--font-garamond); font-style: italic; font-size: 1.15rem; color: var(--aged); text-align: center; margin-bottom: 4px; }
-.how-strip { list-style: none; margin-top: 26px; display: flex; flex-direction: column; gap: 8px; }
+.how-strip { list-style: none; margin-top: var(--sp-5); padding-top: var(--sp-4); border-top: 1px solid rgba(200,146,42,.28); display: flex; flex-direction: column; gap: var(--sp-2); }
 .how-strip li { display: flex; align-items: center; gap: 10px; font-size: .92rem; color: var(--ink-light); }
 .how-num {
   width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
@@ -484,6 +526,12 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 }
 .credits a { color: rgba(200,146,42,.6); margin-left: 10px; text-decoration: none; }
 .credits a:hover { color: var(--gold); }
+/* On a phone the attribution list wrapped to three lines and shouted louder
+   than the buttons — keep the link, drop the list. */
+@media (max-width: 500px) {
+  .credits { font-size: .64rem; }
+  .credits-data { display: none; }
+}
 
 /* ─── 8. Host config ─────────────────────────────────────────────────────── */
 .config-section { margin: 22px 0; }
@@ -497,7 +545,8 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   text-align: left;
   transition: border-color var(--t-fast), transform var(--t-fast) var(--spring), box-shadow var(--t-fast);
 }
-.preset:hover { border-color: var(--gold); box-shadow: 0 2px 10px rgba(200,146,42,.18); }
+.preset:hover { border-color: var(--gold); box-shadow: 0 4px 14px rgba(200,146,42,.22); transform: translateY(-1px); }
+.preset:active { transform: scale(.98); }
 .preset-emoji { font-size: 1.4rem; }
 .preset-label { font-family: var(--font-cinzel); font-size: .74rem; font-weight: 700; letter-spacing: .04em; }
 
@@ -509,14 +558,14 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .group-blurb { font-family: var(--font-garamond); font-style: italic; color: var(--aged); font-size: .9rem; }
 .group-links { display: flex; align-items: center; gap: 4px; color: var(--parchment-dark); }
 
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--sp-2); }
 .cat-card {
   position: relative;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
-  min-height: 60px;
+  min-height: 72px;                        /* even rows even when a blurb wraps */
   padding: 10px 12px;
   background: #fff;
   border: 1px solid var(--parchment-dark);
@@ -526,24 +575,34 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--spring), box-shadow var(--t-fast);
 }
 .cat-card input { position: absolute; opacity: 0; width: 0; height: 0; }
-.cat-card:hover { border-color: var(--gold-muted); }
+.cat-card:hover:not(.disabled) { border-color: var(--gold-muted); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.10); }
+.cat-card:active:not(.disabled) { transform: scale(.99); }
+.cat-card:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; }
 .cat-card.checked { background: #fbf6ec; border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.cat-card.checked:hover { box-shadow: 0 0 0 1px var(--gold) inset, 0 4px 14px rgba(200,146,42,.20); }
 .cat-card.disabled { opacity: .5; cursor: not-allowed; }
+/* Category whose browser module could not be loaded (see markUnavailableModules) */
+.cat-card.unavailable { opacity: .45; background: repeating-linear-gradient(135deg, #fff 0 6px, #f6f1e6 6px 12px); }
 .cat-emoji { font-size: 1.6rem; line-height: 1; }
 .cat-main { display: flex; flex-direction: column; min-width: 0; }
 .cat-label { font-family: var(--font-cinzel); font-size: .78rem; font-weight: 700; letter-spacing: .03em; }
 .cat-blurb { font-size: .8rem; color: var(--aged); font-family: var(--font-garamond); font-style: italic; line-height: 1.3; }
+.cat-note { font-family: var(--font-cinzel); font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; color: var(--wrong); margin-top: 3px; }
+.cat-note:empty { display: none; }
+
+/* Count badge and the "picked" tick share a fixed-width right-hand column, so
+   the tick can never land on top of the blurb the way it used to. */
+.cat-side { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 42px; }
 .cat-count {
   font-family: var(--font-cinzel); font-size: .62rem; font-weight: 700;
   background: var(--parchment-mid); color: var(--aged);
   border-radius: 999px; padding: 2px 8px;
-  align-self: start;
+  font-variant-numeric: tabular-nums;
 }
 .cat-card.checked .cat-count { background: var(--gold); color: var(--ink); }
 .cat-check {
-  position: absolute; right: 10px; bottom: 8px;
   width: 20px; height: 20px; border-radius: 50%;
-  background: var(--correct); color: #fff;
+  background: var(--ink); color: var(--gold-pale);
   font-size: .7rem; font-weight: 700;
   display: inline-flex; align-items: center; justify-content: center;
   transform: scale(0); transition: transform var(--t-fast) var(--spring);
@@ -561,6 +620,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   text-align: left;
   transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
 }
+.mode-card:hover { border-color: var(--gold-muted); }
 .mode-card.active { background: #fbf6ec; border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
 .mode-emoji { font-size: 1.4rem; }
 .mode-name { font-family: var(--font-cinzel); font-size: .8rem; font-weight: 700; }
@@ -568,43 +628,80 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 
 .config-footer {
   position: sticky; bottom: -1px;
-  margin: 12px -24px -28px;
-  padding: 8px 24px 20px;
-  background: linear-gradient(to bottom, rgba(245,237,224,0), var(--parchment) 30%);
+  margin: var(--sp-3) -24px -28px;
+  padding: var(--sp-3) 24px 20px;
+  background: linear-gradient(to bottom, rgba(245,237,224,0), var(--parchment) 34%);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
+.config-tally {
+  text-align: center;
+  font-family: var(--font-cinzel);
+  font-size: .66rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold-muted);
+  margin-bottom: var(--sp-1);
+}
+.config-tally.empty { color: var(--warn); }
 
 /* ─── 9. Lobbies & join ──────────────────────────────────────────────────── */
-.lobby-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.lobby-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); }
 .lobby-code-panel { text-align: center; }
+@media (min-width: 721px) {
+  /* Gold hairline between the "how to join" half and the "who is here" half */
+  .lobby-players-panel { padding-left: var(--sp-5); border-left: 1px solid rgba(200,146,42,.28); }
+}
 .game-code {
   font-family: 'Courier New', monospace;
   font-size: 2.6rem; font-weight: 900; letter-spacing: .28em;
-  padding: 12px 8px 12px 16px;
+  text-indent: .28em;                     /* cancels the trailing letter-space so it sits dead centre */
+  padding: var(--sp-3) var(--sp-2);
   background: var(--ink); color: var(--gold-pale);
   border-radius: var(--radius);
   border-top: 2px solid var(--gold);
+  box-shadow: inset 0 0 26px rgba(200,146,42,.14);
   user-select: all;
 }
 .qr {
-  width: 180px; height: 180px; margin: 14px auto 8px;
-  background: #fff; border: 1px solid var(--parchment-dark); border-radius: var(--radius); padding: 8px;
+  width: 180px; height: 180px; margin: var(--sp-3) auto var(--sp-2);
+  background: #fff; border: 1px solid var(--parchment-dark); border-radius: var(--radius); padding: var(--sp-2);
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
 }
-.join-link-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-.join-link { font-family: 'Courier New', monospace; font-size: .85rem; color: var(--ink-light); word-break: break-all; }
+.join-link-row { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); flex-wrap: wrap; margin-top: 6px; }
+/* The link is the actionable thing, so it now outranks the explanatory hint. */
+.join-link { font-family: 'Courier New', monospace; font-size: .92rem; font-weight: 700; color: var(--ink); word-break: break-all; }
+.lobby-code-panel .hint { font-size: .88rem; margin-top: 6px; }
 .lobby-players-panel h3 { color: var(--ink); font-size: .78rem; }
+/* Empty lobby: a proper placeholder rather than a bare line of italics */
+#host-empty-hint {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 88px; padding: var(--sp-3);
+  border: 1px dashed var(--parchment-dark);
+  border-radius: var(--radius);
+  background: rgba(213,200,180,.16);
+  text-align: center;
+}
 .settings-summary {
-  margin-top: 18px; padding: 10px 14px;
+  margin-top: var(--sp-4); padding: 10px 14px;
   background: var(--parchment-mid); border-radius: var(--radius);
+  border: 1px solid rgba(213,200,180,.9);
   font-family: var(--font-garamond); font-style: italic; color: var(--ink-light); font-size: .95rem;
   text-align: center;
 }
 
 /* ─── 10. Intro splash ───────────────────────────────────────────────────── */
-#screen-intro { background: var(--ink); }
+#screen-intro { background: var(--ink); position: relative; overflow: hidden; }
+/* A slow gold bloom behind the splash so the full-bleed ink screen has a centre
+   of gravity. Pure background-image — nothing to repaint per frame. */
+#screen-intro::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 42%, rgba(200,146,42,.16) 0%, transparent 70%),
+    radial-gradient(circle, rgba(200,146,42,.05) 1px, transparent 1px);
+  background-size: 100% 100%, 26px 26px;
+}
 .intro {
-  width: 100%; max-width: 720px;
-  padding: 32px 24px;
+  position: relative; z-index: 1;
+  width: 100%; max-width: 760px;
+  padding: var(--sp-6) var(--sp-5);
   text-align: center;
   color: var(--parchment);
   display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -616,45 +713,63 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 }
 .intro-ribbon { background: var(--lapis); color: var(--parchment); }
 .intro-final  { background: var(--gold); color: var(--ink); }
-.intro-emoji { font-size: 5rem; line-height: 1; margin-top: 10px; animation: popIn .5s var(--spring) both .1s; filter: drop-shadow(0 6px 20px rgba(200,146,42,.3)); }
-.intro-round { font-family: var(--font-cinzel); font-size: .8rem; letter-spacing: .2em; color: var(--aged-light); text-transform: uppercase; animation: fadeUp .4s var(--ease-out) both .2s; }
-.intro-label { font-size: 2.2rem; color: var(--gold-bright); text-shadow: 0 0 24px rgba(200,146,42,.3); margin: 0; animation: fadeUp .4s var(--ease-out) both .25s; }
-.intro-howto { font-family: var(--font-garamond); font-size: 1.3rem; color: var(--parchment); max-width: 38ch; line-height: 1.4; animation: fadeUp .4s var(--ease-out) both .35s; }
-.intro-progress { width: min(320px, 70%); height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; margin-top: 22px; overflow: hidden; }
-.intro-progress-fill { height: 100%; width: 0; background: var(--gold); }
+/* clamp() so the splash grows with the screen: readable on a 360 px phone,
+   cinematic on a 1080p TV, without a media query for every step. */
+.intro-emoji { font-size: clamp(4rem, 11vmin, 7rem); line-height: 1; margin-top: 10px; animation: popIn .5s var(--spring) both .1s; filter: drop-shadow(0 6px 26px rgba(200,146,42,.42)); }
+.intro-round { font-family: var(--font-cinzel); font-size: clamp(.72rem, 1.4vmin, .95rem); letter-spacing: .2em; color: var(--aged-light); text-transform: uppercase; animation: fadeUp .4s var(--ease-out) both .2s; }
+.intro-label { font-size: clamp(1.7rem, 5.4vmin, 3.4rem); color: var(--gold-bright); text-shadow: 0 0 30px rgba(200,146,42,.35); margin: 0; animation: fadeUp .4s var(--ease-out) both .25s; }
+.intro-howto { font-family: var(--font-garamond); font-size: clamp(1.05rem, 2.6vmin, 1.75rem); color: var(--parchment); max-width: 38ch; line-height: 1.4; animation: fadeUp .4s var(--ease-out) both .35s; }
+.intro-progress { width: min(340px, 70%); height: 4px; background: rgba(255,255,255,.12); border-radius: 999px; margin-top: var(--sp-5); overflow: hidden; }
+.intro-progress-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--gold-muted), var(--gold-bright)); box-shadow: 0 0 10px rgba(200,146,42,.5); }
 
 /* ─── 11. Question screen ────────────────────────────────────────────────── */
 #screen-question { padding-top: 0; }
-.question-col { width: 100%; max-width: var(--col-max); display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; }
+/* margin-block:auto centres the column when the question is short and quietly
+   gives up when it is tall — unlike justify-content:center, which would clip
+   the top of a long map/draw question on a small screen. */
+.question-col {
+  width: 100%; max-width: var(--col-max);
+  margin-block: auto;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding-block: var(--sp-3) var(--sp-5);
+}
 
+/* Full-bleed sticky bar. align-self:stretch + negative side margins make it
+   span the whole screen; .play-bar-inner re-centres its contents on the column. */
 .play-bar {
   position: sticky; top: 0; z-index: 20;
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px;
-  margin: 0 -16px 4px;
-  background: rgba(26,18,8,.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(232,201,122,.18);
+  align-self: stretch;
+  margin: 0 -16px;
+  padding: var(--sp-2) 16px;
+  background: rgba(22,15,7,.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(232,201,122,.2);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
   color: var(--parchment);
+}
+.play-bar-inner {
+  width: 100%; max-width: var(--col-max); margin: 0 auto;
+  display: flex; align-items: center; gap: 10px;
 }
 .play-cat { display: flex; align-items: center; gap: 8px; min-width: 0; font-family: var(--font-cinzel); font-size: .78rem; font-weight: 700; letter-spacing: .05em; color: var(--gold-pale); overflow: hidden; }
 .play-cat > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .play-cat-emoji { font-size: 1.25rem; }
-.play-round { font-family: var(--font-cinzel); font-size: .8rem; color: var(--aged-light); white-space: nowrap; padding-left: 8px; border-left: 1px solid rgba(232,201,122,.2); }
+.play-round { font-family: var(--font-cinzel); font-size: .8rem; color: var(--aged-light); white-space: nowrap; padding-left: var(--sp-2); border-left: 1px solid rgba(232,201,122,.2); font-variant-numeric: tabular-nums; }
 .play-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
 
 /* Timer ring */
-.timer-ring { position: relative; width: 48px; height: 48px; flex-shrink: 0; }
-.timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-ring { position: relative; width: 48px; height: 48px; flex-shrink: 0; will-change: transform; }
+.timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
 .timer-ring-track { fill: none; stroke: rgba(255,255,255,.12); stroke-width: 4; }
 .timer-ring-fill {
   fill: none; stroke: var(--gold); stroke-width: 4; stroke-linecap: round;
   stroke-dasharray: 125.66; stroke-dashoffset: 0;
-  transition: stroke-dashoffset .12s linear, stroke .4s ease;
+  filter: drop-shadow(0 0 4px rgba(200,146,42,.45));
+  transition: stroke-dashoffset .12s linear, stroke .4s ease, filter .4s ease;
 }
-.timer-ring.warn   .timer-ring-fill { stroke: var(--warn); }
-.timer-ring.danger .timer-ring-fill { stroke: #c9352b; }
-.timer-ring.paused .timer-ring-fill { stroke: var(--aged); }
+.timer-ring.warn   .timer-ring-fill { stroke: var(--warn);  filter: drop-shadow(0 0 5px rgba(208,100,42,.5)); }
+.timer-ring.danger .timer-ring-fill { stroke: #c9352b; filter: drop-shadow(0 0 7px rgba(201,53,43,.65)); }
+.timer-ring.paused .timer-ring-fill { stroke: var(--aged); filter: none; }
 .timer-ring-text {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -692,6 +807,8 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 
 .prompt-card {
   background: var(--parchment);
+  background-image: var(--paper-grain);
+  background-size: var(--paper-grain-size);
   border: 1px solid var(--parchment-dark);
   border-top: 3px solid var(--gold);
   border-radius: var(--radius-lg);
@@ -699,7 +816,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   box-shadow: 0 8px 30px rgba(0,0,0,.4);
   animation: fadeUp .3s var(--ease-out) both;
 }
-.question-photo { max-height: 260px; width: auto; margin: 0 auto 14px; border-radius: var(--radius); border: 1px solid var(--parchment-dark); }
+.question-photo { max-height: 260px; width: auto; margin: 0 auto var(--sp-3); border-radius: var(--radius); border: 1px solid var(--parchment-dark); box-shadow: 0 3px 12px rgba(0,0,0,.22); }
 .question-text { font-family: var(--font-lora); font-size: 1.3rem; font-weight: 600; line-height: 1.4; text-align: center; color: var(--ink); }
 .question-text:empty { display: none; }
 
@@ -708,18 +825,24 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 
 .locked-banner {
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 12px 16px;
+  padding: var(--sp-3) var(--sp-4);
   background: var(--ink); color: var(--gold-pale);
-  border: 1px solid rgba(232,201,122,.3);
+  border: 1px solid rgba(232,201,122,.34);
   border-radius: var(--radius);
+  box-shadow: 0 0 24px rgba(200,146,42,.16), 0 4px 16px rgba(0,0,0,.35);
   font-family: var(--font-cinzel); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
   animation: popIn .35s var(--spring) both;
 }
 .locked-icon { font-size: 1rem; }
 
-.answer-progress { color: var(--aged-light); font-family: var(--font-cinzel); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; text-align: center; }
-.progress-track { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-.progress-fill { height: 100%; width: 0; background: var(--gold); transition: width .4s var(--ease-out); }
+.answer-progress { color: var(--aged-light); font-family: var(--font-cinzel); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; text-align: center; font-variant-numeric: tabular-nums; }
+.progress-track { height: 6px; background: rgba(255,255,255,.09); border: 1px solid rgba(232,201,122,.12); border-radius: 999px; margin-top: var(--sp-2); overflow: hidden; }
+.progress-fill {
+  height: 100%; width: 0; border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-muted), var(--gold-bright));
+  box-shadow: 0 0 10px rgba(200,146,42,.45);
+  transition: width .45s var(--ease-out);
+}
 
 /* ─── 12. Answer result ──────────────────────────────────────────────────── */
 .result-split {
@@ -729,13 +852,16 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   box-shadow: 0 12px 48px rgba(0,0,0,.55), 0 2px 0 var(--gold-muted);
 }
 .result-left {
+  position: relative;
   background: var(--ink); color: var(--parchment);
+  background-image: radial-gradient(circle, rgba(200,146,42,.05) 1px, transparent 1px);
+  background-size: 22px 22px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 36px 26px; text-align: center;
   border-right: 1px solid rgba(200,146,42,.2);
 }
-.result-left h2 { color: var(--parchment); margin-bottom: 4px; font-size: 1.5rem; }
-.result-icon { font-size: 3.4rem; line-height: 1; margin-bottom: 12px; }
+.result-left h2 { color: var(--parchment); margin-bottom: var(--sp-1); font-size: 1.5rem; }
+.result-icon { font-size: 3.4rem; line-height: 1; margin-bottom: var(--sp-3); filter: drop-shadow(0 4px 18px rgba(0,0,0,.5)); }
 .result-icon.pop { animation: popIn .45s var(--spring) both; }
 .result-subtitle { font-family: var(--font-garamond); font-style: italic; color: var(--aged-light); font-size: 1rem; }
 .result-html { width: 100%; margin-top: 12px; }
@@ -756,9 +882,16 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .acc-label { font-family: var(--font-cinzel); font-size: .58rem; letter-spacing: .12em; text-transform: uppercase; color: var(--aged); margin-top: 4px; }
 .acc-speed { font-family: var(--font-cinzel); font-size: 1rem; font-weight: 700; color: var(--correct); max-width: 22ch; line-height: 1.4; }
 .acc-speed.zero { color: var(--wrong); }
-.acc-pending { font-family: var(--font-garamond); font-style: italic; color: var(--aged); font-size: 1rem; }
+/* Two supporting lines used to look identical; the "what happens next" line is
+   now the quiet one and the "what you scored" line carries the weight. */
+.acc-pending { font-family: var(--font-cinzel); font-size: .66rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-muted); max-width: 26ch; line-height: 1.6; }
 .streak-note { font-family: var(--font-cinzel); font-size: .74rem; font-weight: 700; color: var(--warn); letter-spacing: .04em; animation: popIn .4s var(--spring) both .4s; }
-.coming-up { margin-top: 12px; font-family: var(--font-garamond); font-style: italic; color: var(--aged-light); font-size: .95rem; }
+.coming-up {
+  margin-top: var(--sp-3); padding-top: var(--sp-3);
+  border-top: 1px solid rgba(200,146,42,.3);
+  width: min(220px, 80%);
+  font-family: var(--font-garamond); font-style: italic; color: var(--aged-light); font-size: .95rem;
+}
 
 /* Shared "compare" boxes for module result HTML (dark panel, light-on-dark) */
 .compare-grid { display: flex; gap: 8px; margin-bottom: 6px; }
@@ -800,6 +933,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   margin-bottom: 14px;
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   color: var(--correct);
+  box-shadow: 0 0 0 3px rgba(42,110,69,.07), 0 3px 12px rgba(42,110,69,.12);
   animation: fadeUp .3s var(--ease-out) both;
 }
 .cr-tag { font-family: var(--font-cinzel); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: rgba(42,110,69,.12); border: 1px solid rgba(42,110,69,.25); border-radius: 3px; padding: 2px 7px; white-space: nowrap; }
@@ -810,7 +944,7 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .lb-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
 .lb-row {
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px;
+  padding: 10px 12px;
   background: var(--parchment-mid);
   border: 1px solid var(--parchment-dark);
   border-left: 3px solid var(--parchment-dark);
@@ -820,13 +954,18 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 }
 .lb-row.me { border-left-color: var(--lapis); background: linear-gradient(to right, rgba(30,58,110,.08), var(--parchment-mid)); }
 .lb-row.offline { opacity: .7; }
-.lb-list .lb-row:nth-child(1) { border-left-color: var(--gold-bright); background: linear-gradient(to right, rgba(200,146,42,.14), var(--parchment-mid)); }
+/* Leader gets a soft gold halo — the one row the whole room looks at. */
+.lb-list .lb-row:nth-child(1) {
+  border-left-color: var(--gold-bright);
+  background: linear-gradient(to right, rgba(200,146,42,.16), var(--parchment-mid));
+  box-shadow: 0 0 0 1px rgba(200,146,42,.35), 0 4px 18px rgba(200,146,42,.18);
+}
 .lb-list .lb-row:nth-child(2) { border-left-color: #8090a8; }
 .lb-list .lb-row:nth-child(3) { border-left-color: #96572a; }
 .lb-list .lb-row:nth-child(1) .lb-rank { color: var(--gold); }
-.lb-rank { font-family: var(--font-cinzel); font-weight: 900; font-size: .9rem; color: var(--aged); min-width: 22px; text-align: center; }
+.lb-rank { font-family: var(--font-cinzel); font-weight: 900; font-size: 1rem; color: var(--aged); min-width: 26px; text-align: center; font-variant-numeric: tabular-nums; }
 .lb-body { flex: 1; min-width: 0; }
-.lb-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.lb-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
 .lb-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
 .you { font-family: var(--font-cinzel); font-size: .55rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: var(--lapis); color: var(--parchment); border-radius: 3px; padding: 1px 5px; }
 .offline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--aged-light); display: inline-block; }
@@ -836,11 +975,24 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .lb-metric { color: var(--aged); font-style: italic; font-family: var(--font-garamond); font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-round { font-family: var(--font-cinzel); font-weight: 700; color: var(--correct); font-size: .82rem; white-space: nowrap; }
 .lb-round.zero { color: var(--aged-light); }
-.lb-chips { margin-top: 3px; font-family: var(--font-cinzel); font-size: .6rem; letter-spacing: .05em; text-transform: uppercase; color: var(--aged); }
+.lb-chips { margin-top: var(--sp-1); font-family: var(--font-cinzel); font-size: .62rem; font-weight: 600; letter-spacing: .035em; text-transform: uppercase; color: var(--gold-muted); line-height: 1.35; }
 
-.lb-footer { margin-top: 16px; text-align: center; }
-.lb-footer .hint { min-height: 1.4em; }
+.lb-footer { margin-top: var(--sp-4); text-align: center; }
+.lb-footer .hint { min-height: 1.4em; font-variant-numeric: tabular-nums; }
 .lb-footer .btn { max-width: 360px; margin-left: auto; margin-right: auto; }
+
+/* Autoplay drain bar (see paintLbBar in client.js) */
+.lb-countdown {
+  height: 4px; border-radius: 999px; overflow: hidden;
+  background: rgba(140,122,94,.18);
+  margin: 0 auto var(--sp-2); max-width: 360px;
+}
+.lb-countdown-fill {
+  display: block; height: 100%; width: 100%;
+  transform-origin: left center;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-muted), var(--gold-bright));
+}
 
 /* ─── 14. Game over ──────────────────────────────────────────────────────── */
 #screen-game-over { position: relative; }
@@ -849,33 +1001,51 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .gameover-title { text-align: center; font-size: 1.9rem; color: var(--gold); text-shadow: 0 0 20px rgba(200,146,42,.3); margin-bottom: 2px; }
 .gameover .hint.center { margin-bottom: 14px; }
 
-.podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: end; margin: 8px 0 22px; }
-.podium-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; animation: podiumRise .6s var(--spring) both; }
+.podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-2); align-items: end; margin: var(--sp-2) 0 var(--sp-5); }
+/* justify-content:flex-end + a fixed-height block below is what keeps the three
+   plinths sitting on one common baseline whatever the name/score lines do. */
+.podium-slot {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: var(--sp-1);
+  animation: podiumRise .7s cubic-bezier(.16,1.1,.3,1) both;
+}
 .podium-slot.empty { visibility: hidden; }
 .podium-name { font-weight: 600; font-size: .92rem; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
-.podium-score { font-family: var(--font-cinzel); font-weight: 900; color: var(--gold-muted); font-size: 1rem; }
+.podium-score { font-family: var(--font-cinzel); font-weight: 900; color: var(--gold-muted); font-size: 1rem; font-variant-numeric: tabular-nums; margin-bottom: var(--sp-1); }
 .podium-block {
   width: 100%; display: flex; align-items: center; justify-content: center;
   font-family: var(--font-cinzel); font-weight: 900; color: var(--parchment);
   border-radius: var(--radius) var(--radius) 0 0;
   background: linear-gradient(to bottom, var(--ink-light), var(--ink));
   border-top: 3px solid var(--gold);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
 }
-.place-1 .podium-block { height: 96px; font-size: 1.8rem; background: linear-gradient(to bottom, #6b4810, var(--ink)); }
-.place-2 .podium-block { height: 68px; border-top-color: #8090a8; }
+.place-1 .podium-block {
+  height: 104px; font-size: 1.9rem;
+  background: linear-gradient(to bottom, #a4761d 0%, #6b4810 45%, var(--ink) 100%);
+  border-top-color: var(--gold-bright);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 -6px 26px rgba(200,146,42,.28);
+}
+.place-2 .podium-block { height: 72px; border-top-color: #8090a8; }
 .place-3 .podium-block { height: 48px; border-top-color: #96572a; }
-.place-1 .avatar-lg { width: 52px; height: 52px; font-size: 1.3rem; box-shadow: 0 0 0 3px var(--gold), 0 4px 12px rgba(0,0,0,.3); }
-@keyframes podiumRise { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+.place-1 .podium-score { color: var(--gold); font-size: 1.15rem; }
+.place-1 .avatar-lg { width: 56px; height: 56px; font-size: 1.4rem; box-shadow: 0 0 0 3px var(--gold), 0 0 22px rgba(200,146,42,.45), 0 4px 12px rgba(0,0,0,.3); }
+@keyframes podiumRise { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }
 
-.awards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; margin-bottom: 22px; }
+/* Two columns from tablet up, so the usual four awards land as a tidy 2×2
+   instead of "three and a lonely one". */
+.awards { display: grid; grid-template-columns: 1fr; gap: var(--sp-2); margin-bottom: var(--sp-5); }
+@media (min-width: 560px) { .awards { grid-template-columns: 1fr 1fr; } }
 .award {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: var(--sp-3);
   padding: 10px 12px;
   background: #fff;
   border: 1px solid var(--parchment-dark);
+  border-left: 3px solid var(--gold-muted);
   border-radius: var(--radius);
   animation: popIn .45s var(--spring) both;
+  transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast);
 }
+.award:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
 .award-emoji { font-size: 1.8rem; }
 .award-title { font-family: var(--font-cinzel); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-muted); }
 .award-who { font-weight: 700; }
@@ -895,25 +1065,80 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   .timer-ring.urgent { animation: none; }
 }
 
-/* TV mode: the host's big shared screen. Wider column, larger type, no chrome. */
+/* ── TV mode ──────────────────────────────────────────────────────────────
+   The host's device is a shared screen several metres away, so everything the
+   room needs to read gets noticeably bigger — not just the question text. The
+   rule of thumb used here: nothing smaller than ~0.9rem survives on a TV. */
 body.tv { --col-max: 1100px; font-size: 1.15rem; }
 body.tv .question-text { font-size: 1.9rem; }
-body.tv .play-bar { padding: 12px 20px; }
-body.tv .play-cat { font-size: 1rem; }
-body.tv .play-cat-emoji { font-size: 1.6rem; }
-body.tv .timer-ring { width: 64px; height: 64px; }
-body.tv .timer-ring-text { font-size: 1.25rem; }
+body.tv .prompt-card { padding: 26px 32px; }
+body.tv .play-bar { padding: var(--sp-3) var(--sp-5); }
+body.tv .play-bar-inner { gap: var(--sp-4); }
+body.tv .play-cat { font-size: 1.05rem; }
+body.tv .play-cat-emoji { font-size: 1.7rem; }
+body.tv .play-round { font-size: 1.05rem; padding-left: var(--sp-3); }
+body.tv .icon-btn { width: 52px; height: 52px; font-size: 1.3rem; }
+body.tv .timer-ring { width: 68px; height: 68px; }
+body.tv .timer-ring-text { font-size: 1.35rem; }
 body.tv .card-wide { max-width: 1100px; }
-body.tv .lb-row { padding: 12px 16px; }
-body.tv .lb-name { font-size: 1.2rem; }
-body.tv .lb-total { font-size: 1.35rem; }
-body.tv .lb-chips { font-size: .72rem; }
-body.tv .intro-label { font-size: 3.2rem; }
-body.tv .intro-howto { font-size: 1.7rem; }
-body.tv .intro-emoji { font-size: 7rem; }
+body.tv .locked-banner { font-size: 1rem; padding: var(--sp-4) var(--sp-5); }
+
+/* Leaderboard on a TV */
+body.tv .lb-head h2 { font-size: 1.9rem; }
+body.tv .lb-row { padding: var(--sp-3) var(--sp-4); }
+body.tv .lb-rank { font-size: 1.4rem; min-width: 36px; }
+body.tv .lb-row > .avatar { width: 38px; height: 38px; font-size: 1.05rem; }
+body.tv .lb-name { font-size: 1.3rem; }
+body.tv .lb-total { font-size: 1.5rem; }
+body.tv .lb-metric { font-size: 1.1rem; }
+body.tv .lb-round { font-size: 1.05rem; }
+body.tv .lb-chips { font-size: .82rem; }
+body.tv .lb-sort-label { font-size: .82rem; }
+body.tv .cr-answer { font-size: 1.35rem; }
+body.tv .cr-tag { font-size: .78rem; }
+body.tv .lb-footer .hint { font-size: 1.25rem; }
+body.tv .lb-countdown { max-width: 520px; height: 6px; }
+body.tv .final-badge { font-size: .88rem; padding: 7px 16px; }
+/* Give the module reveal (map, chart, grid…) real estate on the big screen */
+body.tv .reveal-area.has-reveal { margin-bottom: var(--sp-5); }
+
+/* TV leaderboard in two columns: the reveal on the left, the standings on the
+   right. Stacked, this screen was ~1 600 px tall on a 1080p TV and nobody
+   scrolls a television. :has() means it only kicks in when there IS a reveal —
+   browsers without :has() simply keep the one-column stack. */
+@media (min-width: 1100px) {
+  body.tv .lb-main:has(.reveal-area.has-reveal) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    column-gap: var(--sp-5);
+    align-items: start;
+  }
+  body.tv .lb-main:has(.reveal-area.has-reveal) .lb-row   { padding: 9px var(--sp-3); }
+  body.tv .lb-main:has(.reveal-area.has-reveal) .lb-name  { font-size: 1.15rem; }
+  body.tv .lb-main:has(.reveal-area.has-reveal) .lb-total { font-size: 1.3rem; }
+}
+
+/* Lobby / intro / results on a TV */
+body.tv .intro-emoji { font-size: clamp(5rem, 14vmin, 9rem); }
+body.tv .intro-label { font-size: clamp(2.6rem, 7vmin, 4.6rem); }
+body.tv .intro-howto { font-size: clamp(1.5rem, 3.6vmin, 2.4rem); }
+body.tv .intro-round { font-size: 1.1rem; }
+body.tv .intro-ribbon, body.tv .intro-final { font-size: .9rem; padding: 8px 18px; }
 body.tv .game-code { font-size: 4rem; }
 body.tv .qr { width: 260px; height: 260px; }
-body.tv .answer-progress { font-size: 1rem; }
+body.tv .settings-summary { font-size: 1.15rem; }
+body.tv .pchip { font-size: 1.15rem; min-height: 48px; }
+body.tv .answer-progress { font-size: 1.15rem; }
+body.tv .progress-track { height: 8px; }
+body.tv .gameover-title { font-size: 2.6rem; }
+body.tv .podium-name { font-size: 1.25rem; }
+body.tv .podium-score { font-size: 1.4rem; }
+body.tv .place-1 .podium-block { height: 150px; font-size: 2.6rem; }
+body.tv .place-2 .podium-block { height: 104px; }
+body.tv .place-3 .podium-block { height: 72px; }
+body.tv .award-title { font-size: .82rem; }
+body.tv .award-who { font-size: 1.2rem; }
+body.tv .award-detail { font-size: 1.05rem; }
 
 /* Large screens: let the home hero breathe */
 @media (min-width: 1400px) { .home { max-width: 860px; } }
@@ -943,16 +1168,17 @@ body.tv .answer-progress { font-size: 1rem; }
   .segmented > button { flex: 1; padding: 8px 6px; }
   .game-code { font-size: 2rem; letter-spacing: .2em; }
   .qr { width: 150px; height: 150px; }
-  .play-bar { margin: 0 -10px 4px; padding: 6px 10px; gap: 8px; }
+  .play-bar { margin: 0 -10px; padding: 6px 10px; }
+  .play-bar-inner { gap: var(--sp-2); }
   .play-cat { font-size: .7rem; }
-  .play-round { display: none; }
-  .question-col { gap: 10px; }
+  /* The round counter used to be hidden below 500 px — players want to know how
+     far through the game they are, so keep it and shrink it instead. */
+  .play-round { font-size: .68rem; padding-left: 6px; }
+  .question-col { gap: 10px; padding-block: 10px var(--sp-4); }
   .prompt-card { padding: 14px 14px; }
   .question-text { font-size: 1.12rem; }
-  .intro-label { font-size: 1.7rem; }
-  .intro-howto { font-size: 1.1rem; }
-  .intro-emoji { font-size: 4rem; }
-  .lb-row { padding: 8px 10px; gap: 8px; }
+  /* intro type is handled by clamp() — no per-breakpoint sizes needed */
+  .lb-row { padding: 9px 10px; gap: var(--sp-2); }
   .lb-metric { font-size: .88rem; }
   .podium-name { font-size: .8rem; }
   .gameover-actions { grid-template-columns: 1fr; }
@@ -963,6 +1189,7 @@ body.tv .answer-progress { font-size: 1rem; }
   .pill-row > button { min-width: 44px; padding: 8px 10px; }
   .chip { padding: 8px 10px; font-size: .85rem; }
   .lb-top { flex-wrap: wrap; }
+  .play-round { display: none; }          /* only now is the bar genuinely out of room */
 }
 
 /* Very short landscape phones: don't waste vertical space */

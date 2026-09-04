@@ -25,7 +25,7 @@
   padding: 8px;
   background: var(--parchment);
   border: 1px solid var(--parchment-dark);
-  border-radius: 4px;
+  border-radius: var(--panel-radius);
   box-shadow: 0 6px 24px rgba(0,0,0,.35);
   margin-bottom: 18px;
   opacity: 0;

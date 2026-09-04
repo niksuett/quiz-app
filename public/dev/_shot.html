@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>QuizBlast — screenshot harness</title>
+</head>
+<body>
+<script>
+// ═════════════════════════════════════════════════════════════════════════════
+// _shot.html — screen harness for design work (sibling of harness.html, which
+// tests one game MODULE; this one poses the whole APP on any screen).
+//
+// It boots the REAL index.html markup + the REAL client.js, but replaces the
+// socket.io connection with a stub, so we can push any server event we like and
+// park the app on any screen. Headless Chrome then screenshots it:
+//
+//   chrome --headless --screenshot=x.png --window-size=1280,1000 \
+//          "http://localhost:3000/dev/_shot.html?screen=leaderboard-map"
+//
+// It is a dev tool only (never linked from the game) — safe to delete.
+// ═════════════════════════════════════════════════════════════════════════════
+
+const P = new URLSearchParams(location.search);
+const SCREEN = P.get('screen') || 'home';
+const TV = P.get('tv') === '1';
+
+// ── 1. Fake socket.io ────────────────────────────────────────────────────────
+const LSN = {};   // NOT "L" — that is Leaflet.'s global
+window.io = function () {
+  return {
+    on(ev, fn) { (LSN[ev] = LSN[ev] || []).push(fn); },
+    once(ev, fn) { const w = d => { fn(d); LSN[ev] = (LSN[ev] || []).filter(x => x !== w); }; (LSN[ev] = LSN[ev] || []).push(w); },
+    off() {}, emit() {},
+    io: { on() {} },
+  };
+};
+const fire = (ev, data) => (LSN[ev] || []).slice().forEach(f => { try { f(data); } catch (e) { console.error(ev, e); } });
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function load(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.async = false; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+
+// ── 2. Sample payloads: reuse the ones from the module harness ───────────────
+let SAMPLES = {};
+async function loadSamples() {
+  const txt = await fetch('/dev/harness.html').then(r => r.text());
+  const start = txt.indexOf('const SU_WHALE');
+  const end = txt.indexOf('// Harness plumbing');
+  const src = txt.slice(start, txt.lastIndexOf('};', end) + 2);
+  // eslint-disable-next-line no-new-func
+  SAMPLES = new Function(src + '; return SAMPLES;')();
+}
+
+// ── 3. Fake players / leaderboard ────────────────────────────────────────────
+const NICKS = ['Nikki', 'Sam', 'Ada', 'Bogdan', 'Marie-Louise', 'Tom', 'Zoë', 'Ravi'];
+const lobbyPlayers = NICKS.map((n, i) => ({ nickname: n, connected: i !== 6 }));
+
+function fakeLeaderboard(type) {
+  return NICKS.map((n, i) => ({
+    nickname: n,
+    score: 940 - i * 97,
+    roundPoints: [150, 130, 100, 87, 74, 61, 0, 44][i],
+    roundRank: i + 1,
+    accuracyPts: [100, 80, 85, 87, 74, 61, 0, 44][i],
+    rankBonus: [50, 30, 15, 0, 0, 0, 0, 0][i],
+    streakBonus: i === 0 ? 20 : 0,
+    streak: i === 0 ? 4 : (i === 1 ? 2 : 0),
+    quality: i === 6 ? null : 1 - i * 0.1,
+    detail: i === 6 ? null : (SAMPLES[type] && SAMPLES[type].detail) || { x: 1 },
+    elapsed: 2000 + i * 900,
+    speedTiebreak: i === 1,
+    speedTiebreakedOut: i === 2,
+    connected: i !== 6,
+    stats: { avgAccuracy: 82 - i * 4, firsts: i === 0 ? 3 : 0, perfects: i < 2 ? 2 - i : 0, longestStreak: 4 - i > 0 ? 4 - i : 0 },
+  }));
+}
+
+const CATS = {
+  mc: { id: 'trivia', label: 'Trivia', emoji: '🧠', group: 'classic', howTo: 'Tap the answer you think is right.' },
+  flag: { id: 'flags', label: 'Flags', emoji: '🚩', group: 'classic', howTo: 'Whose flag is this? Tap the country.' },
+  slider: { id: 'estimation', label: 'Estimation', emoji: '📏', group: 'classic', howTo: 'Drag the slider to your best guess.' },
+  timeline: { id: 'timeline', label: 'Timeline', emoji: '⏳', group: 'classic', howTo: 'Drag to the year you think it happened.' },
+  map: { id: 'geo-cities', label: 'Cities', emoji: '🏙️', group: 'map', howTo: 'Tap the map where you think it is.' },
+  sequence: { id: 'sequence', label: 'Sequence', emoji: '🔢', group: 'classic', howTo: 'Drag the four items into the right order.' },
+  trace: { id: 'borders', label: 'Border Draw', emoji: '🖊️', group: 'draw', howTo: 'Draw a single line where the border runs.' },
+  halves: { id: 'halves', label: 'Half & Half', emoji: '⚖️', group: 'draw', howTo: 'Draw the line that splits the population in half.' },
+  curve: { id: 'curves', label: 'Draw the Curve', emoji: '📈', group: 'draw', howTo: 'Draw how you think the line continues.' },
+  compass: { id: 'compass', label: 'Compass', emoji: '🧭', group: 'map', howTo: 'Point the needle at the target.' },
+  tune: { id: 'tunes', label: 'Name That Tune', emoji: '🎵', group: 'classic', howTo: 'Listen, then tap the title.' },
+  silhouette: { id: 'silhouettes', label: 'Silhouettes', emoji: '🌑', group: 'classic', howTo: 'Which country has this shape?' },
+  sizeup: { id: 'sizeup', label: 'Size Up', emoji: '🐋', group: 'draw', howTo: 'Resize it against the reference object.' },
+  fakes: { id: 'fakes', label: 'Spot the Fakes', emoji: '🕵️', group: 'classic', howTo: 'Tap every item that is made up.' },
+};
+
+// ── 4. Screen drivers ────────────────────────────────────────────────────────
+function hostCreated(mode) {
+  fire('game-created', { gameId: 'K7X2QM', gameMode: mode || 'mobile', autoplay: true, hostToken: 't', totalQuestions: 10 });
+}
+
+async function drive() {
+  const [kind, type] = SCREEN.split(/-(.+)/);
+  const t = type && CATS[type] ? type : 'map';
+  const cat = CATS[t];
+
+  if (SCREEN === 'home') return;
+
+  if (SCREEN === 'config') { document.getElementById('btn-host').click(); await sleep(900); return; }
+  if (SCREEN === 'join') { document.getElementById('btn-join').click(); document.getElementById('join-code').value = 'K7X2QM'; document.getElementById('join-nickname').value = 'Nikki'; document.getElementById('join-nickname').dispatchEvent(new Event('input')); return; }
+
+  if (SCREEN === 'host-lobby') { hostCreated(TV ? 'tv' : 'mobile'); fire('lobby-update', { players: lobbyPlayers }); return; }
+  if (SCREEN === 'host-lobby-empty') { hostCreated('mobile'); fire('lobby-update', { players: [] }); return; }
+  if (SCREEN === 'player-lobby') {
+    fire('join-success', { gameId: 'K7X2QM', nickname: 'Nikki', playerToken: 't' });
+    fire('lobby-update', { players: lobbyPlayers });
+    return;
+  }
+
+  if (kind === 'intro') {
+    hostCreated(TV ? 'tv' : 'mobile');
+    fire('question-intro', { questionNumber: 3, totalQuestions: 10, type: t, category: cat, firstTime: true, durationMs: 60000 });
+    return;
+  }
+
+  if (kind === 'question' || kind === 'result' || kind === 'leaderboard') {
+    hostCreated(TV ? 'tv' : 'mobile');
+    fire('lobby-update', { players: lobbyPlayers });
+    if (!TV) { document.getElementById('host-nickname-input').value = 'Nikki'; }
+    fire('new-question', {
+      questionNumber: 4, totalQuestions: 10, type: t, category: cat, timeLimit: 30,
+      payload: (SAMPLES[t] || {}).payload || {},
+    });
+    await sleep(1400);
+    if (kind === 'question') { fire('answer-progress', { answered: 5, total: 8 }); return; }
+
+    if (kind === 'result') {
+      fire('answer-result', Object.assign({ type: t, soundCorrect: true }, (SAMPLES[t] || {}).result || {}));
+      await sleep(2200);
+      return;
+    }
+
+    fire('show-leaderboard', {
+      leaderboard: fakeLeaderboard(t), correctText: 'Reykjavík, Iceland', type: t, category: cat,
+      questionNumber: 4, totalQuestions: 10, isLast: false, multiplier: 1, autoplay: true,
+      revealSeconds: 60, remainingMs: 60000, reveal: (SAMPLES[t] || {}).reveal || null,
+    });
+    await sleep(4200);
+    return;
+  }
+
+  if (SCREEN === 'gameover') {
+    hostCreated(TV ? 'tv' : 'mobile');
+    fire('game-over', {
+      totalQuestions: 10,
+      leaderboard: fakeLeaderboard('map'),
+      awards: [
+        { emoji: '⚡', title: 'Fastest finger', nickname: 'Sam', detail: '1.2 s average' },
+        { emoji: '🎯', title: 'Sharpshooter', nickname: 'Nikki', detail: '92% average accuracy' },
+        { emoji: '🗺️', title: 'Best navigator', nickname: 'Ada', detail: '38 km average miss' },
+        { emoji: '🔥', title: 'On a roll', nickname: 'Nikki', detail: '4 in a row' },
+      ],
+    });
+    await sleep(400);
+    return;
+  }
+}
+
+// ── 5. Boot ──────────────────────────────────────────────────────────────────
+(async function () {
+  const html = await fetch('/index.html').then(r => r.text());
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.head.querySelectorAll('link').forEach(l => {
+    const c = l.cloneNode(true);
+    const href = l.getAttribute('href') || '';
+    // index.html uses relative hrefs ("style.css"); this page lives in /dev/, so
+    // make them absolute or they 404.
+    if (href && !/^[a-z][a-z0-9+.-]*:/i.test(href) && !href.startsWith('//') && href[0] !== '/') c.setAttribute('href', '/' + href);
+    document.head.appendChild(c);
+  });
+  document.body.className = doc.body.className;
+  document.body.insertAdjacentHTML('beforeend', doc.body.innerHTML.replace(/<script[\s\S]*?<\/script>/g, ''));
+
+  await loadSamples();
+  await load('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+  await load('/client.js');
+  document.dispatchEvent(new Event('DOMContentLoaded'));
+  await sleep(120);
+  await drive();
+  await sleep(400);
+  // Headless Chrome's virtual clock does not reliably advance CSS animations, so
+  // entrance animations would be frozen halfway through the shot. Collapse every
+  // animation/transition to ~0 so each element lands on its finished state.
+  const s = document.createElement('style');
+  s.textContent = '*, *::before, *::after { animation-delay: 0s !important; animation-duration: 1ms !important; transition-duration: 1ms !important; transition-delay: 0s !important; }';
+  document.head.appendChild(s);
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('entering'));
+  await sleep(500);
+  document.title = 'READY ' + SCREEN;
+  const m = document.createElement('div'); m.id = '__ready'; document.body.appendChild(m);
+})();
+</script>
+</body>
+</html>

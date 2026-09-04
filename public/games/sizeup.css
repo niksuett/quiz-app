@@ -1,0 +1,284 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/sizeup.css — "Size It Up" (type "sizeup")
+   Prefix: .su-      Theme tokens come from style.css.
+
+   Sections
+     1. Colours & the question card
+     2. The stage (baseline + two silhouettes + captions)
+     3. The log slider, its value bubble and the lock button
+     4. Result screen mini comparison (sits in the dark ink panel)
+     5. Leaderboard reveal (true scene + a row of everyone's guess)
+     6. TV mode, small phones, reduced motion
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Colours & question card ─────────────────────────────────────────── */
+.su-wrap {
+  --su-ref: #8c6b2e;                 /* brown reference silhouette (= --gold-muted) */
+  --su-tgt: #a33;                    /* red target silhouette */
+  width: 100%;
+  padding: 18px 16px 20px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  text-align: center;
+  opacity: 0;
+  animation: suIn .3s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes suIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.su-hint {
+  font-family: var(--font-garamond);
+  font-size: .98rem;
+  font-style: italic;
+  color: var(--aged);
+  margin-bottom: 10px;
+}
+.su-hint b { font-style: normal; font-weight: 600; color: var(--ink-light); }
+
+.su-credit {
+  margin-top: 6px;
+  font-family: var(--font-garamond);
+  font-size: .66rem;
+  color: var(--aged-light);
+  opacity: .75;
+}
+
+/* ─── 2. The stage ───────────────────────────────────────────────────────── */
+/* The SVG fills the box above the caption band; both silhouettes stand on the
+   baseline drawn at its bottom edge. touch-action:none lets us handle the
+   two-finger pinch ourselves instead of the browser zooming the page. */
+.su-stage {
+  position: relative;
+  height: clamp(190px, 40vh, 330px);
+  padding-bottom: 38px;                     /* caption band */
+  background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(213,200,180,.18));
+  border: 1px solid var(--parchment-dark);
+  border-radius: 4px;
+  touch-action: none;
+  user-select: none; -webkit-user-select: none;
+  overflow: hidden;
+}
+.su-stage.is-pinching { cursor: grabbing; }
+.su-svg { display: block; width: 100%; height: 100%; }
+
+.su-ground { stroke: var(--ink-light); stroke-width: 1.5; opacity: .5; }
+.su-shadow { fill: rgba(26,18,8,.13); }
+.su-fig-ref { color: var(--su-ref); }
+.su-fig-tgt { color: var(--su-tgt); transition: none; }
+/* The stage lives inside .su-wrap during the question and inside .su-reveal in
+   the leaderboard — repeat the colours so both parents work. */
+.su-reveal .su-fig-ref { color: #8c6b2e; }
+.su-reveal .su-fig-tgt { color: #a33; }
+
+.su-caps { position: absolute; left: 0; right: 0; bottom: 4px; height: 34px; }
+.su-cap {
+  position: absolute;
+  transform: translateX(-50%);
+  max-width: 46%;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  line-height: 1.15;
+}
+.su-cap-name {
+  font-family: var(--font-cinzel); font-size: .74rem; font-weight: 700;
+  letter-spacing: .03em; color: var(--ink); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.su-cap-size {
+  font-family: var(--font-cinzel); font-size: .68rem; font-variant-numeric: tabular-nums;
+  color: var(--gold-muted); white-space: nowrap;
+}
+.su-cap-ref .su-cap-size { color: var(--gold-muted); }
+.su-cap-tgt .su-cap-size { color: var(--gold); font-weight: 700; }
+.su-cap.is-tiny .su-cap-size { font-style: italic; opacity: .8; }
+
+/* ─── 3. Controls: log slider + bubble + lock ────────────────────────────── */
+.su-controls { margin-top: 14px; }
+
+.su-track { position: relative; padding: 30px 0 4px; }
+.su-range {
+  --su-pct: 50%;
+  width: 100%; height: 44px;                 /* 44px = comfortable tap target */
+  margin: 0;
+  -webkit-appearance: none; appearance: none;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.su-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold) 0 var(--su-pct), var(--parchment-dark) var(--su-pct) 100%);
+}
+.su-range::-moz-range-track    { height: 6px; border-radius: 3px; background: var(--parchment-dark); }
+.su-range::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--gold); }
+.su-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px; height: 30px; margin-top: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--gold));
+  border: 2px solid var(--parchment);
+  box-shadow: 0 2px 8px rgba(200,146,42,.55), 0 0 0 3px rgba(200,146,42,.18);
+  transition: transform .12s ease;
+}
+.su-range::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--gold));
+  border: 2px solid var(--parchment);
+  box-shadow: 0 2px 8px rgba(200,146,42,.55);
+}
+.su-range:active::-webkit-slider-thumb, .su-range:focus-visible::-webkit-slider-thumb { transform: scale(1.15); }
+.su-range:disabled { opacity: .7; cursor: default; }
+
+/* The value bubble rides above the thumb. */
+.su-bubble {
+  position: absolute; top: 0; left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  background: var(--ink);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.28);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.su-bubble::after {
+  content: ''; position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%);
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--ink);
+}
+.su-bubble-val {
+  font-family: var(--font-cinzel); font-size: 1.18rem; font-weight: 900;
+  color: var(--gold-bright); font-variant-numeric: tabular-nums;
+}
+
+/* A small marker on the track showing where the reference size sits. */
+.su-refmark {
+  position: absolute; bottom: 4px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  pointer-events: none;
+}
+.su-refmark i { width: 2px; height: 10px; background: var(--gold-muted); opacity: .7; border-radius: 1px; }
+.su-refmark span {
+  font-family: var(--font-cinzel); font-size: .58rem; letter-spacing: .04em;
+  color: var(--gold-muted); white-space: nowrap; margin-top: 1px; opacity: .85;
+}
+
+.su-bounds {
+  display: flex; justify-content: space-between;
+  margin-top: 14px; padding: 0 2px;
+  font-family: var(--font-cinzel); font-size: .68rem; letter-spacing: .04em;
+  color: var(--aged); font-variant-numeric: tabular-nums;
+}
+
+.su-lock { margin-top: 16px; width: auto !important; display: inline-block; padding: 14px 40px; min-height: 48px; }
+.su-lock:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
+.su-wrap.is-locked .su-lock { background: var(--correct-bg); color: var(--correct); border-color: var(--correct); opacity: 1; }
+.su-wrap.is-locked .su-stage { opacity: .92; }
+.su-wrap.is-locked .su-bubble { background: var(--correct); }
+.su-wrap.is-locked .su-bubble::after { border-top-color: var(--correct); }
+.su-wrap.is-locked .su-bubble-val { color: #eaf6ee; }
+
+.su-host-hint {
+  margin-top: 6px;
+  font-family: var(--font-garamond); font-style: italic;
+  color: var(--aged); font-size: 1rem;
+}
+
+/* ─── 4. Result screen mini comparison (dark ink panel) ──────────────────── */
+.su-rcmp {
+  display: flex; align-items: flex-end; justify-content: center; gap: 22px;
+  margin-top: 14px; width: 100%; max-width: 360px;
+  padding: 10px 12px 8px;
+  background: rgba(245,237,224,.06);
+  border-radius: 4px;
+}
+.su-rcell { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.su-rfig { display: flex; align-items: flex-end; height: 92px; }
+.su-rfig svg { display: block; }
+.su-rlabel {
+  font-family: var(--font-cinzel); font-size: .56rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: rgba(200,180,140,.6); margin-top: 4px;
+}
+.su-rsize {
+  font-family: var(--font-cinzel); font-size: 1rem; font-weight: 700;
+  color: var(--parchment); font-variant-numeric: tabular-nums;
+}
+.su-rcell.is-truth .su-rsize { color: var(--gold-bright); }
+.su-rdiff { margin-top: 8px; font-family: var(--font-garamond); font-style: italic; font-size: .95rem; color: rgba(245,237,224,.72); }
+
+/* ─── 5. Leaderboard reveal ──────────────────────────────────────────────── */
+.su-reveal {
+  width: 100%;
+  padding: 14px 16px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: var(--panel-rule);
+  border-radius: var(--panel-radius);
+}
+.su-rv-title {
+  text-align: center;
+  font-family: var(--font-cinzel); font-size: .64rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--aged); margin-bottom: 10px;
+}
+.su-rv-title2 { margin-top: 16px; }
+.su-rv-scene .su-stage { height: clamp(170px, 32vh, 280px); background: linear-gradient(180deg, rgba(255,255,255,.4), rgba(213,200,180,.12)); }
+.su-rv-punch {
+  margin-top: 10px; text-align: center;
+  font-family: var(--font-garamond); font-size: 1.02rem; color: var(--ink-light);
+  opacity: 0; animation: suFade .4s ease .5s forwards;
+}
+.su-rv-punch b { font-weight: 600; color: var(--ink); }
+@keyframes suFade { to { opacity: 1; } }
+
+/* One chip per player, ordered by guessed size; the gold star chip is the truth. */
+.su-rv-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 4px 10px; }
+.su-rv-item {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  min-width: 44px; max-width: 120px;
+  padding: 2px 4px 4px;
+  border-radius: 4px;
+  opacity: 0;
+  animation: suPop .38s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes suPop {
+  from { opacity: 0; transform: translateY(8px) scale(.9); }
+  to   { opacity: 1; transform: none; }
+}
+.su-rv-fig { display: flex; align-items: flex-end; }
+.su-rv-fig svg { display: block; }
+.su-rv-name {
+  font-family: var(--font-cinzel); font-size: .66rem; font-weight: 700; color: var(--ink);
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px;
+}
+.su-rv-size { font-family: var(--font-cinzel); font-size: .62rem; color: var(--aged); font-variant-numeric: tabular-nums; }
+.su-rv-item.is-truth { background: rgba(200,146,42,.16); box-shadow: 0 0 0 1px rgba(200,146,42,.5) inset; }
+.su-rv-item.is-truth .su-rv-name { color: var(--gold-muted); }
+.su-rv-item.is-truth .su-rv-size { color: var(--gold-muted); font-weight: 700; }
+.su-rv-item.is-me { background: rgba(30,58,110,.10); box-shadow: 0 0 0 1px var(--lapis) inset; }
+.su-rv-nobody { font-family: var(--font-garamond); font-style: italic; color: var(--aged); }
+
+/* ─── 6. TV mode, small phones, reduced motion ───────────────────────────── */
+.su-wrap.is-tv { padding: 26px 34px 28px; }
+.su-wrap.is-tv .su-stage { height: clamp(300px, 52vh, 620px); }
+.su-wrap.is-tv .su-hint { font-size: 1.3rem; }
+.su-wrap.is-tv .su-cap-name { font-size: 1.2rem; }
+.su-wrap.is-tv .su-cap-size { font-size: 1.05rem; }
+.su-wrap.is-tv .su-caps { height: 52px; }
+.su-wrap.is-tv .su-stage { padding-bottom: 56px; }
+.su-wrap.is-tv .su-bubble-val { font-size: 1.7rem; }
+.su-wrap.is-tv .su-bounds { font-size: .9rem; }
+.su-wrap.is-tv .su-host-hint { font-size: 1.4rem; }
+
+@media (max-width: 400px) {
+  .su-wrap { padding: 14px 10px 16px; }
+  .su-hint { font-size: .88rem; }
+  .su-bubble-val { font-size: 1rem; }
+  .su-cap-name { font-size: .66rem; }
+  .su-cap-size { font-size: .6rem; }
+  .su-rv-item { min-width: 38px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .su-wrap, .su-rv-item, .su-rv-punch { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
