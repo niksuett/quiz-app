@@ -1,0 +1,218 @@
+[
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[66,1],[66,1],[67,1],[69,1],[69,1],[67,1],[66,1],[64,1],[62,1],[62,1],[64,1],[66,1],[66,1.5],[64,0.5],[64,2]],
+    "bpm": 120, "wave": "square",
+    "answers": ["Ode to Joy", "Pomp and Circumstance", "Hallelujah Chorus", "Bridal Chorus"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[76,0.5],[75,0.5],[76,0.5],[75,0.5],[76,0.5],[71,0.5],[74,0.5],[72,0.5],[69,1.5],[0,0.5],[60,0.5],[64,0.5],[69,0.5],[71,1.5],[0,0.5],[64,0.5],[68,0.5],[71,0.5],[72,1.5]],
+    "bpm": 120, "wave": "triangle",
+    "answers": ["Canon in D", "Für Elise", "Moonlight Sonata", "Turkish March (Mozart)"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[67,1],[62,1],[67,0.5],[62,0.5],[67,0.5],[71,0.5],[74,1],[79,2]],
+    "bpm": 120, "wave": "square",
+    "answers": ["The Blue Danube", "Eine kleine Nachtmusik", "Symphony No. 40 (Mozart)", "Spring (The Four Seasons)"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[71,0.5],[69,0.5],[68,0.5],[69,0.5],[72,1],[74,0.5],[72,0.5],[71,0.5],[72,0.5],[76,1],[77,0.5],[76,0.5],[75,0.5],[76,0.5],[83,0.5],[81,0.5],[80,0.5],[81,0.5],[84,1]],
+    "bpm": 126, "wave": "square",
+    "answers": ["Flight of the Bumblebee", "The Entertainer", "Turkish March (Mozart)", "Hungarian Dance No. 5"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[78,2],[76,2],[74,2],[73,2],[71,2],[69,2],[71,2],[73,2],[74,2],[73,2],[71,2],[69,2],[67,2],[66,2],[67,2],[64,2]],
+    "bpm": 132, "wave": "sine",
+    "answers": ["Clair de Lune", "Moonlight Sonata", "Canon in D", "Air on the G String"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[62,1],[66,1],[69,2],[69,1],[69,1],[0,1],[71,1],[71,1],[0,1],[62,1],[66,1],[69,2],[69,1],[69,1],[0,1],[71,1],[71,1]],
+    "bpm": 174, "wave": "triangle",
+    "answers": ["Waltz of the Flowers", "Radetzky March", "The Blue Danube", "Boléro"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[67,0.5],[67,0.5],[72,1],[67,0.5],[67,0.5],[72,1],[67,0.5],[67,0.5],[72,0.5],[72,0.5],[72,1],[72,0.5],[72,0.5],[76,1],[72,0.5],[72,0.5],[76,1],[72,0.5],[72,0.5],[76,0.5],[76,0.5],[76,1]],
+    "bpm": 160, "wave": "square",
+    "answers": ["Radetzky March", "William Tell Overture (finale)", "Ride of the Valkyries", "1812 Overture"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[66,0.5],[71,1.5],[74,0.5],[71,1.5],[66,0.5],[71,1.5],[74,0.5],[78,1.5],[74,0.5],[71,1.5],[66,0.5],[71,2]],
+    "bpm": 96, "wave": "sawtooth",
+    "answers": ["1812 Overture", "In the Hall of the Mountain King", "Also sprach Zarathustra", "Ride of the Valkyries"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[71,0.5],[73,0.5],[74,0.5],[76,0.5],[74,0.5],[78,0.5],[76,0.5],[74,0.5],[71,0.5],[73,0.5],[74,0.5],[76,0.5],[74,0.5],[78,0.5],[76,0.5],[74,0.5],[71,2]],
+    "bpm": 120, "wave": "square",
+    "answers": ["Morning Mood (Peer Gynt)", "Night on Bald Mountain", "Danse Macabre", "In the Hall of the Mountain King"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 3,
+    "notes": [[76,0.5],[73,0.5],[71,0.5],[69,0.5],[71,0.5],[73,0.5],[76,0.5],[73,0.5],[71,1],[73,0.5],[76,0.5],[73,0.5],[71,0.5],[69,0.5],[71,2]],
+    "bpm": 100, "wave": "sine",
+    "answers": ["The Swan", "Air on the G String", "Clair de Lune", "Morning Mood (Peer Gynt)"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 3,
+    "notes": [[74,0.5],[73,0.5],[72,0.5],[71,0.5],[70,0.5],[69,1],[0,0.5],[69,0.5],[69,0.5],[74,0.5],[73,0.5],[72,0.5],[71,0.5],[70,0.5],[69,1.5]],
+    "bpm": 100, "wave": "triangle",
+    "answers": ["Dance of the Sugar Plum Fairy", "Habanera (Carmen)", "Boléro", "Toreador Song (Carmen)"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[67,0.5],[67,0.5],[67,0.5],[63,3],[0,0.5],[65,0.5],[65,0.5],[65,0.5],[62,3]],
+    "bpm": 108, "wave": "square",
+    "answers": ["Symphony No. 9 (Beethoven)", "The Blue Danube", "Symphony No. 5 (Beethoven)", "Symphony No. 40 (Mozart)"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[75,0.5],[74,0.5],[74,1],[75,0.5],[74,0.5],[74,1],[75,0.5],[74,0.5],[74,1],[82,2]],
+    "bpm": 140, "wave": "triangle",
+    "answers": ["Eine kleine Nachtmusik", "Symphony No. 5 (Beethoven)", "Symphony No. 40 (Mozart)", "Turkish March (Mozart)"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 3,
+    "notes": [[76,1],[80,0.5],[80,0.5],[80,1],[78,0.5],[76,0.5],[78,1],[71,1],[80,1],[83,0.5],[83,0.5],[83,1],[81,0.5],[80,0.5],[81,1],[76,1]],
+    "bpm": 120, "wave": "sine",
+    "answers": ["Water Music", "Spring (The Four Seasons)", "Brandenburg Concerto No. 3", "Canon in D"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[48,1],[55,1],[60,3],[64,2],[63,3],[0,1],[48,1],[55,1],[60,3],[64,2],[63,3]],
+    "bpm": 100, "wave": "sawtooth",
+    "answers": ["Ride of the Valkyries", "Mars (The Planets)", "1812 Overture", "Also sprach Zarathustra"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[81,0.25],[80,0.25],[79,0.25],[78,0.25],[77,0.25],[76,0.25],[75,0.25],[74,0.25],[73,0.25],[72,0.25],[71,0.25],[70,0.25],[69,0.25],[68,0.25],[67,0.25],[66,0.25],[65,0.25],[64,0.25],[63,0.25],[62,0.25],[74,0.25],[73,0.25],[72,0.25],[71,0.25],[70,0.25],[69,0.25],[68,0.25],[67,0.25],[66,0.25],[65,0.25],[64,0.25],[63,0.25],[62,0.5]],
+    "bpm": 110, "wave": "sawtooth",
+    "answers": ["Hungarian Dance No. 5", "Flight of the Bumblebee", "The Entertainer", "Turkish March (Mozart)"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[62,0.25],[63,0.25],[64,0.25],[72,0.5],[64,0.5],[72,0.5],[64,0.5],[72,1.5],[72,0.25],[74,0.25],[75,0.25],[76,0.5],[72,0.5],[74,0.5],[76,1],[71,0.5],[74,0.5],[72,1.5]],
+    "bpm": 96, "wave": "square",
+    "answers": ["Rhapsody in Blue", "The Entertainer", "Maple Leaf Rag", "Alexander's Ragtime Band"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[58,1],[58,0.75],[58,0.25],[58,1],[61,1],[60,0.75],[60,0.25],[58,1],[61,1],[60,0.75],[58,0.25],[58,2]],
+    "bpm": 60, "wave": "triangle",
+    "answers": ["Nocturne in E-flat", "Adagio for Strings", "Ave Maria", "Funeral March (Chopin)"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[64,0.75],[64,0.25],[67,2],[64,0.75],[64,0.25],[67,2],[64,0.5],[67,0.5],[72,1],[71,1],[69,1],[69,1],[67,2]],
+    "bpm": 110, "wave": "sine",
+    "answers": ["Clair de Lune", "Silent Night", "Brahms' Lullaby", "Twinkle Twinkle Little Star"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[56,0.5],[61,0.5],[64,0.5],[56,0.5],[61,0.5],[64,0.5],[56,0.5],[61,0.5],[64,0.5],[56,0.5],[61,0.5],[64,0.5],[57,0.5],[61,0.5],[64,0.5],[57,0.5],[61,0.5],[64,0.5],[57,0.5],[62,0.5],[66,0.5],[57,0.5],[62,0.5],[66,1]],
+    "bpm": 160, "wave": "sine",
+    "answers": ["Nocturne in E-flat", "Moonlight Sonata", "Für Elise", "Clair de Lune"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[69,1],[72,1],[74,1],[76,1.5],[77,0.5],[76,1],[74,1],[71,1],[67,1.5],[69,0.5],[71,1],[72,1],[69,1],[69,1.5],[68,0.5],[69,1],[71,1],[67,2]],
+    "bpm": 140, "wave": "triangle",
+    "answers": ["Greensleeves", "Auld Lang Syne", "Scarborough Fair", "Danny Boy"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[69,1],[69,1],[76,2],[76,1],[78,1],[76,1],[74,2],[72,1],[71,1],[69,3]],
+    "bpm": 120, "wave": "sine",
+    "answers": ["Scarborough Fair", "Danny Boy", "Greensleeves", "The Water Is Wide"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[60,1],[60,1],[67,1],[67,1],[69,1],[69,1],[67,2],[65,1],[65,1],[64,1],[64,1],[62,1],[62,1],[60,2]],
+    "bpm": 120, "wave": "square",
+    "answers": ["London Bridge Is Falling Down", "Row, Row, Row Your Boat", "Frère Jacques", "Twinkle Twinkle Little Star"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[67,0.75],[67,0.25],[69,1],[67,1],[72,1],[71,2],[67,0.75],[67,0.25],[69,1],[67,1],[74,1],[72,2]],
+    "bpm": 130, "wave": "square",
+    "answers": ["For He's a Jolly Good Fellow", "Auld Lang Syne", "Happy Birthday to You", "Jingle Bells"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[60,1],[62,1],[64,1],[60,1],[60,1],[62,1],[64,1],[60,1],[64,1],[65,1],[67,2],[64,1],[65,1],[67,2]],
+    "bpm": 120, "wave": "triangle",
+    "answers": ["Sur le Pont d'Avignon", "Frère Jacques", "Twinkle Twinkle Little Star", "Alouette"], "correct": 1
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[64,1],[64,1],[64,2],[64,1],[64,1],[64,2],[64,1],[67,1],[60,1.5],[62,0.5],[64,4]],
+    "bpm": 130, "wave": "square",
+    "answers": ["Jingle Bells", "We Wish You a Merry Christmas", "Silent Night", "Deck the Halls"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[67,1.5],[69,0.5],[67,1],[64,3],[67,1.5],[69,0.5],[67,1],[64,3],[74,2],[74,1],[71,3],[72,2],[72,1],[67,3]],
+    "bpm": 110, "wave": "sine",
+    "answers": ["O Holy Night", "Away in a Manger", "Silent Night", "The First Noel"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[60,0.5],[65,1.5],[65,0.5],[65,1],[69,1],[67,1.5],[65,0.5],[67,1],[69,1],[65,1.5],[65,0.5],[69,1],[72,1],[74,3]],
+    "bpm": 100, "wave": "triangle",
+    "answers": ["Loch Lomond", "Amazing Grace", "Auld Lang Syne", "Danny Boy"], "correct": 2
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[60,1],[64,1],[65,1],[67,3],[60,1],[64,1],[65,1],[67,3],[60,1],[64,1],[65,1],[67,1],[64,1],[60,1],[64,1],[62,3]],
+    "bpm": 140, "wave": "square",
+    "answers": ["Camptown Races", "Oh! Susanna", "This Little Light of Mine", "When the Saints Go Marching In"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[60,1],[60,1],[62,1],[64,1],[60,1],[64,1],[62,2],[60,1],[60,1],[62,1],[64,1],[65,1],[64,1],[62,1],[60,2]],
+    "bpm": 130, "wave": "square",
+    "answers": ["Yankee Doodle", "Oh! Susanna", "This Old Man", "The Star-Spangled Banner"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[60,0.5],[60,0.5],[60,1],[65,1],[69,2],[60,0.5],[60,0.5],[60,1],[65,1],[69,2],[65,1],[65,1],[64,1],[64,1],[62,1],[62,1],[60,2]],
+    "bpm": 140, "wave": "square",
+    "answers": ["La Cucaracha", "Cielito Lindo", "Guantanamera", "La Bamba"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 2,
+    "notes": [[69,1],[69,1],[71,2],[69,1],[69,1],[71,2],[69,1],[71,1],[72,1],[71,1],[69,1],[71,1],[69,2]],
+    "bpm": 84, "wave": "sine",
+    "answers": ["Arirang", "Kojo no Tsuki", "Mo Li Hua (Jasmine Flower)", "Sakura Sakura"], "correct": 3
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[76,1],[71,0.5],[72,0.5],[74,1],[72,0.5],[71,0.5],[69,1],[69,0.5],[72,0.5],[76,1],[74,0.5],[72,0.5],[71,1.5],[72,0.5],[74,1],[76,1],[72,1],[69,1],[69,2]],
+    "bpm": 150, "wave": "square",
+    "answers": ["Korobeiniki (the Tetris tune)", "Kalinka", "Dark Eyes (Ochi Chyornye)", "Katyusha"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[62,1],[67,2],[71,0.5],[67,0.5],[71,2],[69,1],[67,2],[64,1],[62,3]],
+    "bpm": 100, "wave": "sine",
+    "answers": ["Amazing Grace", "Auld Lang Syne", "Danny Boy", "Swing Low, Sweet Chariot"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[67,0.75],[64,0.25],[60,1],[64,1],[67,1],[72,2],[76,0.75],[74,0.25],[72,1],[64,1],[66,1],[67,2]],
+    "bpm": 100, "wave": "triangle",
+    "answers": ["The Star-Spangled Banner", "America the Beautiful", "God Save the King", "La Marseillaise"], "correct": 0
+  },
+  {
+    "type": "tune", "category": "tunes", "question": "Name that tune", "difficulty": 1,
+    "notes": [[60,1],[65,0.5],[65,0.5],[65,2],[60,1],[65,0.5],[67,0.5],[69,2]],
+    "bpm": 110, "wave": "square",
+    "answers": ["Wedding March (Mendelssohn)", "Bridal Chorus (Here Comes the Bride)", "Pomp and Circumstance", "Ave Maria"], "correct": 1
+  }
+]

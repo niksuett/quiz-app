@@ -1,0 +1,278 @@
+[
+ {
+  "id": "ARG",
+  "name": "Argentina",
+  "total": 45310812,
+  "region": "south-america"
+ },
+ {
+  "id": "AUS",
+  "name": "Australia",
+  "total": 21457276,
+  "region": "oceania"
+ },
+ {
+  "id": "BRA",
+  "name": "Brazil",
+  "total": 217237210,
+  "region": "south-america"
+ },
+ {
+  "id": "CAN",
+  "name": "Canada",
+  "total": 37290835,
+  "region": "north-america"
+ },
+ {
+  "id": "CHL",
+  "name": "Chile",
+  "total": 20819798,
+  "region": "south-america"
+ },
+ {
+  "id": "CHN",
+  "name": "China",
+  "total": 1444325632,
+  "region": "asia"
+ },
+ {
+  "id": "COD",
+  "name": "DR Congo",
+  "total": 114297549,
+  "region": "africa"
+ },
+ {
+  "id": "COL",
+  "name": "Colombia",
+  "total": 63250296,
+  "region": "south-america"
+ },
+ {
+  "id": "DEU",
+  "name": "Germany",
+  "total": 78294623,
+  "region": "europe"
+ },
+ {
+  "id": "DZA",
+  "name": "Algeria",
+  "total": 44181379,
+  "region": "africa"
+ },
+ {
+  "id": "EGY",
+  "name": "Egypt",
+  "total": 96172587,
+  "region": "africa"
+ },
+ {
+  "id": "ESP",
+  "name": "Spain",
+  "total": 50577941,
+  "region": "europe"
+ },
+ {
+  "id": "ETH",
+  "name": "Ethiopia",
+  "total": 103932118,
+  "region": "africa"
+ },
+ {
+  "id": "FIN",
+  "name": "Finland",
+  "total": 5622034,
+  "region": "europe"
+ },
+ {
+  "id": "FRA",
+  "name": "France",
+  "total": 68074302,
+  "region": "europe"
+ },
+ {
+  "id": "GBR",
+  "name": "United Kingdom",
+  "total": 67581154,
+  "region": "europe"
+ },
+ {
+  "id": "GRC",
+  "name": "Greece",
+  "total": 10729435,
+  "region": "europe"
+ },
+ {
+  "id": "IDN",
+  "name": "Indonesia",
+  "total": 284214140,
+  "region": "asia"
+ },
+ {
+  "id": "IND",
+  "name": "India",
+  "total": 1409367664,
+  "region": "asia"
+ },
+ {
+  "id": "IRL",
+  "name": "Ireland",
+  "total": 5510202,
+  "region": "europe"
+ },
+ {
+  "id": "IRN",
+  "name": "Iran",
+  "total": 80382498,
+  "region": "asia"
+ },
+ {
+  "id": "IRQ",
+  "name": "Iraq",
+  "total": 44530593,
+  "region": "asia"
+ },
+ {
+  "id": "ITA",
+  "name": "Italy",
+  "total": 62117313,
+  "region": "europe"
+ },
+ {
+  "id": "JPN",
+  "name": "Japan",
+  "total": 128747772,
+  "region": "asia"
+ },
+ {
+  "id": "KEN",
+  "name": "Kenya",
+  "total": 55224459,
+  "region": "africa"
+ },
+ {
+  "id": "KOR",
+  "name": "South Korea",
+  "total": 52259727,
+  "region": "asia"
+ },
+ {
+  "id": "MAR",
+  "name": "Morocco",
+  "total": 35822090,
+  "region": "africa"
+ },
+ {
+  "id": "MEX",
+  "name": "Mexico",
+  "total": 140555074,
+  "region": "north-america"
+ },
+ {
+  "id": "NGA",
+  "name": "Nigeria",
+  "total": 216798615,
+  "region": "africa"
+ },
+ {
+  "id": "NLD",
+  "name": "Netherlands",
+  "total": 17309470,
+  "region": "europe"
+ },
+ {
+  "id": "NOR",
+  "name": "Norway",
+  "total": 5367078,
+  "region": "europe"
+ },
+ {
+  "id": "NZL",
+  "name": "New Zealand",
+  "total": 4478985,
+  "region": "oceania"
+ },
+ {
+  "id": "PAK",
+  "name": "Pakistan",
+  "total": 231216362,
+  "region": "asia"
+ },
+ {
+  "id": "PER",
+  "name": "Peru",
+  "total": 35869576,
+  "region": "south-america"
+ },
+ {
+  "id": "PHL",
+  "name": "Philippines",
+  "total": 110194169,
+  "region": "asia"
+ },
+ {
+  "id": "POL",
+  "name": "Poland",
+  "total": 39216855,
+  "region": "europe"
+ },
+ {
+  "id": "PRT",
+  "name": "Portugal",
+  "total": 10190482,
+  "region": "europe"
+ },
+ {
+  "id": "RUS",
+  "name": "Russia",
+  "total": 140741755,
+  "region": "europe"
+ },
+ {
+  "id": "SAU",
+  "name": "Saudi Arabia",
+  "total": 37040927,
+  "region": "asia"
+ },
+ {
+  "id": "SWE",
+  "name": "Sweden",
+  "total": 10245940,
+  "region": "europe"
+ },
+ {
+  "id": "THA",
+  "name": "Thailand",
+  "total": 75208653,
+  "region": "asia"
+ },
+ {
+  "id": "TUR",
+  "name": "Turkey",
+  "total": 80832262,
+  "region": "asia"
+ },
+ {
+  "id": "UKR",
+  "name": "Ukraine",
+  "total": 43757807,
+  "region": "europe"
+ },
+ {
+  "id": "USA",
+  "name": "United States",
+  "total": 341127423,
+  "region": "north-america"
+ },
+ {
+  "id": "VNM",
+  "name": "Vietnam",
+  "total": 99488566,
+  "region": "asia"
+ },
+ {
+  "id": "ZAF",
+  "name": "South Africa",
+  "total": 59991128,
+  "region": "africa"
+ }
+]

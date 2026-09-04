@@ -1,0 +1,362 @@
+[
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "IKEA furniture or made up? Tap the FAKES",
+    "items": [
+      { "text": "BILLY", "fake": false },
+      { "text": "POÄNG", "fake": false },
+      { "text": "KALLAX", "fake": false },
+      { "text": "GRUNDÖS", "fake": true },
+      { "text": "SNÖRKEL", "fake": true },
+      { "text": "MALM", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "James Bond film or made up? Tap the FAKES",
+    "items": [
+      { "text": "Goldfinger", "fake": false },
+      { "text": "Skyfall", "fake": false },
+      { "text": "Moonraker", "fake": false },
+      { "text": "Silverstrike", "fake": true },
+      { "text": "Nightfall Protocol", "fake": true },
+      { "text": "Diamond Requiem", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real dinosaur or made up? Tap the FAKES",
+    "items": [
+      { "text": "Triceratops", "fake": false },
+      { "text": "Stegosaurus", "fake": false },
+      { "text": "Velociraptor", "fake": false },
+      { "text": "Draconyx rex", "fake": true },
+      { "text": "Spinolophus", "fake": true },
+      { "text": "Terrorclaw giganticus", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3, "fakeLabel": "Drugs",
+    "question": "Pokémon or pharmaceutical? Tap the DRUGS",
+    "items": [
+      { "text": "Bulbasaur", "fake": false },
+      { "text": "Lamictal", "fake": true },
+      { "text": "Zangief", "fake": false },
+      { "text": "Metronidazole", "fake": true },
+      { "text": "Wigglytuff", "fake": false },
+      { "text": "Ondansetron", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Shakespeare play or made up? Tap the FAKES",
+    "items": [
+      { "text": "Twelfth Night", "fake": false },
+      { "text": "Coriolanus", "fake": false },
+      { "text": "The Winter's Tale", "fake": false },
+      { "text": "The Duke's Lament", "fake": true },
+      { "text": "A Crown of Thorns", "fake": true },
+      { "text": "Measure for Measure", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real US state or made up? Tap the FAKES",
+    "items": [
+      { "text": "Montana", "fake": false },
+      { "text": "West Dakota", "fake": true },
+      { "text": "Vermont", "fake": false },
+      { "text": "New Castile", "fake": true },
+      { "text": "Idaho", "fake": false },
+      { "text": "Delaware", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real chemical element or made up? Tap the FAKES",
+    "items": [
+      { "text": "Rhodium", "fake": false },
+      { "text": "Yttrium", "fake": false },
+      { "text": "Florenium", "fake": true },
+      { "text": "Astatine", "fake": false },
+      { "text": "Corundite", "fake": true },
+      { "text": "Selenium", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Greek god or made up? Tap the FAKES",
+    "items": [
+      { "text": "Hermes", "fake": false },
+      { "text": "Demeter", "fake": false },
+      { "text": "Morvane", "fake": true },
+      { "text": "Hephaestus", "fake": false },
+      { "text": "Kalithros", "fake": true },
+      { "text": "Nemesis", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real constellation or made up? Tap the FAKES",
+    "items": [
+      { "text": "Cassiopeia", "fake": false },
+      { "text": "Lyra", "fake": false },
+      { "text": "Draconis Minor", "fake": true },
+      { "text": "Perseus", "fake": false },
+      { "text": "Vulpecula", "fake": false },
+      { "text": "Orionis Major", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real dog breed or made up? Tap the FAKES",
+    "items": [
+      { "text": "Weimaraner", "fake": false },
+      { "text": "Shiba Inu", "fake": false },
+      { "text": "Highland Snapper", "fake": true },
+      { "text": "Basset Hound", "fake": false },
+      { "text": "Copperback Setter", "fake": true },
+      { "text": "Vizsla", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real cheese or made up? Tap the FAKES",
+    "items": [
+      { "text": "Roquefort", "fake": false },
+      { "text": "Gruyère", "fake": false },
+      { "text": "Manchego", "fake": false },
+      { "text": "Brindlewood", "fake": true },
+      { "text": "Vellcorn", "fake": true },
+      { "text": "Halloumi", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real world capital or made up? Tap the FAKES",
+    "items": [
+      { "text": "Ljubljana", "fake": false },
+      { "text": "Bishkek", "fake": false },
+      { "text": "Vaduzstadt", "fake": true },
+      { "text": "Nouakchott", "fake": false },
+      { "text": "Port Callindra", "fake": true },
+      { "text": "Thimphu", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real NBA team or made up? Tap the FAKES",
+    "items": [
+      { "text": "Milwaukee Bucks", "fake": false },
+      { "text": "Portland Trail Blazers", "fake": false },
+      { "text": "Denver Nuggets", "fake": false },
+      { "text": "Austin Wildcats", "fake": true },
+      { "text": "Cincinnati Rapids", "fake": true },
+      { "text": "Sacramento Kings", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real river or made up? Tap the FAKES",
+    "items": [
+      { "text": "Zambezi", "fake": false },
+      { "text": "Orinoco", "fake": false },
+      { "text": "Kaltoren", "fake": true },
+      { "text": "Irrawaddy", "fake": false },
+      { "text": "Vessalon", "fake": true },
+      { "text": "Yukon", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real board game or made up? Tap the FAKES",
+    "items": [
+      { "text": "Carcassonne", "fake": false },
+      { "text": "Ticket to Ride", "fake": false },
+      { "text": "Foundry of Kings", "fake": true },
+      { "text": "Settlers Rise", "fake": true },
+      { "text": "Pandemic", "fake": false },
+      { "text": "Azul", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real vitamin/mineral or made up? Tap the FAKES",
+    "items": [
+      { "text": "Riboflavin", "fake": false },
+      { "text": "Molybdenum", "fake": false },
+      { "text": "Ferricol", "fake": true },
+      { "text": "Biotin", "fake": false },
+      { "text": "Calcivorin", "fake": true },
+      { "text": "Niacin", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Roman emperor or made up? Tap the FAKES",
+    "items": [
+      { "text": "Vespasian", "fake": false },
+      { "text": "Diocletian", "fake": false },
+      { "text": "Caligula", "fake": false },
+      { "text": "Marcellinus Rex", "fake": true },
+      { "text": "Tiberian Maximus", "fake": true },
+      { "text": "Hadrian", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real sushi roll or made up? Tap the FAKES",
+    "items": [
+      { "text": "California Roll", "fake": false },
+      { "text": "Dragon Roll", "fake": false },
+      { "text": "Crimson Tiger Roll", "fake": true },
+      { "text": "Spider Roll", "fake": false },
+      { "text": "Moonlight Salmon Roll", "fake": true },
+      { "text": "Rainbow Roll", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real dance style or made up? Tap the FAKES",
+    "items": [
+      { "text": "Merengue", "fake": false },
+      { "text": "Kizomba", "fake": false },
+      { "text": "Vollstep", "fake": true },
+      { "text": "Lindy Hop", "fake": false },
+      { "text": "Crestwalk", "fake": true },
+      { "text": "Bharatanatyam", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real volcano or made up? Tap the FAKES",
+    "items": [
+      { "text": "Krakatoa", "fake": false },
+      { "text": "Popocatépetl", "fake": false },
+      { "text": "Mount Erebus", "fake": false },
+      { "text": "Ashfall Cauldera", "fake": true },
+      { "text": "Vulcanor Peak", "fake": true },
+      { "text": "Nyiragongo", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real operating system or made up? Tap the FAKES",
+    "items": [
+      { "text": "Ubuntu", "fake": false },
+      { "text": "FreeBSD", "fake": false },
+      { "text": "ChromaOS Prime", "fake": true },
+      { "text": "Haiku", "fake": false },
+      { "text": "ZenithOS", "fake": true },
+      { "text": "Solaris", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real yoga pose or made up? Tap the FAKES",
+    "items": [
+      { "text": "Downward Dog", "fake": false },
+      { "text": "Crow Pose", "fake": false },
+      { "text": "Wandering Falcon", "fake": true },
+      { "text": "Camel Pose", "fake": false },
+      { "text": "Silver Lotus Twist", "fake": true },
+      { "text": "Pigeon Pose", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real cocktail or made up? Tap the FAKES",
+    "items": [
+      { "text": "Negroni", "fake": false },
+      { "text": "Sazerac", "fake": false },
+      { "text": "Velvet Ember", "fake": true },
+      { "text": "Corpse Reviver", "fake": false },
+      { "text": "Ashfire Fizz", "fake": true },
+      { "text": "Mai Tai", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real butterfly or moth or made up? Tap the FAKES",
+    "items": [
+      { "text": "Monarch", "fake": false },
+      { "text": "Luna Moth", "fake": false },
+      { "text": "Emperor Cloakwing", "fake": true },
+      { "text": "Swallowtail", "fake": false },
+      { "text": "Copperveil Skipper", "fake": true },
+      { "text": "Atlas Moth", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real musical instrument or made up? Tap the FAKES",
+    "items": [
+      { "text": "Hurdy-gurdy", "fake": false },
+      { "text": "Theremin", "fake": false },
+      { "text": "Sarangi", "fake": false },
+      { "text": "Flutterhorn", "fake": true },
+      { "text": "Bellowdrum", "fake": true },
+      { "text": "Bassoon", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real car brand or made up? Tap the FAKES",
+    "items": [
+      { "text": "Škoda", "fake": false },
+      { "text": "Isuzu", "fake": false },
+      { "text": "Ravensworth Motors", "fake": true },
+      { "text": "Seat", "fake": false },
+      { "text": "Draymark Auto", "fake": true },
+      { "text": "Suzuki", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real programming language or made up? Tap the FAKES",
+    "items": [
+      { "text": "Erlang", "fake": false },
+      { "text": "Haskell", "fake": false },
+      { "text": "Verbrix", "fake": true },
+      { "text": "Nim", "fake": false },
+      { "text": "Cobalisp", "fake": true },
+      { "text": "Zig", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Harry Potter spell or made up? Tap the FAKES",
+    "items": [
+      { "text": "Expelliarmus", "fake": false },
+      { "text": "Lumos", "fake": false },
+      { "text": "Fulgurenta", "fake": true },
+      { "text": "Riddikulus", "fake": false },
+      { "text": "Nocturnis Vex", "fake": true },
+      { "text": "Expecto Patronum", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real cloud type or made up? Tap the FAKES",
+    "items": [
+      { "text": "Cumulonimbus", "fake": false },
+      { "text": "Altostratus", "fake": false },
+      { "text": "Vaporcirrus", "fake": true },
+      { "text": "Nimbostratus", "fake": false },
+      { "text": "Featherhaze", "fake": true },
+      { "text": "Cirrocumulus", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real sailing knot or made up? Tap the FAKES",
+    "items": [
+      { "text": "Bowline", "fake": false },
+      { "text": "Clove Hitch", "fake": false },
+      { "text": "Sheet Bend", "fake": false },
+      { "text": "Marlin Cleat", "fake": true },
+      { "text": "Windward Loop", "fake": true },
+      { "text": "Figure Eight", "fake": false }
+    ]
+  }
+]

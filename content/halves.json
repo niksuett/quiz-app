@@ -1,0 +1,370 @@
+[
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Argentina's population in half",
+  "regionId": "ARG",
+  "region": "south-america",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Australia's population in half",
+  "regionId": "AUS",
+  "region": "oceania",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Brazil's population in half",
+  "regionId": "BRA",
+  "region": "south-america",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Canada's population in half",
+  "regionId": "CAN",
+  "region": "north-america",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Chile's population in half",
+  "regionId": "CHL",
+  "region": "south-america",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits China's population in half",
+  "regionId": "CHN",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits DR Congo's population in half",
+  "regionId": "COD",
+  "region": "africa",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Colombia's population in half",
+  "regionId": "COL",
+  "region": "south-america",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Germany's population in half",
+  "regionId": "DEU",
+  "region": "europe",
+  "difficulty": 3
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Algeria's population in half",
+  "regionId": "DZA",
+  "region": "africa",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Egypt's population in half",
+  "regionId": "EGY",
+  "region": "africa",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Spain's population in half",
+  "regionId": "ESP",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Ethiopia's population in half",
+  "regionId": "ETH",
+  "region": "africa",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Finland's population in half",
+  "regionId": "FIN",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits France's population in half",
+  "regionId": "FRA",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits United Kingdom's population in half",
+  "regionId": "GBR",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Greece's population in half",
+  "regionId": "GRC",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Indonesia's population in half",
+  "regionId": "IDN",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits India's population in half",
+  "regionId": "IND",
+  "region": "asia",
+  "difficulty": 3
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Ireland's population in half",
+  "regionId": "IRL",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Iran's population in half",
+  "regionId": "IRN",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Iraq's population in half",
+  "regionId": "IRQ",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Italy's population in half",
+  "regionId": "ITA",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Japan's population in half",
+  "regionId": "JPN",
+  "region": "asia",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Kenya's population in half",
+  "regionId": "KEN",
+  "region": "africa",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits South Korea's population in half",
+  "regionId": "KOR",
+  "region": "asia",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Morocco's population in half",
+  "regionId": "MAR",
+  "region": "africa",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Mexico's population in half",
+  "regionId": "MEX",
+  "region": "north-america",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Nigeria's population in half",
+  "regionId": "NGA",
+  "region": "africa",
+  "difficulty": 3
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Netherlands's population in half",
+  "regionId": "NLD",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Norway's population in half",
+  "regionId": "NOR",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits New Zealand's population in half",
+  "regionId": "NZL",
+  "region": "oceania",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Pakistan's population in half",
+  "regionId": "PAK",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Peru's population in half",
+  "regionId": "PER",
+  "region": "south-america",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Philippines's population in half",
+  "regionId": "PHL",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Poland's population in half",
+  "regionId": "POL",
+  "region": "europe",
+  "difficulty": 3
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Portugal's population in half",
+  "regionId": "PRT",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Russia's population in half",
+  "regionId": "RUS",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Saudi Arabia's population in half",
+  "regionId": "SAU",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Sweden's population in half",
+  "regionId": "SWE",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Thailand's population in half",
+  "regionId": "THA",
+  "region": "asia",
+  "difficulty": 1
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Turkey's population in half",
+  "regionId": "TUR",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Ukraine's population in half",
+  "regionId": "UKR",
+  "region": "europe",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits United States's population in half",
+  "regionId": "USA",
+  "region": "north-america",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits Vietnam's population in half",
+  "regionId": "VNM",
+  "region": "asia",
+  "difficulty": 2
+ },
+ {
+  "type": "halves",
+  "category": "halves",
+  "question": "Draw a line that splits South Africa's population in half",
+  "regionId": "ZAF",
+  "region": "africa",
+  "difficulty": 2
+ }
+]

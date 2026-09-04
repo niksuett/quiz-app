@@ -1,0 +1,634 @@
+[
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Danube",
+    "riverId": "danube",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Rhine",
+    "riverId": "rhine",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Seine",
+    "riverId": "seine",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Loire",
+    "riverId": "loire",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Rhône",
+    "riverId": "rhone",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Thames",
+    "riverId": "thames",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Elbe",
+    "riverId": "elbe",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Oder (the Germany–Poland border river)",
+    "riverId": "oder",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Vistula (Poland)",
+    "riverId": "vistula",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Po (northern Italy)",
+    "riverId": "po",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Tiber (Italy)",
+    "riverId": "tiber",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Ebro (Spain)",
+    "riverId": "ebro",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Tagus (Spain and Portugal)",
+    "riverId": "tagus",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Douro (Spain and Portugal)",
+    "riverId": "douro",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Guadalquivir (southern Spain)",
+    "riverId": "guadalquivir",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Volga",
+    "riverId": "volga",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Don (Russia)",
+    "riverId": "don",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Dnieper (Ukraine)",
+    "riverId": "dnieper",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Sava (the Balkans)",
+    "riverId": "sava",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Dniester (Moldova and Ukraine)",
+    "riverId": "dniester",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Ural (Russia and Kazakhstan)",
+    "riverId": "ural",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Northern Dvina (northern Russia)",
+    "riverId": "northern-dvina",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Yangtze",
+    "riverId": "yangtze",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Yellow River (China)",
+    "riverId": "huanghe",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Mekong",
+    "riverId": "mekong",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Ganges",
+    "riverId": "ganges",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Indus",
+    "riverId": "indus",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Brahmaputra",
+    "riverId": "brahmaputra",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Tigris (Iraq)",
+    "riverId": "tigris",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Euphrates",
+    "riverId": "euphrates",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Jordan",
+    "riverId": "jordan",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Ob (Siberia)",
+    "riverId": "ob",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Irtysh",
+    "riverId": "irtysh",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Yenisey (Siberia)",
+    "riverId": "yenisey",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Lena (Siberia)",
+    "riverId": "lena",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Amur (the Russia–China border river)",
+    "riverId": "amur",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Kolyma (far-eastern Siberia)",
+    "riverId": "kolyma",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Amu Darya (Central Asia)",
+    "riverId": "amudarya",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Syr Darya (Central Asia)",
+    "riverId": "syrdarya",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Irrawaddy (Myanmar)",
+    "riverId": "irrawaddy",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Chao Phraya (Thailand)",
+    "riverId": "chaophraya",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Narmada (India)",
+    "riverId": "narmada",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Nile",
+    "riverId": "nile",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Blue Nile",
+    "riverId": "bluenile",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the White Nile",
+    "riverId": "whitenile",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Congo",
+    "riverId": "congo",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Niger",
+    "riverId": "niger",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Zambezi",
+    "riverId": "zambezi",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Limpopo",
+    "riverId": "limpopo",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Orange River (southern Africa)",
+    "riverId": "orange",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Chari (Chad)",
+    "riverId": "chari",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Gambia River",
+    "riverId": "gambia",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Volta (Ghana)",
+    "riverId": "volta",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Mississippi",
+    "riverId": "mississippi",
+    "difficulty": 1,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Missouri",
+    "riverId": "missouri",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Ohio",
+    "riverId": "ohio",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Rio Grande (the USA–Mexico border river)",
+    "riverId": "riogrande",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Colorado (the river of the Grand Canyon)",
+    "riverId": "colorado",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Columbia",
+    "riverId": "columbia",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Yukon",
+    "riverId": "yukon",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Mackenzie (Canada)",
+    "riverId": "mackenzie",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Fraser (British Columbia)",
+    "riverId": "fraser",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Arkansas River",
+    "riverId": "arkansas",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Nelson (Canada)",
+    "riverId": "nelson",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Usumacinta (Guatemala and Mexico)",
+    "riverId": "usumacinta",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Amazon",
+    "riverId": "amazon",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Paraná",
+    "riverId": "parana",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Orinoco (Venezuela)",
+    "riverId": "orinoco",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the São Francisco (Brazil)",
+    "riverId": "saofrancisco",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Magdalena (Colombia)",
+    "riverId": "magdalena",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Uruguay River",
+    "riverId": "uruguay",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Madeira (the biggest Amazon tributary)",
+    "riverId": "madeira",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Tocantins (Brazil)",
+    "riverId": "tocantins",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Xingu (Brazil)",
+    "riverId": "xingu",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Essequibo (Guyana)",
+    "riverId": "essequibo",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Murray (Australia)",
+    "riverId": "murray",
+    "difficulty": 2,
+    "region": "oceania"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Darling (Australia)",
+    "riverId": "darling",
+    "difficulty": 3,
+    "region": "oceania"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Sepik (Papua New Guinea)",
+    "riverId": "sepik",
+    "difficulty": 3,
+    "region": "oceania"
+  },
+  {
+    "type": "trace",
+    "category": "rivers",
+    "question": "Trace the course of the Waikato (New Zealand)",
+    "riverId": "waikato",
+    "difficulty": 3,
+    "region": "oceania"
+  }
+]

@@ -1,0 +1,1982 @@
+[
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Uzbekistan",
+    "iso3": "UZB",
+    "answers": [
+      "Uzbekistan",
+      "Pakistan",
+      "Kyrgyzstan",
+      "Afghanistan"
+    ],
+    "correct": 0,
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Gambia",
+    "iso3": "GMB",
+    "answers": [
+      "Sierra Leone",
+      "Gambia",
+      "Senegal",
+      "Guinea-Bissau"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Austria",
+    "iso3": "AUT",
+    "answers": [
+      "Czechia",
+      "Bulgaria",
+      "Austria",
+      "Lithuania"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Guatemala",
+    "iso3": "GTM",
+    "answers": [
+      "Nicaragua",
+      "Panama",
+      "Belize",
+      "Guatemala"
+    ],
+    "correct": 3,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Venezuela",
+    "iso3": "VEN",
+    "answers": [
+      "Venezuela",
+      "Peru",
+      "Bolivia",
+      "Ecuador"
+    ],
+    "correct": 0,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Cuba",
+    "iso3": "CUB",
+    "answers": [
+      "Haiti",
+      "Cuba",
+      "Costa Rica",
+      "Honduras"
+    ],
+    "correct": 1,
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Pakistan",
+    "iso3": "PAK",
+    "answers": [
+      "Turkey",
+      "Turkmenistan",
+      "Pakistan",
+      "Iraq"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Yemen",
+    "iso3": "YEM",
+    "answers": [
+      "Iraq",
+      "Turkey",
+      "Syria",
+      "Yemen"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Czechia",
+    "iso3": "CZE",
+    "answers": [
+      "Czechia",
+      "Slovakia",
+      "Latvia",
+      "Hungary"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Afghanistan",
+    "iso3": "AFG",
+    "answers": [
+      "Uzbekistan",
+      "Afghanistan",
+      "Iraq",
+      "Myanmar"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Russia",
+    "iso3": "RUS",
+    "answers": [
+      "India",
+      "Iran",
+      "Russia",
+      "China"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Angola",
+    "iso3": "AGO",
+    "answers": [
+      "DR Congo",
+      "Chad",
+      "Tanzania",
+      "Angola"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Portugal",
+    "iso3": "PRT",
+    "answers": [
+      "Portugal",
+      "Ireland",
+      "Austria",
+      "Croatia"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Australia",
+    "iso3": "AUS",
+    "answers": [
+      "New Zealand",
+      "Australia",
+      "Philippines",
+      "Russia"
+    ],
+    "correct": 1,
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Mozambique",
+    "iso3": "MOZ",
+    "answers": [
+      "South Africa",
+      "Zimbabwe",
+      "Mozambique",
+      "Botswana"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "New Zealand",
+    "iso3": "NZL",
+    "answers": [
+      "Australia",
+      "Vietnam",
+      "Malaysia",
+      "New Zealand"
+    ],
+    "correct": 3,
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Azerbaijan",
+    "iso3": "AZE",
+    "answers": [
+      "Azerbaijan",
+      "Tajikistan",
+      "United Arab Emirates",
+      "Nepal"
+    ],
+    "correct": 0,
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Italy",
+    "iso3": "ITA",
+    "answers": [
+      "Belarus",
+      "Italy",
+      "United Kingdom",
+      "Spain"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Oman",
+    "iso3": "OMN",
+    "answers": [
+      "Afghanistan",
+      "Uzbekistan",
+      "Oman",
+      "Iraq"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Mali",
+    "iso3": "MLI",
+    "answers": [
+      "Chad",
+      "Angola",
+      "Algeria",
+      "Mali"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Poland",
+    "iso3": "POL",
+    "answers": [
+      "Poland",
+      "Germany",
+      "Romania",
+      "Belarus"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Taiwan",
+    "iso3": "TWN",
+    "answers": [
+      "Timor-Leste",
+      "Taiwan",
+      "Laos",
+      "Sri Lanka"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Hungary",
+    "iso3": "HUN",
+    "answers": [
+      "Bosnia and Herzegovina",
+      "Bulgaria",
+      "Hungary",
+      "Serbia"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "China",
+    "iso3": "CHN",
+    "answers": [
+      "Kazakhstan",
+      "India",
+      "Russia",
+      "China"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Egypt",
+    "iso3": "EGY",
+    "answers": [
+      "Egypt",
+      "Chad",
+      "Nigeria",
+      "Ethiopia"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Mongolia",
+    "iso3": "MNG",
+    "answers": [
+      "Kazakhstan",
+      "Mongolia",
+      "Indonesia",
+      "India"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "United States",
+    "iso3": "USA",
+    "answers": [
+      "China",
+      "Brazil",
+      "United States",
+      "Russia"
+    ],
+    "correct": 2,
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Philippines",
+    "iso3": "PHL",
+    "answers": [
+      "Vietnam",
+      "Malaysia",
+      "Cambodia",
+      "Philippines"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Slovakia",
+    "iso3": "SVK",
+    "answers": [
+      "Slovakia",
+      "Croatia",
+      "Bosnia and Herzegovina",
+      "Switzerland"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Estonia",
+    "iso3": "EST",
+    "answers": [
+      "Netherlands",
+      "Estonia",
+      "Switzerland",
+      "Bosnia and Herzegovina"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Nepal",
+    "iso3": "NPL",
+    "answers": [
+      "Tajikistan",
+      "Cambodia",
+      "Nepal",
+      "Bhutan"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Israel",
+    "iso3": "ISR",
+    "answers": [
+      "Jordan",
+      "Armenia",
+      "Lebanon",
+      "Israel"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Colombia",
+    "iso3": "COL",
+    "answers": [
+      "Colombia",
+      "Ecuador",
+      "Venezuela",
+      "Guyana"
+    ],
+    "correct": 0,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Bulgaria",
+    "iso3": "BGR",
+    "answers": [
+      "Romania",
+      "Bulgaria",
+      "Greece",
+      "Austria"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Jordan",
+    "iso3": "JOR",
+    "answers": [
+      "Israel",
+      "Armenia",
+      "Jordan",
+      "Georgia"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Ukraine",
+    "iso3": "UKR",
+    "answers": [
+      "Belarus",
+      "Norway",
+      "Romania",
+      "Ukraine"
+    ],
+    "correct": 3,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Serbia",
+    "iso3": "SRB",
+    "answers": [
+      "Serbia",
+      "Slovakia",
+      "Hungary",
+      "Croatia"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Uruguay",
+    "iso3": "URY",
+    "answers": [
+      "Argentina",
+      "Uruguay",
+      "Paraguay",
+      "Bolivia"
+    ],
+    "correct": 1,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Mauritania",
+    "iso3": "MRT",
+    "answers": [
+      "Mali",
+      "Nigeria",
+      "Mauritania",
+      "Niger"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Bolivia",
+    "iso3": "BOL",
+    "answers": [
+      "Peru",
+      "Venezuela",
+      "Uruguay",
+      "Bolivia"
+    ],
+    "correct": 3,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Peru",
+    "iso3": "PER",
+    "answers": [
+      "Peru",
+      "Colombia",
+      "Chile",
+      "Argentina"
+    ],
+    "correct": 0,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Chile",
+    "iso3": "CHL",
+    "answers": [
+      "Ecuador",
+      "Chile",
+      "Colombia",
+      "Bolivia"
+    ],
+    "correct": 1,
+    "region": "south-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Cameroon",
+    "iso3": "CMR",
+    "answers": [
+      "Central African Republic",
+      "Nigeria",
+      "Cameroon",
+      "Ghana"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Cyprus",
+    "iso3": "CYP",
+    "answers": [
+      "Montenegro",
+      "Lebanon",
+      "Kuwait",
+      "Cyprus"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Haiti",
+    "iso3": "HTI",
+    "answers": [
+      "Haiti",
+      "Bahamas",
+      "El Salvador",
+      "Cuba"
+    ],
+    "correct": 0,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Romania",
+    "iso3": "ROU",
+    "answers": [
+      "Greece",
+      "Romania",
+      "United Kingdom",
+      "Belarus"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Greenland",
+    "iso3": "GRL",
+    "answers": [
+      "Algeria",
+      "United States",
+      "Greenland",
+      "Canada"
+    ],
+    "correct": 2,
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Ghana",
+    "iso3": "GHA",
+    "answers": [
+      "Guinea",
+      "Ivory Coast",
+      "Gabon",
+      "Ghana"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "North Korea",
+    "iso3": "PRK",
+    "answers": [
+      "North Korea",
+      "Tajikistan",
+      "Bangladesh",
+      "Cambodia"
+    ],
+    "correct": 0,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Netherlands",
+    "iso3": "NLD",
+    "answers": [
+      "Slovakia",
+      "Netherlands",
+      "Denmark",
+      "Moldova"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Belgium",
+    "iso3": "BEL",
+    "answers": [
+      "Switzerland",
+      "Slovenia",
+      "Belgium",
+      "Denmark"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "DR Congo",
+    "iso3": "COD",
+    "answers": [
+      "Angola",
+      "Chad",
+      "Libya",
+      "DR Congo"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Senegal",
+    "iso3": "SEN",
+    "answers": [
+      "Senegal",
+      "Ghana",
+      "Sierra Leone",
+      "Burkina Faso"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Germany",
+    "iso3": "DEU",
+    "answers": [
+      "Romania",
+      "Germany",
+      "Norway",
+      "Poland"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Tanzania",
+    "iso3": "TZA",
+    "answers": [
+      "Kenya",
+      "Angola",
+      "Tanzania",
+      "Ethiopia"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Ireland",
+    "iso3": "IRL",
+    "answers": [
+      "Portugal",
+      "Netherlands",
+      "Lithuania",
+      "Ireland"
+    ],
+    "correct": 3,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Malawi",
+    "iso3": "MWI",
+    "answers": [
+      "Malawi",
+      "Mozambique",
+      "Burundi",
+      "Republic of the Congo"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Morocco",
+    "iso3": "MAR",
+    "answers": [
+      "Burkina Faso",
+      "Morocco",
+      "Ivory Coast",
+      "Nigeria"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Finland",
+    "iso3": "FIN",
+    "answers": [
+      "Poland",
+      "Romania",
+      "Finland",
+      "United Kingdom"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Jamaica",
+    "iso3": "JAM",
+    "answers": [
+      "Costa Rica",
+      "Belize",
+      "Panama",
+      "Jamaica"
+    ],
+    "correct": 3,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Kenya",
+    "iso3": "KEN",
+    "answers": [
+      "Kenya",
+      "Zambia",
+      "Central African Republic",
+      "Somalia"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "United Arab Emirates",
+    "iso3": "ARE",
+    "answers": [
+      "Oman",
+      "United Arab Emirates",
+      "Sri Lanka",
+      "Georgia"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Sweden",
+    "iso3": "SWE",
+    "answers": [
+      "Ukraine",
+      "France",
+      "Sweden",
+      "Norway"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "United Kingdom",
+    "iso3": "GBR",
+    "answers": [
+      "Belarus",
+      "Finland",
+      "Norway",
+      "United Kingdom"
+    ],
+    "correct": 3,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Papua New Guinea",
+    "iso3": "PNG",
+    "answers": [
+      "Papua New Guinea",
+      "New Zealand",
+      "Japan",
+      "Thailand"
+    ],
+    "correct": 0,
+    "region": "oceania",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Paraguay",
+    "iso3": "PRY",
+    "answers": [
+      "Peru",
+      "Paraguay",
+      "Ecuador",
+      "Bolivia"
+    ],
+    "correct": 1,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Nigeria",
+    "iso3": "NGA",
+    "answers": [
+      "Egypt",
+      "Mauritania",
+      "Nigeria",
+      "Chad"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Kyrgyzstan",
+    "iso3": "KGZ",
+    "answers": [
+      "Bangladesh",
+      "Oman",
+      "Afghanistan",
+      "Kyrgyzstan"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Belarus",
+    "iso3": "BLR",
+    "answers": [
+      "Belarus",
+      "Greece",
+      "Romania",
+      "Poland"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Ethiopia",
+    "iso3": "ETH",
+    "answers": [
+      "Kenya",
+      "Ethiopia",
+      "Tanzania",
+      "Sudan"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Somalia",
+    "iso3": "SOM",
+    "answers": [
+      "Zambia",
+      "South Sudan",
+      "Somalia",
+      "Central African Republic"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Togo",
+    "iso3": "TGO",
+    "answers": [
+      "Ghana",
+      "Equatorial Guinea",
+      "Senegal",
+      "Togo"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Lebanon",
+    "iso3": "LBN",
+    "answers": [
+      "Lebanon",
+      "Armenia",
+      "Israel",
+      "Cyprus"
+    ],
+    "correct": 0,
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Switzerland",
+    "iso3": "CHE",
+    "answers": [
+      "Albania",
+      "Switzerland",
+      "Bosnia and Herzegovina",
+      "Netherlands"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Brazil",
+    "iso3": "BRA",
+    "answers": [
+      "Argentina",
+      "Venezuela",
+      "Brazil",
+      "Paraguay"
+    ],
+    "correct": 2,
+    "region": "south-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Ivory Coast",
+    "iso3": "CIV",
+    "answers": [
+      "Benin",
+      "Senegal",
+      "Guinea",
+      "Ivory Coast"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Argentina",
+    "iso3": "ARG",
+    "answers": [
+      "Argentina",
+      "Venezuela",
+      "Uruguay",
+      "Paraguay"
+    ],
+    "correct": 0,
+    "region": "south-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "France",
+    "iso3": "FRA",
+    "answers": [
+      "Ukraine",
+      "France",
+      "Poland",
+      "Sweden"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Guinea",
+    "iso3": "GIN",
+    "answers": [
+      "Liberia",
+      "Senegal",
+      "Guinea",
+      "Burkina Faso"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Lithuania",
+    "iso3": "LTU",
+    "answers": [
+      "Latvia",
+      "Serbia",
+      "Austria",
+      "Lithuania"
+    ],
+    "correct": 3,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Guyana",
+    "iso3": "GUY",
+    "answers": [
+      "Guyana",
+      "Colombia",
+      "Bolivia",
+      "Peru"
+    ],
+    "correct": 0,
+    "region": "south-america",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Chad",
+    "iso3": "TCD",
+    "answers": [
+      "Ethiopia",
+      "Chad",
+      "Sudan",
+      "Mali"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Cambodia",
+    "iso3": "KHM",
+    "answers": [
+      "Vietnam",
+      "Malaysia",
+      "Cambodia",
+      "Thailand"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Benin",
+    "iso3": "BEN",
+    "answers": [
+      "Burkina Faso",
+      "Senegal",
+      "Togo",
+      "Benin"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Mexico",
+    "iso3": "MEX",
+    "answers": [
+      "Mexico",
+      "Nicaragua",
+      "Guatemala",
+      "Greenland"
+    ],
+    "correct": 0,
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Qatar",
+    "iso3": "QAT",
+    "answers": [
+      "United Arab Emirates",
+      "Qatar",
+      "Israel",
+      "Kuwait"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "South Korea",
+    "iso3": "KOR",
+    "answers": [
+      "Taiwan",
+      "Japan",
+      "South Korea",
+      "Laos"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Sri Lanka",
+    "iso3": "LKA",
+    "answers": [
+      "Azerbaijan",
+      "Bangladesh",
+      "Georgia",
+      "Sri Lanka"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Uganda",
+    "iso3": "UGA",
+    "answers": [
+      "Uganda",
+      "South Sudan",
+      "Republic of the Congo",
+      "Zimbabwe"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "India",
+    "iso3": "IND",
+    "answers": [
+      "China",
+      "India",
+      "Myanmar",
+      "Mongolia"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Turkey",
+    "iso3": "TUR",
+    "answers": [
+      "Syria",
+      "Iran",
+      "Turkey",
+      "Saudi Arabia"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Myanmar",
+    "iso3": "MMR",
+    "answers": [
+      "Malaysia",
+      "Pakistan",
+      "Cambodia",
+      "Myanmar"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Vietnam",
+    "iso3": "VNM",
+    "answers": [
+      "Vietnam",
+      "Malaysia",
+      "Bangladesh",
+      "Thailand"
+    ],
+    "correct": 0,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Costa Rica",
+    "iso3": "CRI",
+    "answers": [
+      "El Salvador",
+      "Costa Rica",
+      "Dominican Republic",
+      "Guatemala"
+    ],
+    "correct": 1,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Malaysia",
+    "iso3": "MYS",
+    "answers": [
+      "Philippines",
+      "Myanmar",
+      "Malaysia",
+      "Vietnam"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Niger",
+    "iso3": "NER",
+    "answers": [
+      "Nigeria",
+      "Mali",
+      "Central African Republic",
+      "Niger"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Sudan",
+    "iso3": "SDN",
+    "answers": [
+      "Sudan",
+      "Niger",
+      "Libya",
+      "Algeria"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Laos",
+    "iso3": "LAO",
+    "answers": [
+      "Bangladesh",
+      "Laos",
+      "Cambodia",
+      "Vietnam"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Iraq",
+    "iso3": "IRQ",
+    "answers": [
+      "Pakistan",
+      "Oman",
+      "Iraq",
+      "Afghanistan"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Indonesia",
+    "iso3": "IDN",
+    "answers": [
+      "India",
+      "Thailand",
+      "Malaysia",
+      "Indonesia"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Algeria",
+    "iso3": "DZA",
+    "answers": [
+      "Algeria",
+      "Nigeria",
+      "Mauritania",
+      "Sudan"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Namibia",
+    "iso3": "NAM",
+    "answers": [
+      "Zambia",
+      "Namibia",
+      "Botswana",
+      "South Africa"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Thailand",
+    "iso3": "THA",
+    "answers": [
+      "Cambodia",
+      "Malaysia",
+      "Thailand",
+      "Myanmar"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Nicaragua",
+    "iso3": "NIC",
+    "answers": [
+      "Panama",
+      "El Salvador",
+      "Costa Rica",
+      "Nicaragua"
+    ],
+    "correct": 3,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Spain",
+    "iso3": "ESP",
+    "answers": [
+      "Spain",
+      "Ukraine",
+      "France",
+      "Italy"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Japan",
+    "iso3": "JPN",
+    "answers": [
+      "North Korea",
+      "Japan",
+      "Myanmar",
+      "South Korea"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Norway",
+    "iso3": "NOR",
+    "answers": [
+      "Germany",
+      "Italy",
+      "Norway",
+      "Belarus"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Saudi Arabia",
+    "iso3": "SAU",
+    "answers": [
+      "Iraq",
+      "Turkey",
+      "Kazakhstan",
+      "Saudi Arabia"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "South Africa",
+    "iso3": "ZAF",
+    "answers": [
+      "South Africa",
+      "Botswana",
+      "Mozambique",
+      "Namibia"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Panama",
+    "iso3": "PAN",
+    "answers": [
+      "Nicaragua",
+      "Panama",
+      "Cuba",
+      "Guatemala"
+    ],
+    "correct": 1,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Madagascar",
+    "iso3": "MDG",
+    "answers": [
+      "South Sudan",
+      "Zambia",
+      "Madagascar",
+      "Kenya"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Greece",
+    "iso3": "GRC",
+    "answers": [
+      "Bulgaria",
+      "Bosnia and Herzegovina",
+      "Hungary",
+      "Greece"
+    ],
+    "correct": 3,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Tajikistan",
+    "iso3": "TJK",
+    "answers": [
+      "Tajikistan",
+      "Uzbekistan",
+      "Azerbaijan",
+      "Turkmenistan"
+    ],
+    "correct": 0,
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Georgia",
+    "iso3": "GEO",
+    "answers": [
+      "Syria",
+      "Georgia",
+      "Armenia",
+      "Kuwait"
+    ],
+    "correct": 1,
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Iceland",
+    "iso3": "ISL",
+    "answers": [
+      "Hungary",
+      "Lithuania",
+      "Iceland",
+      "Latvia"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Zimbabwe",
+    "iso3": "ZWE",
+    "answers": [
+      "Zambia",
+      "Botswana",
+      "Republic of the Congo",
+      "Zimbabwe"
+    ],
+    "correct": 3,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Ecuador",
+    "iso3": "ECU",
+    "answers": [
+      "Ecuador",
+      "Suriname",
+      "Peru",
+      "Venezuela"
+    ],
+    "correct": 0,
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Libya",
+    "iso3": "LBY",
+    "answers": [
+      "Mali",
+      "Libya",
+      "Algeria",
+      "Nigeria"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Croatia",
+    "iso3": "HRV",
+    "answers": [
+      "Serbia",
+      "Switzerland",
+      "Croatia",
+      "Czechia"
+    ],
+    "correct": 2,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Iran",
+    "iso3": "IRN",
+    "answers": [
+      "Iraq",
+      "Turkmenistan",
+      "India",
+      "Iran"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Dominican Republic",
+    "iso3": "DOM",
+    "answers": [
+      "Dominican Republic",
+      "Panama",
+      "Costa Rica",
+      "Guatemala"
+    ],
+    "correct": 0,
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Suriname",
+    "iso3": "SUR",
+    "answers": [
+      "Colombia",
+      "Suriname",
+      "Ecuador",
+      "Guyana"
+    ],
+    "correct": 1,
+    "region": "south-america",
+    "difficulty": 3
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Canada",
+    "iso3": "CAN",
+    "answers": [
+      "Mexico",
+      "Kazakhstan",
+      "Canada",
+      "Greenland"
+    ],
+    "correct": 2,
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Kazakhstan",
+    "iso3": "KAZ",
+    "answers": [
+      "Saudi Arabia",
+      "Iran",
+      "Uzbekistan",
+      "Kazakhstan"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Denmark",
+    "iso3": "DNK",
+    "answers": [
+      "Denmark",
+      "Estonia",
+      "Belgium",
+      "Slovakia"
+    ],
+    "correct": 0,
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Latvia",
+    "iso3": "LVA",
+    "answers": [
+      "Austria",
+      "Latvia",
+      "Denmark",
+      "Lithuania"
+    ],
+    "correct": 1,
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Tunisia",
+    "iso3": "TUN",
+    "answers": [
+      "Guinea",
+      "Benin",
+      "Tunisia",
+      "Senegal"
+    ],
+    "correct": 2,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Bangladesh",
+    "iso3": "BGD",
+    "answers": [
+      "Nepal",
+      "Tajikistan",
+      "Kyrgyzstan",
+      "Bangladesh"
+    ],
+    "correct": 3,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Zambia",
+    "iso3": "ZMB",
+    "answers": [
+      "Zambia",
+      "Tanzania",
+      "Kenya",
+      "Mozambique"
+    ],
+    "correct": 0,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Botswana",
+    "iso3": "BWA",
+    "answers": [
+      "Zimbabwe",
+      "Botswana",
+      "Namibia",
+      "Mozambique"
+    ],
+    "correct": 1,
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Syria",
+    "iso3": "SYR",
+    "answers": [
+      "Azerbaijan",
+      "Tajikistan",
+      "Syria",
+      "Jordan"
+    ],
+    "correct": 2,
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "silhouette",
+    "category": "silhouettes",
+    "question": "Honduras",
+    "iso3": "HND",
+    "answers": [
+      "Belize",
+      "Guatemala",
+      "Costa Rica",
+      "Honduras"
+    ],
+    "correct": 3,
+    "region": "north-america",
+    "difficulty": 2
+  }
+]

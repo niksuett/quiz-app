@@ -30,7 +30,8 @@ app.use(compression());
 app.use(express.json({ limit: '25mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/data', express.static(path.join(__dirname, 'data'), { maxAge: '1h' }));
+// NOTE: data/ is intentionally NOT served — files like borders.json and halves/*.json contain the answers.
+// Game modules send exactly what the client needs inside each question payload.
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ilikehistory99';

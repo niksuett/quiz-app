@@ -1,0 +1,1674 @@
+[
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Paris, which direction is Berlin?",
+    "from": {
+      "id": "paris",
+      "name": "Paris",
+      "lat": 48.8534,
+      "lng": 2.3488
+    },
+    "to": {
+      "id": "berlin",
+      "name": "Berlin",
+      "lat": 52.5244,
+      "lng": 13.4105
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From London, which direction is Rome?",
+    "from": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "to": {
+      "id": "rome",
+      "name": "Rome",
+      "lat": 41.8919,
+      "lng": 12.5113
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Madrid, which direction is Lisbon?",
+    "from": {
+      "id": "madrid",
+      "name": "Madrid",
+      "lat": 40.4165,
+      "lng": -3.7026
+    },
+    "to": {
+      "id": "lisbon",
+      "name": "Lisbon",
+      "lat": 38.7251,
+      "lng": -9.1498
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Berlin, which direction is Moscow?",
+    "from": {
+      "id": "berlin",
+      "name": "Berlin",
+      "lat": 52.5244,
+      "lng": 13.4105
+    },
+    "to": {
+      "id": "moscow",
+      "name": "Moscow",
+      "lat": 55.752,
+      "lng": 37.6178
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Rome, which direction is Athens?",
+    "from": {
+      "id": "rome",
+      "name": "Rome",
+      "lat": 41.8919,
+      "lng": 12.5113
+    },
+    "to": {
+      "id": "athens",
+      "name": "Athens",
+      "lat": 37.9838,
+      "lng": 23.7278
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Amsterdam, which direction is Vienna?",
+    "from": {
+      "id": "amsterdam",
+      "name": "Amsterdam",
+      "lat": 52.374,
+      "lng": 4.8897
+    },
+    "to": {
+      "id": "vienna",
+      "name": "Vienna",
+      "lat": 48.2085,
+      "lng": 16.3721
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Stockholm, which direction is Madrid?",
+    "from": {
+      "id": "stockholm",
+      "name": "Stockholm",
+      "lat": 59.3294,
+      "lng": 18.0687
+    },
+    "to": {
+      "id": "madrid",
+      "name": "Madrid",
+      "lat": 40.4165,
+      "lng": -3.7026
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Dublin, which direction is Istanbul?",
+    "from": {
+      "id": "dublin",
+      "name": "Dublin",
+      "lat": 53.3331,
+      "lng": -6.2489
+    },
+    "to": {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "lat": 41.0138,
+      "lng": 28.9497
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Lisbon, which direction is Warsaw?",
+    "from": {
+      "id": "lisbon",
+      "name": "Lisbon",
+      "lat": 38.7251,
+      "lng": -9.1498
+    },
+    "to": {
+      "id": "warsaw",
+      "name": "Warsaw",
+      "lat": 52.2298,
+      "lng": 21.0118
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Oslo, which direction is Rome?",
+    "from": {
+      "id": "oslo",
+      "name": "Oslo",
+      "lat": 59.9127,
+      "lng": 10.7461
+    },
+    "to": {
+      "id": "rome",
+      "name": "Rome",
+      "lat": 41.8919,
+      "lng": 12.5113
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Vienna, which direction is London?",
+    "from": {
+      "id": "vienna",
+      "name": "Vienna",
+      "lat": 48.2085,
+      "lng": 16.3721
+    },
+    "to": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Athens, which direction is Paris?",
+    "from": {
+      "id": "athens",
+      "name": "Athens",
+      "lat": 37.9838,
+      "lng": 23.7278
+    },
+    "to": {
+      "id": "paris",
+      "name": "Paris",
+      "lat": 48.8534,
+      "lng": 2.3488
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Barcelona, which direction is Amsterdam?",
+    "from": {
+      "id": "barcelona",
+      "name": "Barcelona",
+      "lat": 41.3888,
+      "lng": 2.159
+    },
+    "to": {
+      "id": "amsterdam",
+      "name": "Amsterdam",
+      "lat": 52.374,
+      "lng": 4.8897
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Copenhagen, which direction is Istanbul?",
+    "from": {
+      "id": "copenhagen",
+      "name": "Copenhagen",
+      "lat": 55.6759,
+      "lng": 12.5655
+    },
+    "to": {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "lat": 41.0138,
+      "lng": 28.9497
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Istanbul, which direction is London?",
+    "from": {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "lat": 41.0138,
+      "lng": 28.9497
+    },
+    "to": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Reykjavik, which direction is Moscow?",
+    "from": {
+      "id": "reykjavik",
+      "name": "Reykjavik",
+      "lat": 64.1355,
+      "lng": -21.8954
+    },
+    "to": {
+      "id": "moscow",
+      "name": "Moscow",
+      "lat": 55.752,
+      "lng": 37.6178
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Zurich, which direction is Stockholm?",
+    "from": {
+      "id": "zurich",
+      "name": "Zurich",
+      "lat": 47.3667,
+      "lng": 8.55
+    },
+    "to": {
+      "id": "stockholm",
+      "name": "Stockholm",
+      "lat": 59.3294,
+      "lng": 18.0687
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Tokyo, which direction is Beijing?",
+    "from": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "to": {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.9075,
+      "lng": 116.3972
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Delhi, which direction is Mumbai?",
+    "from": {
+      "id": "delhi",
+      "name": "Delhi",
+      "lat": 28.6519,
+      "lng": 77.2315
+    },
+    "to": {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "lat": 19.0728,
+      "lng": 72.8826
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Bangkok, which direction is Singapore?",
+    "from": {
+      "id": "bangkok",
+      "name": "Bangkok",
+      "lat": 13.754,
+      "lng": 100.5014
+    },
+    "to": {
+      "id": "singapore",
+      "name": "Singapore",
+      "lat": 1.2897,
+      "lng": 103.8501
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Seoul, which direction is Tokyo?",
+    "from": {
+      "id": "seoul",
+      "name": "Seoul",
+      "lat": 37.566,
+      "lng": 126.9784
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Beijing, which direction is Shanghai?",
+    "from": {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.9075,
+      "lng": 116.3972
+    },
+    "to": {
+      "id": "shanghai",
+      "name": "Shanghai",
+      "lat": 31.2222,
+      "lng": 121.4581
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Hong Kong, which direction is Tokyo?",
+    "from": {
+      "id": "hong-kong",
+      "name": "Hong Kong",
+      "lat": 22.2783,
+      "lng": 114.1747
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Dubai, which direction is Delhi?",
+    "from": {
+      "id": "dubai",
+      "name": "Dubai",
+      "lat": 25.0772,
+      "lng": 55.3093
+    },
+    "to": {
+      "id": "delhi",
+      "name": "Delhi",
+      "lat": 28.6519,
+      "lng": 77.2315
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Singapore, which direction is Hong Kong?",
+    "from": {
+      "id": "singapore",
+      "name": "Singapore",
+      "lat": 1.2897,
+      "lng": 103.8501
+    },
+    "to": {
+      "id": "hong-kong",
+      "name": "Hong Kong",
+      "lat": 22.2783,
+      "lng": 114.1747
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Tehran, which direction is Beijing?",
+    "from": {
+      "id": "tehran",
+      "name": "Tehran",
+      "lat": 35.6944,
+      "lng": 51.4215
+    },
+    "to": {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.9075,
+      "lng": 116.3972
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Riyadh, which direction is Tokyo?",
+    "from": {
+      "id": "riyadh",
+      "name": "Riyadh",
+      "lat": 24.6877,
+      "lng": 46.7219
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Delhi, which direction is Beijing?",
+    "from": {
+      "id": "delhi",
+      "name": "Delhi",
+      "lat": 28.6519,
+      "lng": 77.2315
+    },
+    "to": {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.9075,
+      "lng": 116.3972
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Tokyo, which direction is Singapore?",
+    "from": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "to": {
+      "id": "singapore",
+      "name": "Singapore",
+      "lat": 1.2897,
+      "lng": 103.8501
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Istanbul, which direction is Tokyo?",
+    "from": {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "lat": 41.0138,
+      "lng": 28.9497
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Seoul, which direction is Dubai?",
+    "from": {
+      "id": "seoul",
+      "name": "Seoul",
+      "lat": 37.566,
+      "lng": 126.9784
+    },
+    "to": {
+      "id": "dubai",
+      "name": "Dubai",
+      "lat": 25.0772,
+      "lng": 55.3093
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Cairo, which direction is Cape Town?",
+    "from": {
+      "id": "cairo",
+      "name": "Cairo",
+      "lat": 30.0626,
+      "lng": 31.2497
+    },
+    "to": {
+      "id": "cape-town",
+      "name": "Cape Town",
+      "lat": -33.9258,
+      "lng": 18.4232
+    },
+    "region": "africa",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Nairobi, which direction is Cairo?",
+    "from": {
+      "id": "nairobi",
+      "name": "Nairobi",
+      "lat": -1.2833,
+      "lng": 36.8167
+    },
+    "to": {
+      "id": "cairo",
+      "name": "Cairo",
+      "lat": 30.0626,
+      "lng": 31.2497
+    },
+    "region": "africa",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Lagos, which direction is Nairobi?",
+    "from": {
+      "id": "lagos",
+      "name": "Lagos",
+      "lat": 6.4541,
+      "lng": 3.3947
+    },
+    "to": {
+      "id": "nairobi",
+      "name": "Nairobi",
+      "lat": -1.2833,
+      "lng": 36.8167
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Johannesburg, which direction is Lagos?",
+    "from": {
+      "id": "johannesburg",
+      "name": "Johannesburg",
+      "lat": -26.2023,
+      "lng": 28.0436
+    },
+    "to": {
+      "id": "lagos",
+      "name": "Lagos",
+      "lat": 6.4541,
+      "lng": 3.3947
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Casablanca, which direction is Cairo?",
+    "from": {
+      "id": "casablanca",
+      "name": "Casablanca",
+      "lat": 33.5883,
+      "lng": -7.6114
+    },
+    "to": {
+      "id": "cairo",
+      "name": "Cairo",
+      "lat": 30.0626,
+      "lng": 31.2497
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Addis Ababa, which direction is Dakar?",
+    "from": {
+      "id": "addis-ababa",
+      "name": "Addis Ababa",
+      "lat": 9.025,
+      "lng": 38.7469
+    },
+    "to": {
+      "id": "dakar",
+      "name": "Dakar",
+      "lat": 14.6937,
+      "lng": -17.4441
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From New York, which direction is Los Angeles?",
+    "from": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "to": {
+      "id": "los-angeles",
+      "name": "Los Angeles",
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Chicago, which direction is Miami?",
+    "from": {
+      "id": "chicago",
+      "name": "Chicago",
+      "lat": 41.85,
+      "lng": -87.65
+    },
+    "to": {
+      "id": "miami",
+      "name": "Miami",
+      "lat": 25.7743,
+      "lng": -80.1937
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Toronto, which direction is Mexico City?",
+    "from": {
+      "id": "toronto",
+      "name": "Toronto",
+      "lat": 43.7064,
+      "lng": -79.3986
+    },
+    "to": {
+      "id": "mexico-city",
+      "name": "Mexico City",
+      "lat": 19.4285,
+      "lng": -99.1277
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From San Francisco, which direction is New York?",
+    "from": {
+      "id": "san-francisco",
+      "name": "San Francisco",
+      "lat": 37.7749,
+      "lng": -122.4194
+    },
+    "to": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Vancouver, which direction is Mexico City?",
+    "from": {
+      "id": "vancouver",
+      "name": "Vancouver",
+      "lat": 49.2497,
+      "lng": -123.1193
+    },
+    "to": {
+      "id": "mexico-city",
+      "name": "Mexico City",
+      "lat": 19.4285,
+      "lng": -99.1277
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Seattle, which direction is Miami?",
+    "from": {
+      "id": "seattle",
+      "name": "Seattle",
+      "lat": 47.6062,
+      "lng": -122.3321
+    },
+    "to": {
+      "id": "miami",
+      "name": "Miami",
+      "lat": 25.7743,
+      "lng": -80.1937
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Havana, which direction is Toronto?",
+    "from": {
+      "id": "havana",
+      "name": "Havana",
+      "lat": 23.133,
+      "lng": -82.383
+    },
+    "to": {
+      "id": "toronto",
+      "name": "Toronto",
+      "lat": 43.7064,
+      "lng": -79.3986
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Los Angeles, which direction is Chicago?",
+    "from": {
+      "id": "los-angeles",
+      "name": "Los Angeles",
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "to": {
+      "id": "chicago",
+      "name": "Chicago",
+      "lat": 41.85,
+      "lng": -87.65
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Anchorage, which direction is New York?",
+    "from": {
+      "id": "anchorage",
+      "name": "Anchorage",
+      "lat": 61.2181,
+      "lng": -149.9003
+    },
+    "to": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Buenos Aires, which direction is Rio de Janeiro?",
+    "from": {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "lat": -34.6131,
+      "lng": -58.3772
+    },
+    "to": {
+      "id": "rio-de-janeiro",
+      "name": "Rio de Janeiro",
+      "lat": -22.9064,
+      "lng": -43.1822
+    },
+    "region": "south-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Lima, which direction is Bogotá?",
+    "from": {
+      "id": "lima",
+      "name": "Lima",
+      "lat": -12.0432,
+      "lng": -77.0282
+    },
+    "to": {
+      "id": "bogota",
+      "name": "Bogotá",
+      "lat": 4.6097,
+      "lng": -74.0817
+    },
+    "region": "south-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Santiago, which direction is Buenos Aires?",
+    "from": {
+      "id": "santiago",
+      "name": "Santiago",
+      "lat": -33.4569,
+      "lng": -70.6483
+    },
+    "to": {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "lat": -34.6131,
+      "lng": -58.3772
+    },
+    "region": "south-america",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From São Paulo, which direction is Lima?",
+    "from": {
+      "id": "sao-paulo",
+      "name": "São Paulo",
+      "lat": -23.5475,
+      "lng": -46.6361
+    },
+    "to": {
+      "id": "lima",
+      "name": "Lima",
+      "lat": -12.0432,
+      "lng": -77.0282
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Caracas, which direction is Buenos Aires?",
+    "from": {
+      "id": "caracas",
+      "name": "Caracas",
+      "lat": 10.488,
+      "lng": -66.8792
+    },
+    "to": {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "lat": -34.6131,
+      "lng": -58.3772
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Sydney, which direction is Perth?",
+    "from": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "to": {
+      "id": "perth",
+      "name": "Perth",
+      "lat": -31.9522,
+      "lng": 115.8614
+    },
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Auckland, which direction is Sydney?",
+    "from": {
+      "id": "auckland",
+      "name": "Auckland",
+      "lat": -36.8485,
+      "lng": 174.7635
+    },
+    "to": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Melbourne, which direction is Brisbane?",
+    "from": {
+      "id": "melbourne",
+      "name": "Melbourne",
+      "lat": -37.814,
+      "lng": 144.9633
+    },
+    "to": {
+      "id": "brisbane",
+      "name": "Brisbane",
+      "lat": -27.4679,
+      "lng": 153.0281
+    },
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From London, which direction is New York?",
+    "from": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "to": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Paris, which direction is Cairo?",
+    "from": {
+      "id": "paris",
+      "name": "Paris",
+      "lat": 48.8534,
+      "lng": 2.3488
+    },
+    "to": {
+      "id": "cairo",
+      "name": "Cairo",
+      "lat": 30.0626,
+      "lng": 31.2497
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From London, which direction is Tokyo?",
+    "from": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From New York, which direction is Madrid?",
+    "from": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "to": {
+      "id": "madrid",
+      "name": "Madrid",
+      "lat": 40.4165,
+      "lng": -3.7026
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Singapore, which direction is London?",
+    "from": {
+      "id": "singapore",
+      "name": "Singapore",
+      "lat": 1.2897,
+      "lng": 103.8501
+    },
+    "to": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Cape Town, which direction is Rio de Janeiro?",
+    "from": {
+      "id": "cape-town",
+      "name": "Cape Town",
+      "lat": -33.9258,
+      "lng": 18.4232
+    },
+    "to": {
+      "id": "rio-de-janeiro",
+      "name": "Rio de Janeiro",
+      "lat": -22.9064,
+      "lng": -43.1822
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Johannesburg, which direction is Sydney?",
+    "from": {
+      "id": "johannesburg",
+      "name": "Johannesburg",
+      "lat": -26.2023,
+      "lng": 28.0436
+    },
+    "to": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Dubai, which direction is Sydney?",
+    "from": {
+      "id": "dubai",
+      "name": "Dubai",
+      "lat": 25.0772,
+      "lng": 55.3093
+    },
+    "to": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Rio de Janeiro, which direction is Lisbon?",
+    "from": {
+      "id": "rio-de-janeiro",
+      "name": "Rio de Janeiro",
+      "lat": -22.9064,
+      "lng": -43.1822
+    },
+    "to": {
+      "id": "lisbon",
+      "name": "Lisbon",
+      "lat": 38.7251,
+      "lng": -9.1498
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Cairo, which direction is Mumbai?",
+    "from": {
+      "id": "cairo",
+      "name": "Cairo",
+      "lat": 30.0626,
+      "lng": 31.2497
+    },
+    "to": {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "lat": 19.0728,
+      "lng": 72.8826
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Miami, which direction is Lagos?",
+    "from": {
+      "id": "miami",
+      "name": "Miami",
+      "lat": 25.7743,
+      "lng": -80.1937
+    },
+    "to": {
+      "id": "lagos",
+      "name": "Lagos",
+      "lat": 6.4541,
+      "lng": 3.3947
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Vancouver, which direction is London?",
+    "from": {
+      "id": "vancouver",
+      "name": "Vancouver",
+      "lat": 49.2497,
+      "lng": -123.1193
+    },
+    "to": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Auckland, which direction is Los Angeles?",
+    "from": {
+      "id": "auckland",
+      "name": "Auckland",
+      "lat": -36.8485,
+      "lng": 174.7635
+    },
+    "to": {
+      "id": "los-angeles",
+      "name": "Los Angeles",
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "region": "oceania",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Mumbai, which direction is London?",
+    "from": {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "lat": 19.0728,
+      "lng": 72.8826
+    },
+    "to": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Nairobi, which direction is Sydney?",
+    "from": {
+      "id": "nairobi",
+      "name": "Nairobi",
+      "lat": -1.2833,
+      "lng": 36.8167
+    },
+    "to": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Rome, which direction is Buenos Aires?",
+    "from": {
+      "id": "rome",
+      "name": "Rome",
+      "lat": 41.8919,
+      "lng": 12.5113
+    },
+    "to": {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "lat": -34.6131,
+      "lng": -58.3772
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Honolulu, which direction is Tokyo?",
+    "from": {
+      "id": "honolulu",
+      "name": "Honolulu",
+      "lat": 21.3069,
+      "lng": -157.8583
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "oceania",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Madrid, which direction is Mexico City?",
+    "from": {
+      "id": "madrid",
+      "name": "Madrid",
+      "lat": 40.4165,
+      "lng": -3.7026
+    },
+    "to": {
+      "id": "mexico-city",
+      "name": "Mexico City",
+      "lat": 19.4285,
+      "lng": -99.1277
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Buenos Aires, which direction is Cape Town?",
+    "from": {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "lat": -34.6131,
+      "lng": -58.3772
+    },
+    "to": {
+      "id": "cape-town",
+      "name": "Cape Town",
+      "lat": -33.9258,
+      "lng": 18.4232
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From São Paulo, which direction is Nairobi?",
+    "from": {
+      "id": "sao-paulo",
+      "name": "São Paulo",
+      "lat": -23.5475,
+      "lng": -46.6361
+    },
+    "to": {
+      "id": "nairobi",
+      "name": "Nairobi",
+      "lat": -1.2833,
+      "lng": 36.8167
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Los Angeles, which direction is Tokyo?",
+    "from": {
+      "id": "los-angeles",
+      "name": "Los Angeles",
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Buenos Aires, which direction is Sydney?",
+    "from": {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "lat": -34.6131,
+      "lng": -58.3772
+    },
+    "to": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "region": "south-america",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Moscow, which direction is Los Angeles?",
+    "from": {
+      "id": "moscow",
+      "name": "Moscow",
+      "lat": 55.752,
+      "lng": 37.6178
+    },
+    "to": {
+      "id": "los-angeles",
+      "name": "Los Angeles",
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Delhi, which direction is New York?",
+    "from": {
+      "id": "delhi",
+      "name": "Delhi",
+      "lat": 28.6519,
+      "lng": 77.2315
+    },
+    "to": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From London, which direction is Sydney?",
+    "from": {
+      "id": "london",
+      "name": "London",
+      "lat": 51.5085,
+      "lng": -0.1257
+    },
+    "to": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Tokyo, which direction is San Francisco?",
+    "from": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "to": {
+      "id": "san-francisco",
+      "name": "San Francisco",
+      "lat": 37.7749,
+      "lng": -122.4194
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Sydney, which direction is Santiago?",
+    "from": {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.8678,
+      "lng": 151.2073
+    },
+    "to": {
+      "id": "santiago",
+      "name": "Santiago",
+      "lat": -33.4569,
+      "lng": -70.6483
+    },
+    "region": "oceania",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Seoul, which direction is Paris?",
+    "from": {
+      "id": "seoul",
+      "name": "Seoul",
+      "lat": 37.566,
+      "lng": 126.9784
+    },
+    "to": {
+      "id": "paris",
+      "name": "Paris",
+      "lat": 48.8534,
+      "lng": 2.3488
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Toronto, which direction is Beijing?",
+    "from": {
+      "id": "toronto",
+      "name": "Toronto",
+      "lat": 43.7064,
+      "lng": -79.3986
+    },
+    "to": {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.9075,
+      "lng": 116.3972
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Mexico City, which direction is Tokyo?",
+    "from": {
+      "id": "mexico-city",
+      "name": "Mexico City",
+      "lat": 19.4285,
+      "lng": -99.1277
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Reykjavik, which direction is Tokyo?",
+    "from": {
+      "id": "reykjavik",
+      "name": "Reykjavik",
+      "lat": 64.1355,
+      "lng": -21.8954
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Beijing, which direction is New York?",
+    "from": {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.9075,
+      "lng": 116.3972
+    },
+    "to": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From Hong Kong, which direction is San Francisco?",
+    "from": {
+      "id": "hong-kong",
+      "name": "Hong Kong",
+      "lat": 22.2783,
+      "lng": 114.1747
+    },
+    "to": {
+      "id": "san-francisco",
+      "name": "San Francisco",
+      "lat": 37.7749,
+      "lng": -122.4194
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "type": "compass",
+    "category": "compass",
+    "question": "From New York, which direction is Tokyo?",
+    "from": {
+      "id": "new-york",
+      "name": "New York",
+      "lat": 40.7143,
+      "lng": -74.006
+    },
+    "to": {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.6895,
+      "lng": 139.6917
+    },
+    "region": "north-america",
+    "difficulty": 3
+  }
+]

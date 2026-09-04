@@ -1,0 +1,2306 @@
+[
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Spain and France",
+    "pairId": "ESP-FRA",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Spain and Portugal",
+    "pairId": "ESP-PRT",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Germany and France",
+    "pairId": "DEU-FRA",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Germany and Poland",
+    "pairId": "DEU-POL",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Germany",
+    "pairId": "AUT-DEU",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between France and Italy",
+    "pairId": "FRA-ITA",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Switzerland and France",
+    "pairId": "CHE-FRA",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Switzerland and Italy",
+    "pairId": "CHE-ITA",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Switzerland and Germany",
+    "pairId": "CHE-DEU",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Italy",
+    "pairId": "AUT-ITA",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belgium and France",
+    "pairId": "BEL-FRA",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belgium and the Netherlands",
+    "pairId": "BEL-NLD",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Germany and the Netherlands",
+    "pairId": "DEU-NLD",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belgium and Germany",
+    "pairId": "BEL-DEU",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belgium and Luxembourg",
+    "pairId": "BEL-LUX",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Germany and Luxembourg",
+    "pairId": "DEU-LUX",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Germany and Denmark",
+    "pairId": "DEU-DNK",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Czechia and Germany",
+    "pairId": "CZE-DEU",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Czechia",
+    "pairId": "AUT-CZE",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Czechia and Poland",
+    "pairId": "CZE-POL",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Czechia and Slovakia",
+    "pairId": "CZE-SVK",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Poland and Slovakia",
+    "pairId": "POL-SVK",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Hungary",
+    "pairId": "AUT-HUN",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Hungary and Slovakia",
+    "pairId": "HUN-SVK",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Slovenia",
+    "pairId": "AUT-SVN",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Croatia and Slovenia",
+    "pairId": "HRV-SVN",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Italy and Slovenia",
+    "pairId": "ITA-SVN",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Switzerland",
+    "pairId": "AUT-CHE",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Austria and Slovakia",
+    "pairId": "AUT-SVK",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Croatia and Hungary",
+    "pairId": "HRV-HUN",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Croatia and Serbia",
+    "pairId": "HRV-SRB",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bosnia and Herzegovina and Croatia",
+    "pairId": "BIH-HRV",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bosnia and Herzegovina and Serbia",
+    "pairId": "BIH-SRB",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Hungary and Serbia",
+    "pairId": "HUN-SRB",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Hungary and Romania",
+    "pairId": "HUN-ROU",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Romania and Serbia",
+    "pairId": "ROU-SRB",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bulgaria and Romania",
+    "pairId": "BGR-ROU",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bulgaria and Greece",
+    "pairId": "BGR-GRC",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Albania and Greece",
+    "pairId": "ALB-GRC",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Albania and Montenegro",
+    "pairId": "ALB-MNE",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bulgaria and Serbia",
+    "pairId": "BGR-SRB",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bulgaria and North Macedonia",
+    "pairId": "BGR-MKD",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Greece and North Macedonia",
+    "pairId": "GRC-MKD",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Albania and North Macedonia",
+    "pairId": "ALB-MKD",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Montenegro and Serbia",
+    "pairId": "MNE-SRB",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bosnia and Herzegovina and Montenegro",
+    "pairId": "BIH-MNE",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Moldova and Romania",
+    "pairId": "MDA-ROU",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Romania and Ukraine",
+    "pairId": "ROU-UKR",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Moldova and Ukraine",
+    "pairId": "MDA-UKR",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Hungary and Ukraine",
+    "pairId": "HUN-UKR",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Poland and Ukraine",
+    "pairId": "POL-UKR",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belarus and Ukraine",
+    "pairId": "BLR-UKR",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Russia and Ukraine",
+    "pairId": "RUS-UKR",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belarus and Poland",
+    "pairId": "BLR-POL",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belarus and Russia",
+    "pairId": "BLR-RUS",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belarus and Lithuania",
+    "pairId": "BLR-LTU",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Lithuania and Poland",
+    "pairId": "LTU-POL",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Lithuania and Latvia",
+    "pairId": "LTU-LVA",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Estonia and Latvia",
+    "pairId": "EST-LVA",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Estonia and Russia",
+    "pairId": "EST-RUS",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Latvia and Russia",
+    "pairId": "LVA-RUS",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belarus and Latvia",
+    "pairId": "BLR-LVA",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Finland and Russia",
+    "pairId": "FIN-RUS",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Finland and Sweden",
+    "pairId": "FIN-SWE",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Finland and Norway",
+    "pairId": "FIN-NOR",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Norway and Sweden",
+    "pairId": "NOR-SWE",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Norway and Russia",
+    "pairId": "NOR-RUS",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Poland and Russia",
+    "pairId": "POL-RUS",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Lithuania and Russia",
+    "pairId": "LTU-RUS",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the United Kingdom and Ireland",
+    "pairId": "GBR-IRL",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bulgaria and Türkiye",
+    "pairId": "BGR-TUR",
+    "difficulty": 2,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Greece and Türkiye",
+    "pairId": "GRC-TUR",
+    "difficulty": 1,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Slovakia and Ukraine",
+    "pairId": "SVK-UKR",
+    "difficulty": 3,
+    "region": "europe"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Russia",
+    "pairId": "CHN-RUS",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Mongolia",
+    "pairId": "CHN-MNG",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mongolia and Russia",
+    "pairId": "MNG-RUS",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Kazakhstan",
+    "pairId": "CHN-KAZ",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kazakhstan and Russia",
+    "pairId": "KAZ-RUS",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and North Korea",
+    "pairId": "CHN-PRK",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between South Korea and North Korea",
+    "pairId": "KOR-PRK",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Vietnam",
+    "pairId": "CHN-VNM",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Myanmar",
+    "pairId": "CHN-MMR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Nepal",
+    "pairId": "CHN-NPL",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bhutan and People's Republic of China",
+    "pairId": "BTN-CHN",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between India and Nepal",
+    "pairId": "IND-NPL",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bhutan and India",
+    "pairId": "BTN-IND",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bangladesh and India",
+    "pairId": "BGD-IND",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between India and Pakistan",
+    "pairId": "IND-PAK",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between India and Myanmar",
+    "pairId": "IND-MMR",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Afghanistan and Pakistan",
+    "pairId": "AFG-PAK",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iran and Pakistan",
+    "pairId": "IRN-PAK",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Afghanistan and Iran",
+    "pairId": "AFG-IRN",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iran and Iraq",
+    "pairId": "IRN-IRQ",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iran and Türkiye",
+    "pairId": "IRN-TUR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iraq and Saudi Arabia",
+    "pairId": "IRQ-SAU",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iraq and Syria",
+    "pairId": "IRQ-SYR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iraq and Türkiye",
+    "pairId": "IRQ-TUR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Syria and Türkiye",
+    "pairId": "SYR-TUR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iraq and Jordan",
+    "pairId": "IRQ-JOR",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Jordan and Saudi Arabia",
+    "pairId": "JOR-SAU",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Jordan and Syria",
+    "pairId": "JOR-SYR",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Israel and Jordan",
+    "pairId": "ISR-JOR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Israel and Lebanon",
+    "pairId": "ISR-LBN",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Lebanon and Syria",
+    "pairId": "LBN-SYR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Egypt and Israel",
+    "pairId": "EGY-ISR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Oman and Saudi Arabia",
+    "pairId": "OMN-SAU",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Saudi Arabia and Yemen",
+    "pairId": "SAU-YEM",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Oman and Yemen",
+    "pairId": "OMN-YEM",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the United Arab Emirates and Saudi Arabia",
+    "pairId": "ARE-SAU",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the United Arab Emirates and Oman",
+    "pairId": "ARE-OMN",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kuwait and Saudi Arabia",
+    "pairId": "KWT-SAU",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iraq and Kuwait",
+    "pairId": "IRQ-KWT",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Armenia and Azerbaijan",
+    "pairId": "ARM-AZE",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Armenia and Georgia",
+    "pairId": "ARM-GEO",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Azerbaijan and Georgia",
+    "pairId": "AZE-GEO",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Georgia and Russia",
+    "pairId": "GEO-RUS",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Azerbaijan and Russia",
+    "pairId": "AZE-RUS",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Armenia and Türkiye",
+    "pairId": "ARM-TUR",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Azerbaijan and Iran",
+    "pairId": "AZE-IRN",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Georgia and Türkiye",
+    "pairId": "GEO-TUR",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kazakhstan and Uzbekistan",
+    "pairId": "KAZ-UZB",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kazakhstan and Kyrgyzstan",
+    "pairId": "KAZ-KGZ",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kazakhstan and Turkmenistan",
+    "pairId": "KAZ-TKM",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Turkmenistan and Uzbekistan",
+    "pairId": "TKM-UZB",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Tajikistan and Uzbekistan",
+    "pairId": "TJK-UZB",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kyrgyzstan and Uzbekistan",
+    "pairId": "KGZ-UZB",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Afghanistan and Tajikistan",
+    "pairId": "AFG-TJK",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Afghanistan and Turkmenistan",
+    "pairId": "AFG-TKM",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Afghanistan and Uzbekistan",
+    "pairId": "AFG-UZB",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Kyrgyzstan",
+    "pairId": "CHN-KGZ",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Tajikistan",
+    "pairId": "CHN-TJK",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kyrgyzstan and Tajikistan",
+    "pairId": "KGZ-TJK",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Iran and Turkmenistan",
+    "pairId": "IRN-TKM",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Pakistan",
+    "pairId": "CHN-PAK",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Afghanistan and People's Republic of China",
+    "pairId": "AFG-CHN",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between People's Republic of China and Laos",
+    "pairId": "CHN-LAO",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Laos and Thailand",
+    "pairId": "LAO-THA",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Laos and Vietnam",
+    "pairId": "LAO-VNM",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cambodia and Thailand",
+    "pairId": "KHM-THA",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cambodia and Vietnam",
+    "pairId": "KHM-VNM",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cambodia and Laos",
+    "pairId": "KHM-LAO",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Myanmar and Thailand",
+    "pairId": "MMR-THA",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Laos and Myanmar",
+    "pairId": "LAO-MMR",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Malaysia and Thailand",
+    "pairId": "MYS-THA",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Indonesia and Malaysia",
+    "pairId": "IDN-MYS",
+    "difficulty": 1,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Indonesia and Papua New Guinea",
+    "pairId": "IDN-PNG",
+    "difficulty": 2,
+    "region": "oceania"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Indonesia and Timor-Leste",
+    "pairId": "IDN-TLS",
+    "difficulty": 2,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bangladesh and Myanmar",
+    "pairId": "BGD-MMR",
+    "difficulty": 3,
+    "region": "asia"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Algeria and Morocco",
+    "pairId": "DZA-MAR",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Algeria and Tunisia",
+    "pairId": "DZA-TUN",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Algeria and Libya",
+    "pairId": "DZA-LBY",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Egypt and Libya",
+    "pairId": "EGY-LBY",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Egypt and Sudan",
+    "pairId": "EGY-SDN",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Libya and Tunisia",
+    "pairId": "LBY-TUN",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Algeria and Mali",
+    "pairId": "DZA-MLI",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Algeria and Niger",
+    "pairId": "DZA-NER",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Algeria and Mauritania",
+    "pairId": "DZA-MRT",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mali and Mauritania",
+    "pairId": "MLI-MRT",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mali and Niger",
+    "pairId": "MLI-NER",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Libya and Niger",
+    "pairId": "LBY-NER",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Libya and Chad",
+    "pairId": "LBY-TCD",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Niger and Chad",
+    "pairId": "NER-TCD",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Niger and Nigeria",
+    "pairId": "NER-NGA",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Benin and Nigeria",
+    "pairId": "BEN-NGA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cameroon and Nigeria",
+    "pairId": "CMR-NGA",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cameroon and Chad",
+    "pairId": "CMR-TCD",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Sudan and Chad",
+    "pairId": "SDN-TCD",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Central African Republic and Chad",
+    "pairId": "CAF-TCD",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Central African Republic and Sudan",
+    "pairId": "CAF-SDN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Sudan and South Sudan",
+    "pairId": "SDN-SDS",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Ethiopia and Sudan",
+    "pairId": "ETH-SDN",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Eritrea and Ethiopia",
+    "pairId": "ERI-ETH",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Ethiopia and Somalia",
+    "pairId": "ETH-SOM",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Ethiopia and Kenya",
+    "pairId": "ETH-KEN",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Ethiopia and South Sudan",
+    "pairId": "ETH-SDS",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kenya and Somalia",
+    "pairId": "KEN-SOM",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kenya and Tanzania",
+    "pairId": "KEN-TZA",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kenya and Uganda",
+    "pairId": "KEN-UGA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between South Sudan and Uganda",
+    "pairId": "SDS-UGA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the DR Congo and Uganda",
+    "pairId": "COD-UGA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Rwanda and Uganda",
+    "pairId": "RWA-UGA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burundi and Tanzania",
+    "pairId": "BDI-TZA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mozambique and Tanzania",
+    "pairId": "MOZ-TZA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Malawi and Tanzania",
+    "pairId": "MWI-TZA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mozambique and Zambia",
+    "pairId": "MOZ-ZMB",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mozambique and Zimbabwe",
+    "pairId": "MOZ-ZWE",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between South Africa and Zimbabwe",
+    "pairId": "ZAF-ZWE",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Botswana and South Africa",
+    "pairId": "BWA-ZAF",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Namibia and South Africa",
+    "pairId": "NAM-ZAF",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Angola and Namibia",
+    "pairId": "AGO-NAM",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Botswana and Namibia",
+    "pairId": "BWA-NAM",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Botswana and Zimbabwe",
+    "pairId": "BWA-ZWE",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Zambia and Zimbabwe",
+    "pairId": "ZMB-ZWE",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Angola and Zambia",
+    "pairId": "AGO-ZMB",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the DR Congo and Zambia",
+    "pairId": "COD-ZMB",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Angola and the DR Congo",
+    "pairId": "AGO-COD",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Angola and the Republic of the Congo",
+    "pairId": "AGO-COG",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the DR Congo and the Republic of the Congo",
+    "pairId": "COD-COG",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Central African Republic and the DR Congo",
+    "pairId": "CAF-COD",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the DR Congo and South Sudan",
+    "pairId": "COD-SDS",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the DR Congo and Rwanda",
+    "pairId": "COD-RWA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burundi and the DR Congo",
+    "pairId": "BDI-COD",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the DR Congo and Tanzania",
+    "pairId": "COD-TZA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cameroon and the Republic of the Congo",
+    "pairId": "CMR-COG",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cameroon and Gabon",
+    "pairId": "CMR-GAB",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Republic of the Congo and Gabon",
+    "pairId": "COG-GAB",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Central African Republic and Cameroon",
+    "pairId": "CAF-CMR",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Cameroon and Equatorial Guinea",
+    "pairId": "CMR-GNQ",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Gabon and Equatorial Guinea",
+    "pairId": "GAB-GNQ",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Lesotho and South Africa",
+    "pairId": "LSO-ZAF",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Eswatini and South Africa",
+    "pairId": "SWZ-ZAF",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mozambique and South Africa",
+    "pairId": "MOZ-ZAF",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mozambique and Eswatini",
+    "pairId": "MOZ-SWZ",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mozambique and Malawi",
+    "pairId": "MOZ-MWI",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Malawi and Zambia",
+    "pairId": "MWI-ZMB",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Tanzania and Zambia",
+    "pairId": "TZA-ZMB",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Côte d'Ivoire and Ghana",
+    "pairId": "CIV-GHA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burkina Faso and Ghana",
+    "pairId": "BFA-GHA",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Ghana and Togo",
+    "pairId": "GHA-TGO",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Benin and Togo",
+    "pairId": "BEN-TGO",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burkina Faso and Mali",
+    "pairId": "BFA-MLI",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burkina Faso and Niger",
+    "pairId": "BFA-NER",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burkina Faso and Côte d'Ivoire",
+    "pairId": "BFA-CIV",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Benin and Burkina Faso",
+    "pairId": "BEN-BFA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guinea and Mali",
+    "pairId": "GIN-MLI",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Côte d'Ivoire and Liberia",
+    "pairId": "CIV-LBR",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guinea and Sierra Leone",
+    "pairId": "GIN-SLE",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guinea and Liberia",
+    "pairId": "GIN-LBR",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Côte d'Ivoire and Guinea",
+    "pairId": "CIV-GIN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guinea and Senegal",
+    "pairId": "GIN-SEN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mauritania and Senegal",
+    "pairId": "MRT-SEN",
+    "difficulty": 2,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between The Gambia and Senegal",
+    "pairId": "GMB-SEN",
+    "difficulty": 1,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guinea-Bissau and Senegal",
+    "pairId": "GNB-SEN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guinea and Guinea-Bissau",
+    "pairId": "GIN-GNB",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Djibouti and Ethiopia",
+    "pairId": "DJI-ETH",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Eritrea and Sudan",
+    "pairId": "ERI-SDN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Nigeria and Chad",
+    "pairId": "NGA-TCD",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Côte d'Ivoire and Mali",
+    "pairId": "CIV-MLI",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Liberia and Sierra Leone",
+    "pairId": "LBR-SLE",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Rwanda and Tanzania",
+    "pairId": "RWA-TZA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Tanzania and Uganda",
+    "pairId": "TZA-UGA",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Namibia and Zambia",
+    "pairId": "NAM-ZMB",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Djibouti and Eritrea",
+    "pairId": "DJI-ERI",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Libya and Sudan",
+    "pairId": "LBY-SDN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Kenya and South Sudan",
+    "pairId": "KEN-SDS",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mali and Senegal",
+    "pairId": "MLI-SEN",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Benin and Niger",
+    "pairId": "BEN-NER",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Burkina Faso and Togo",
+    "pairId": "BFA-TGO",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Central African Republic and the Republic of the Congo",
+    "pairId": "CAF-COG",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Central African Republic and South Sudan",
+    "pairId": "CAF-SDS",
+    "difficulty": 3,
+    "region": "africa"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Canada and the United States",
+    "pairId": "CAN-USA",
+    "difficulty": 1,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Mexico and the United States",
+    "pairId": "MEX-USA",
+    "difficulty": 1,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guatemala and Mexico",
+    "pairId": "GTM-MEX",
+    "difficulty": 1,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belize and Mexico",
+    "pairId": "BLZ-MEX",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Belize and Guatemala",
+    "pairId": "BLZ-GTM",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guatemala and Honduras",
+    "pairId": "GTM-HND",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Honduras and Nicaragua",
+    "pairId": "HND-NIC",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Costa Rica and Nicaragua",
+    "pairId": "CRI-NIC",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Costa Rica and Panama",
+    "pairId": "CRI-PAN",
+    "difficulty": 2,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Colombia and Panama",
+    "pairId": "COL-PAN",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Honduras and El Salvador",
+    "pairId": "HND-SLV",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guatemala and El Salvador",
+    "pairId": "GTM-SLV",
+    "difficulty": 3,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between the Dominican Republic and Haiti",
+    "pairId": "DOM-HTI",
+    "difficulty": 1,
+    "region": "north-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Colombia and Venezuela",
+    "pairId": "COL-VEN",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Colombia and Ecuador",
+    "pairId": "COL-ECU",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Colombia and Peru",
+    "pairId": "COL-PER",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Colombia",
+    "pairId": "BRA-COL",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Venezuela",
+    "pairId": "BRA-VEN",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guyana and Venezuela",
+    "pairId": "GUY-VEN",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Guyana",
+    "pairId": "BRA-GUY",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Guyana and Suriname",
+    "pairId": "GUY-SUR",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Suriname",
+    "pairId": "BRA-SUR",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and France",
+    "pairId": "BRA-FRA",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between France and Suriname",
+    "pairId": "FRA-SUR",
+    "difficulty": 3,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Ecuador and Peru",
+    "pairId": "ECU-PER",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Peru",
+    "pairId": "BRA-PER",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bolivia and Peru",
+    "pairId": "BOL-PER",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bolivia and Brazil",
+    "pairId": "BOL-BRA",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bolivia and Chile",
+    "pairId": "BOL-CHL",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Argentina and Chile",
+    "pairId": "ARG-CHL",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Argentina and Bolivia",
+    "pairId": "ARG-BOL",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Bolivia and Paraguay",
+    "pairId": "BOL-PRY",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Argentina and Paraguay",
+    "pairId": "ARG-PRY",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Paraguay",
+    "pairId": "BRA-PRY",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Argentina and Brazil",
+    "pairId": "ARG-BRA",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Argentina and Uruguay",
+    "pairId": "ARG-URY",
+    "difficulty": 1,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Brazil and Uruguay",
+    "pairId": "BRA-URY",
+    "difficulty": 2,
+    "region": "south-america"
+  },
+  {
+    "type": "trace",
+    "category": "borders",
+    "question": "Draw the border between Chile and Peru",
+    "pairId": "CHL-PER",
+    "difficulty": 2,
+    "region": "south-america"
+  }
+]

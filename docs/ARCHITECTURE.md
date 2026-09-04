@@ -18,7 +18,7 @@ quiz-app/
 │   ├── index.js              registry: loads every games/*.js module, builds category list
 │   ├── mc.js flag.js slider.js timeline.js map.js sequence.js   (classic types)
 │   └── trace.js sizeup.js halves.js curve.js compass.js tune.js silhouette.js fakes.js (new)
-├── data/                     static game data served at /data/* (JSON, committed, ≤ ~10 MB total)
+├── data/                     game data read by server modules (JSON, committed; NEVER served — it contains answers)
 │   ├── borders.json  rivers.json  silhouettes.json  countries.json  halves/<ISO3>.json ...
 ├── tools/                    build scripts that generate data/* from raw sources (raw files are gitignored under tools/raw/)
 ├── test/simulate.js          headless end-to-end test: host + bots play a whole game via socket.io-client
@@ -237,7 +237,7 @@ Server → room:
 * `host-left`, `kicked`
 
 HTTP: `GET /api/games` → `{ types:[{type,timeLimit,speedScored,...}], categories:[{id,label,emoji,group,blurb,howTo,type,count}], groups:[{id,label,emoji}], regions:[...], presets:[{id,label,categories}] }`
-`GET /qr/:gameId` → SVG QR code of the join link. `GET /data/*` → static data. `GET /?join=ABC123` prefills the join screen.
+`GET /qr/:gameId` → SVG QR code of the join link. (`data/` is not served — modules put what the client needs in the payload.) `GET /?join=ABC123` prefills the join screen.
 
 ---
 

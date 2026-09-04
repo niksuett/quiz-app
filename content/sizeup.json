@@ -1,0 +1,285 @@
+[
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a blue whale next to a 12 m city bus?",
+    "target":    { "name": "Blue whale", "icon": "whale", "sizeM": 30, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 1 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long was Tyrannosaurus rex next to a 12 m city bus?",
+    "target":    { "name": "Tyrannosaurus rex", "icon": "trex", "sizeM": 12, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 1 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is an African elephant at the shoulder next to a 1.75 m person?",
+    "target":    { "name": "African elephant", "icon": "elephant", "sizeM": 3.2, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 1 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is an ostrich next to a 1.75 m person?",
+    "target":    { "name": "Ostrich", "icon": "ostrich", "sizeM": 2.5, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is an emperor penguin next to a 1.75 m person?",
+    "target":    { "name": "Emperor penguin", "icon": "penguin", "sizeM": 1.15, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall does a male gorilla stand next to a 1.75 m person?",
+    "target":    { "name": "Male gorilla (standing)", "icon": "gorilla", "sizeM": 1.7, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a polar bear rearing up on its hind legs next to a 2 m door?",
+    "target":    { "name": "Polar bear (on hind legs)", "icon": "polar-bear", "sizeM": 3.0, "dim": "height" },
+    "reference": { "name": "Door", "icon": "door", "sizeM": 2.0, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall does a red kangaroo stand next to a 1.75 m person?",
+    "target":    { "name": "Red kangaroo", "icon": "kangaroo", "sizeM": 1.6, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a dromedary camel at the shoulder next to a 1.75 m person?",
+    "target":    { "name": "Dromedary camel", "icon": "camel", "sizeM": 1.9, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is an American bison at the shoulder next to a 1.5 m cow?",
+    "target":    { "name": "American bison", "icon": "bison", "sizeM": 1.9, "dim": "height" },
+    "reference": { "name": "Cow", "icon": "cow", "sizeM": 1.5, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a red deer stag at the shoulder next to a 1.75 m person?",
+    "target":    { "name": "Red deer stag", "icon": "deer", "sizeM": 1.2, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a greater flamingo next to a 1.75 m person?",
+    "target":    { "name": "Greater flamingo", "icon": "flamingo", "sizeM": 1.4, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a Siberian tiger, nose to base of tail, next to a 2 m bed?",
+    "target":    { "name": "Siberian tiger", "icon": "tiger", "sizeM": 2.0, "dim": "length" },
+    "reference": { "name": "Bed", "icon": "bed", "sizeM": 2.0, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is an adult farm pig next to a 2 m bed?",
+    "target":    { "name": "Farm pig", "icon": "pig", "sizeM": 1.5, "dim": "length" },
+    "reference": { "name": "Bed", "icon": "bed", "sizeM": 2.0, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a capybara, the world's largest rodent, next to a 46 cm house cat?",
+    "target":    { "name": "Capybara", "icon": "capybara", "sizeM": 1.2, "dim": "length" },
+    "reference": { "name": "House cat", "icon": "cat", "sizeM": 0.46, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a house cat's body, nose to base of tail, next to an 80 cm skateboard?",
+    "target":    { "name": "House cat", "icon": "cat", "sizeM": 0.46, "dim": "length" },
+    "reference": { "name": "Skateboard", "icon": "skateboard", "sizeM": 0.8, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a house mouse's body, tail excluded, next to a 15 cm smartphone?",
+    "target":    { "name": "House mouse", "icon": "mouse", "sizeM": 0.08, "dim": "length" },
+    "reference": { "name": "Smartphone", "icon": "smartphone", "sizeM": 0.15, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a bottlenose dolphin next to a 1.8 m bicycle?",
+    "target":    { "name": "Bottlenose dolphin", "icon": "dolphin", "sizeM": 2.8, "dim": "length" },
+    "reference": { "name": "Bicycle", "icon": "bicycle", "sizeM": 1.8, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a leatherback sea turtle, the largest turtle alive, next to a 1.8 m bicycle?",
+    "target":    { "name": "Leatherback turtle", "icon": "sea-turtle", "sizeM": 2.0, "dim": "length" },
+    "reference": { "name": "Bicycle", "icon": "bicycle", "sizeM": 1.8, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a Galápagos giant tortoise's shell next to an 80 cm skateboard?",
+    "target":    { "name": "Galápagos tortoise", "icon": "tortoise", "sizeM": 1.3, "dim": "length" },
+    "reference": { "name": "Skateboard", "icon": "skateboard", "sizeM": 0.8, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How wide is a giant manta ray from wingtip to wingtip, next to a 4.2 m car?",
+    "target":    { "name": "Giant manta ray", "icon": "manta-ray", "sizeM": 7.0, "dim": "length" },
+    "reference": { "name": "Car", "icon": "car", "sizeM": 4.2, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How wide is a Japanese spider crab from claw tip to claw tip, next to a 4.2 m car?",
+    "target":    { "name": "Japanese spider crab", "icon": "crab", "sizeM": 3.7, "dim": "length" },
+    "reference": { "name": "Car", "icon": "car", "sizeM": 4.2, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a mute swan, bill to tail, next to a 1.8 m bicycle?",
+    "target":    { "name": "Mute swan", "icon": "swan", "sizeM": 1.5, "dim": "length" },
+    "reference": { "name": "Bicycle", "icon": "bicycle", "sizeM": 1.8, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a Eurasian eagle-owl next to a 38 cm bowling pin?",
+    "target":    { "name": "Eurasian eagle-owl", "icon": "owl", "sizeM": 0.7, "dim": "height" },
+    "reference": { "name": "Bowling pin", "icon": "bowling-pin", "sizeM": 0.38, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a goliath frog, the world's largest frog, next to a 15 cm smartphone?",
+    "target":    { "name": "Goliath frog", "icon": "frog", "sizeM": 0.32, "dim": "length" },
+    "reference": { "name": "Smartphone", "icon": "smartphone", "sizeM": 0.15, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a giant African land snail's shell next to a 15 cm smartphone?",
+    "target":    { "name": "Giant African land snail", "icon": "snail", "sizeM": 0.2, "dim": "length" },
+    "reference": { "name": "Smartphone", "icon": "smartphone", "sizeM": 0.15, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is an emperor scorpion next to a 19 cm pencil?",
+    "target":    { "name": "Emperor scorpion", "icon": "scorpion", "sizeM": 0.2, "dim": "length" },
+    "reference": { "name": "Pencil", "icon": "pencil", "sizeM": 0.19, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How wide are the wings of Queen Alexandra's birdwing, the largest butterfly, next to a 19 cm pencil?",
+    "target":    { "name": "Queen Alexandra's birdwing", "icon": "butterfly", "sizeM": 0.25, "dim": "length" },
+    "reference": { "name": "Pencil", "icon": "pencil", "sizeM": 0.19, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a bee hummingbird, the smallest bird on Earth, next to a 19 cm pencil?",
+    "target":    { "name": "Bee hummingbird", "icon": "hummingbird", "sizeM": 0.055, "dim": "length" },
+    "reference": { "name": "Pencil", "icon": "pencil", "sizeM": 0.19, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a worker honeybee next to a 2.3 cm coin?",
+    "target":    { "name": "Honeybee", "icon": "bee", "sizeM": 0.013, "dim": "length" },
+    "reference": { "name": "Coin", "icon": "coin", "sizeM": 0.023, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a black garden ant next to a 2.3 cm coin?",
+    "target":    { "name": "Black garden ant", "icon": "ant", "sizeM": 0.005, "dim": "length" },
+    "reference": { "name": "Coin", "icon": "coin", "sizeM": 0.023, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long was a Velociraptor — the real one, not the film version — next to a 2 m bed?",
+    "target":    { "name": "Velociraptor", "icon": "velociraptor", "sizeM": 2.0, "dim": "length" },
+    "reference": { "name": "Bed", "icon": "bed", "sizeM": 2.0, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long was Diplodocus, nose to tail tip, next to a 12 m city bus?",
+    "target":    { "name": "Diplodocus", "icon": "diplodocus", "sizeM": 26, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall was a woolly mammoth at the shoulder next to a 3.2 m African elephant?",
+    "target":    { "name": "Woolly mammoth", "icon": "mammoth", "sizeM": 3.0, "dim": "height" },
+    "reference": { "name": "African elephant", "icon": "elephant", "sizeM": 3.2, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How wide were the wings of Pterodactylus, the first pterosaur ever named, next to a 1.8 m bicycle?",
+    "target":    { "name": "Pterodactylus", "icon": "pterodactyl", "sizeM": 1.04, "dim": "length" },
+    "reference": { "name": "Bicycle", "icon": "bicycle", "sizeM": 1.8, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a modern Formula 1 car next to a 4.2 m hatchback?",
+    "target":    { "name": "Formula 1 car", "icon": "f1-car", "sizeM": 5.6, "dim": "length" },
+    "reference": { "name": "Hatchback", "icon": "car", "sizeM": 4.2, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a European articulated lorry at the legal maximum, next to a 12 m city bus?",
+    "target":    { "name": "Articulated lorry", "icon": "truck", "sizeM": 16.5, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is an M1 Abrams tank with its gun pointing forward, next to a 12 m city bus?",
+    "target":    { "name": "M1 Abrams tank", "icon": "tank", "sizeM": 9.8, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a Caterpillar 797 mining truck next to an 8 m two-storey house?",
+    "target":    { "name": "Caterpillar 797 mining truck", "icon": "mine-truck", "sizeM": 7.6, "dim": "height" },
+    "reference": { "name": "Two-storey house", "icon": "house", "sizeM": 8, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is Bagger 293, the giant German mining excavator and heaviest land vehicle ever built, next to an 8 m house?",
+    "target":    { "name": "Bagger 293 excavator", "icon": "excavator", "sizeM": 96, "dim": "height" },
+    "reference": { "name": "Two-storey house", "icon": "house", "sizeM": 8, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a Union Pacific 'Big Boy', tender included — one of the largest steam locomotives ever — next to a 12 m city bus?",
+    "target":    { "name": "Big Boy locomotive", "icon": "locomotive", "sizeM": 40.5, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a Boeing 747-400 next to a 12 m city bus?",
+    "target":    { "name": "Boeing 747-400", "icon": "airliner", "sizeM": 70.7, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 1 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long was the airship Hindenburg next to a 70.7 m Boeing 747?",
+    "target":    { "name": "Hindenburg airship", "icon": "zeppelin", "sizeM": 245, "dim": "length" },
+    "reference": { "name": "Boeing 747", "icon": "airliner", "sizeM": 70.7, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is one blade of a GE Haliade-X offshore wind turbine next to a 70.7 m Boeing 747?",
+    "target":    { "name": "Haliade-X turbine blade", "icon": "wind-turbine", "sizeM": 107, "dim": "length" },
+    "reference": { "name": "Boeing 747", "icon": "airliner", "sizeM": 70.7, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a typical passenger hot-air balloon in flight next to an 8 m two-storey house?",
+    "target":    { "name": "Hot-air balloon", "icon": "balloon", "sizeM": 20, "dim": "height" },
+    "reference": { "name": "Two-storey house", "icon": "house", "sizeM": 8, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall was the Saturn V moon rocket next to Big Ben's 96 m tower?",
+    "target":    { "name": "Saturn V rocket", "icon": "rocket", "sizeM": 110.6, "dim": "height" },
+    "reference": { "name": "Big Ben's tower", "icon": "clock-tower", "sizeM": 96, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long was a Space Shuttle orbiter next to a 12 m city bus?",
+    "target":    { "name": "Space Shuttle orbiter", "icon": "space-shuttle", "sizeM": 37.2, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is the Hubble Space Telescope next to a 12 m city bus?",
+    "target":    { "name": "Hubble Space Telescope", "icon": "satellite", "sizeM": 13.2, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is the container ship Ever Given next to the 269 m Titanic?",
+    "target":    { "name": "Ever Given", "icon": "cargo-ship", "sizeM": 400, "dim": "length" },
+    "reference": { "name": "Titanic", "icon": "steamer", "sizeM": 269, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a Typhoon-class submarine, the biggest submarine ever built, next to a 70.7 m Boeing 747?",
+    "target":    { "name": "Typhoon-class submarine", "icon": "submarine", "sizeM": 175, "dim": "length" },
+    "reference": { "name": "Boeing 747", "icon": "airliner", "sizeM": 70.7, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is the main span of the Golden Gate Bridge next to the 400 m container ship Ever Given?",
+    "target":    { "name": "Golden Gate Bridge main span", "icon": "suspension-bridge", "sizeM": 1280, "dim": "length" },
+    "reference": { "name": "Ever Given", "icon": "cargo-ship", "sizeM": 400, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is the Great Pyramid of Giza today next to Big Ben's 96 m tower?",
+    "target":    { "name": "Great Pyramid of Giza", "icon": "pyramid", "sizeM": 138.5, "dim": "height" },
+    "reference": { "name": "Big Ben's tower", "icon": "clock-tower", "sizeM": 96, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is the Statue of Liberty from the ground to the torch, pedestal included, next to Big Ben's 96 m tower?",
+    "target":    { "name": "Statue of Liberty (with pedestal)", "icon": "statue", "sizeM": 93, "dim": "height" },
+    "reference": { "name": "Big Ben's tower", "icon": "clock-tower", "sizeM": 96, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is the Leaning Tower of Pisa next to Big Ben's 96 m tower?",
+    "target":    { "name": "Leaning Tower of Pisa", "icon": "pisa-tower", "sizeM": 56, "dim": "height" },
+    "reference": { "name": "Big Ben's tower", "icon": "clock-tower", "sizeM": 96, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is Cologne Cathedral next to Big Ben's 96 m tower?",
+    "target":    { "name": "Cologne Cathedral", "icon": "cathedral", "sizeM": 157, "dim": "height" },
+    "reference": { "name": "Big Ben's tower", "icon": "clock-tower", "sizeM": 96, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is the CN Tower in Toronto next to the 138.5 m Great Pyramid of Giza?",
+    "target":    { "name": "CN Tower", "icon": "tv-tower", "sizeM": 553, "dim": "height" },
+    "reference": { "name": "Great Pyramid", "icon": "pyramid", "sizeM": 138.5, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is Seattle's Space Needle next to the 138.5 m Great Pyramid of Giza?",
+    "target":    { "name": "Space Needle", "icon": "space-needle", "sizeM": 184, "dim": "height" },
+    "reference": { "name": "Great Pyramid", "icon": "pyramid", "sizeM": 138.5, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is the Washington Monument next to the 93 m Statue of Liberty (pedestal included)?",
+    "target":    { "name": "Washington Monument", "icon": "obelisk", "sizeM": 169, "dim": "height" },
+    "reference": { "name": "Statue of Liberty", "icon": "statue", "sizeM": 93, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is the Great Sphinx of Giza next to a 12 m city bus?",
+    "target":    { "name": "Great Sphinx of Giza", "icon": "sphinx", "sizeM": 73, "dim": "length" },
+    "reference": { "name": "City bus", "icon": "bus", "sizeM": 12, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is the Parthenon in Athens next to a 70.7 m Boeing 747?",
+    "target":    { "name": "The Parthenon", "icon": "greek-temple", "sizeM": 69.5, "dim": "length" },
+    "reference": { "name": "Boeing 747", "icon": "airliner", "sizeM": 70.7, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is the Sydney Opera House next to a 70.7 m Boeing 747?",
+    "target":    { "name": "Sydney Opera House", "icon": "opera-house", "sizeM": 183, "dim": "length" },
+    "reference": { "name": "Boeing 747", "icon": "airliner", "sizeM": 70.7, "dim": "length" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is Hyperion, the tallest tree on Earth (a coast redwood), next to the 93 m Statue of Liberty?",
+    "target":    { "name": "Hyperion, tallest tree on Earth", "icon": "pine-tree", "sizeM": 116, "dim": "height" },
+    "reference": { "name": "Statue of Liberty", "icon": "statue", "sizeM": 93, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a mature English oak next to an 8 m two-storey house?",
+    "target":    { "name": "English oak", "icon": "oak", "sizeM": 25, "dim": "height" },
+    "reference": { "name": "Two-storey house", "icon": "house", "sizeM": 8, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a big African baobab next to an 8 m two-storey house?",
+    "target":    { "name": "African baobab", "icon": "baobab", "sizeM": 20, "dim": "height" },
+    "reference": { "name": "Two-storey house", "icon": "house", "sizeM": 8, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall is a full-grown saguaro cactus next to an 8 m two-storey house?",
+    "target":    { "name": "Saguaro cactus", "icon": "cactus", "sizeM": 12, "dim": "height" },
+    "reference": { "name": "Two-storey house", "icon": "house", "sizeM": 8, "dim": "height" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How tall does a garden sunflower grow next to a 1.75 m person?",
+    "target":    { "name": "Sunflower", "icon": "sunflower", "sizeM": 3.0, "dim": "height" },
+    "reference": { "name": "Person", "icon": "person", "sizeM": 1.75, "dim": "height" }, "difficulty": 1 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a supermarket banana next to a 15 cm smartphone?",
+    "target":    { "name": "Banana", "icon": "banana", "sizeM": 0.18, "dim": "length" },
+    "reference": { "name": "Smartphone", "icon": "smartphone", "sizeM": 0.15, "dim": "height" }, "difficulty": 1 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a concert grand piano next to a 2 m bed?",
+    "target":    { "name": "Concert grand piano", "icon": "piano", "sizeM": 2.7, "dim": "length" },
+    "reference": { "name": "Bed", "icon": "bed", "sizeM": 2.0, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a full-size violin next to a 1 m acoustic guitar?",
+    "target":    { "name": "Violin", "icon": "violin", "sizeM": 0.6, "dim": "length" },
+    "reference": { "name": "Acoustic guitar", "icon": "guitar", "sizeM": 1.0, "dim": "length" }, "difficulty": 2 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How long is a tennis racket at the legal maximum next to a 38 cm bowling pin?",
+    "target":    { "name": "Tennis racket", "icon": "tennis-racket", "sizeM": 0.685, "dim": "length" },
+    "reference": { "name": "Bowling pin", "icon": "bowling-pin", "sizeM": 0.38, "dim": "height" }, "difficulty": 3 },
+
+  { "type": "sizeup", "category": "sizeup", "question": "How wide is a football (soccer ball) across the middle, next to a 6.7 cm tennis ball?",
+    "target":    { "name": "Football", "icon": "soccer-ball", "sizeM": 0.22, "dim": "length" },
+    "reference": { "name": "Tennis ball", "icon": "tennis-ball", "sizeM": 0.067, "dim": "length" }, "difficulty": 2 }
+]
