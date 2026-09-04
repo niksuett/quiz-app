@@ -202,8 +202,8 @@
     "answers": [
       "New Zealand",
       "Australia",
-      "Philippines",
-      "Russia"
+      "Fiji",
+      "Vanuatu"
     ],
     "correct": 1,
     "region": "oceania",
@@ -231,8 +231,8 @@
     "iso3": "NZL",
     "answers": [
       "Australia",
-      "Vietnam",
-      "Malaysia",
+      "Solomon Islands",
+      "Fiji",
       "New Zealand"
     ],
     "correct": 3,
@@ -395,10 +395,10 @@
     "question": "United States",
     "iso3": "USA",
     "answers": [
-      "China",
-      "Brazil",
+      "Mexico",
+      "Cuba",
       "United States",
-      "Russia"
+      "Canada"
     ],
     "correct": 2,
     "region": "north-america",
@@ -650,7 +650,7 @@
     "question": "Cyprus",
     "iso3": "CYP",
     "answers": [
-      "Montenegro",
+      "Bahrain",
       "Lebanon",
       "Kuwait",
       "Cyprus"
@@ -695,7 +695,7 @@
     "question": "Greenland",
     "iso3": "GRL",
     "answers": [
-      "Algeria",
+      "Cuba",
       "United States",
       "Greenland",
       "Canada"
@@ -967,8 +967,8 @@
     "answers": [
       "Papua New Guinea",
       "New Zealand",
-      "Japan",
-      "Thailand"
+      "Fiji",
+      "Vanuatu"
     ],
     "correct": 0,
     "region": "oceania",
@@ -1836,7 +1836,7 @@
     "iso3": "CAN",
     "answers": [
       "Mexico",
-      "Kazakhstan",
+      "Guatemala",
       "Canada",
       "Greenland"
     ],

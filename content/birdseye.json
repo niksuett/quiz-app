@@ -1,0 +1,947 @@
+[
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 25.1124,
+    "correctLng": 55.139,
+    "locationName": "Palm Jumeirah, Dubai",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 25.225,
+    "correctLng": 55.17,
+    "locationName": "The World Islands, Dubai",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 25.1972,
+    "correctLng": 55.2744,
+    "locationName": "Burj Khalifa and Downtown Dubai",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 21.4225,
+    "correctLng": 39.8262,
+    "locationName": "The Grand Mosque, Mecca",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 30.3285,
+    "correctLng": 35.4444,
+    "locationName": "Petra, Jordan",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 31.5,
+    "correctLng": 35.47,
+    "locationName": "The Dead Sea",
+    "satellite": {
+      "zoom": 11
+    },
+    "region": "asia",
+    "difficulty": 2,
+    "toleranceKm": 40
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 29.9773,
+    "correctLng": 31.1325,
+    "locationName": "The Pyramids of Giza",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "africa",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 30.585,
+    "correctLng": 32.34,
+    "locationName": "The Suez Canal",
+    "satellite": {
+      "zoom": 12
+    },
+    "region": "africa",
+    "difficulty": 2,
+    "toleranceKm": 30
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -33.955,
+    "correctLng": 18.42,
+    "locationName": "Cape Town and Table Mountain",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -17.9243,
+    "correctLng": 25.8572,
+    "locationName": "Victoria Falls",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "africa",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 40.77,
+    "correctLng": -73.97,
+    "locationName": "Manhattan, New York City",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 40.7829,
+    "correctLng": -73.9654,
+    "locationName": "Central Park, New York City",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 40.6892,
+    "correctLng": -74.0445,
+    "locationName": "Liberty Island, New York",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 38.871,
+    "correctLng": -77.0563,
+    "locationName": "The Pentagon, Washington DC",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 37.8199,
+    "correctLng": -122.4783,
+    "locationName": "The Golden Gate Bridge, San Francisco",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 36.1147,
+    "correctLng": -115.1728,
+    "locationName": "The Las Vegas Strip",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 43.079,
+    "correctLng": -79.075,
+    "locationName": "Niagara Falls",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "north-america",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 36.0161,
+    "correctLng": -114.7377,
+    "locationName": "The Hoover Dam",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 44.5251,
+    "correctLng": -110.8382,
+    "locationName": "Grand Prismatic Spring, Yellowstone",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 35.0272,
+    "correctLng": -111.0225,
+    "locationName": "Meteor Crater, Arizona",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 36.062,
+    "correctLng": -112.108,
+    "locationName": "The Grand Canyon (South Rim)",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "north-america",
+    "difficulty": 1,
+    "toleranceKm": 40
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 42.9446,
+    "correctLng": -122.109,
+    "locationName": "Crater Lake, Oregon",
+    "satellite": {
+      "zoom": 12
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 46.1912,
+    "correctLng": -122.1944,
+    "locationName": "Mount St. Helens",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 37.235,
+    "correctLng": -115.811,
+    "locationName": "Groom Lake (Area 51), Nevada",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 28.6084,
+    "correctLng": -80.6043,
+    "locationName": "Kennedy Space Center, Florida",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 39.8617,
+    "correctLng": -104.6731,
+    "locationName": "Denver International Airport",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 8.996,
+    "correctLng": -79.591,
+    "locationName": "The Miraflores Locks, Panama Canal",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 20.6829,
+    "correctLng": -88.5686,
+    "locationName": "Chichen Itza, Mexico",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "north-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 17.3159,
+    "correctLng": -87.5348,
+    "locationName": "The Great Blue Hole, Belize",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "north-america",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -25.687,
+    "correctLng": -54.445,
+    "locationName": "Iguazu Falls",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -13.1631,
+    "correctLng": -72.545,
+    "locationName": "Machu Picchu",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -14.739,
+    "correctLng": -75.13,
+    "locationName": "The Nazca Lines, Peru",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "south-america",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -15.794,
+    "correctLng": -47.882,
+    "locationName": "Brasilia",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -22.971,
+    "correctLng": -43.183,
+    "locationName": "Copacabana beach, Rio de Janeiro",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -22.9519,
+    "correctLng": -43.2105,
+    "locationName": "Christ the Redeemer, Rio de Janeiro",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "south-america",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -20.1338,
+    "correctLng": -67.4891,
+    "locationName": "Salar de Uyuni, Bolivia",
+    "satellite": {
+      "zoom": 11
+    },
+    "region": "south-america",
+    "difficulty": 2,
+    "toleranceKm": 80
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 45.438,
+    "correctLng": 12.335,
+    "locationName": "Venice",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 41.392,
+    "correctLng": 2.165,
+    "locationName": "The Eixample grid, Barcelona",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 41.3809,
+    "correctLng": 2.1228,
+    "locationName": "Camp Nou, Barcelona",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 52.37,
+    "correctLng": 4.889,
+    "locationName": "The canal ring, Amsterdam",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 48.636,
+    "correctLng": -1.5115,
+    "locationName": "Mont-Saint-Michel, France",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 48.8584,
+    "correctLng": 2.2945,
+    "locationName": "The Eiffel Tower and Champ de Mars, Paris",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 48.8738,
+    "correctLng": 2.295,
+    "locationName": "The Arc de Triomphe, Paris",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 41.9022,
+    "correctLng": 12.4539,
+    "locationName": "Vatican City and St Peter’s Square",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 41.8902,
+    "correctLng": 12.4922,
+    "locationName": "The Colosseum, Rome",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "europe",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 45.905,
+    "correctLng": 13.31,
+    "locationName": "Palmanova star fort, Italy",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 40.821,
+    "correctLng": 14.426,
+    "locationName": "Mount Vesuvius",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 40.75,
+    "correctLng": 14.485,
+    "locationName": "The ruins of Pompeii",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 36.4,
+    "correctLng": 25.42,
+    "locationName": "Santorini",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 35.95,
+    "correctLng": -5.6,
+    "locationName": "The Strait of Gibraltar",
+    "satellite": {
+      "zoom": 11
+    },
+    "region": "europe",
+    "difficulty": 2,
+    "toleranceKm": 30
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 41.045,
+    "correctLng": 29.035,
+    "locationName": "The Bosporus, Istanbul",
+    "satellite": {
+      "zoom": 12
+    },
+    "region": "europe",
+    "difficulty": 2,
+    "toleranceKm": 20
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 55.753,
+    "correctLng": 37.621,
+    "locationName": "Red Square and the Kremlin, Moscow",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 51.1789,
+    "correctLng": -1.8262,
+    "locationName": "Stonehenge",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "europe",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 51.47,
+    "correctLng": -0.4543,
+    "locationName": "Heathrow Airport, London",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 55.5714,
+    "correctLng": 12.83,
+    "locationName": "The Oresund Bridge",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 51.389,
+    "correctLng": 30.099,
+    "locationName": "The Chernobyl nuclear plant",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "europe",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 39.9163,
+    "correctLng": 116.3972,
+    "locationName": "The Forbidden City, Beijing",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 30.823,
+    "correctLng": 111.003,
+    "locationName": "The Three Gorges Dam, China",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 22.295,
+    "correctLng": 114.17,
+    "locationName": "Victoria Harbour, Hong Kong",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 1.284,
+    "correctLng": 103.86,
+    "locationName": "Marina Bay, Singapore",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 13.4125,
+    "correctLng": 103.867,
+    "locationName": "Angkor Wat, Cambodia",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "asia",
+    "difficulty": 2
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 20.91,
+    "correctLng": 107.183,
+    "locationName": "Ha Long Bay, Vietnam",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 2,
+    "toleranceKm": 30
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 21.1717,
+    "correctLng": 94.8585,
+    "locationName": "Bagan, Myanmar",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 27.1751,
+    "correctLng": 78.0421,
+    "locationName": "The Taj Mahal, Agra",
+    "satellite": {
+      "zoom": 16
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 4.1755,
+    "correctLng": 73.5093,
+    "locationName": "Male and its atoll, Maldives",
+    "satellite": {
+      "zoom": 12
+    },
+    "region": "asia",
+    "difficulty": 2,
+    "toleranceKm": 60
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 35.3606,
+    "correctLng": 138.7274,
+    "locationName": "Mount Fuji",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": 34.432,
+    "correctLng": 135.23,
+    "locationName": "Kansai International Airport, Japan",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "asia",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -25.3444,
+    "correctLng": 131.0369,
+    "locationName": "Uluru, Australia",
+    "satellite": {
+      "zoom": 14
+    },
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -33.8568,
+    "correctLng": 151.2153,
+    "locationName": "Sydney Opera House and harbour",
+    "satellite": {
+      "zoom": 15
+    },
+    "region": "oceania",
+    "difficulty": 1
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -35.3,
+    "correctLng": 149.125,
+    "locationName": "Canberra, Australia",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "oceania",
+    "difficulty": 3
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -19.75,
+    "correctLng": 149.19,
+    "locationName": "Hardy Reef, Great Barrier Reef",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "oceania",
+    "difficulty": 2,
+    "toleranceKm": 150
+  },
+  {
+    "category": "birdseye",
+    "type": "map",
+    "question": "Where on Earth is this?",
+    "correctLat": -16.5004,
+    "correctLng": -151.7415,
+    "locationName": "Bora Bora, French Polynesia",
+    "satellite": {
+      "zoom": 13
+    },
+    "region": "oceania",
+    "difficulty": 2
+  }
+]

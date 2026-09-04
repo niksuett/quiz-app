@@ -41,7 +41,7 @@
     "items": [
       { "text": "Bulbasaur", "fake": false },
       { "text": "Lamictal", "fake": true },
-      { "text": "Zangief", "fake": false },
+      { "text": "Slowpoke", "fake": false },
       { "text": "Metronidazole", "fake": true },
       { "text": "Wigglytuff", "fake": false },
       { "text": "Ondansetron", "fake": true }

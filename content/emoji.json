@@ -1,0 +1,1601 @@
+[
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧙‍♂️💍🌋",
+    "answers": [
+      "Harry Potter",
+      "The Chronicles of Narnia",
+      "The Lord of the Rings",
+      "The Hobbit"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦁👑🌅",
+    "answers": [
+      "Madagascar",
+      "The Lion King",
+      "Tarzan",
+      "The Jungle Book"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚢🧊💔",
+    "answers": [
+      "Life of Pi",
+      "The Perfect Storm",
+      "Poseidon",
+      "Titanic"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦖🏝️🧬",
+    "answers": [
+      "Land of the Lost",
+      "Jurassic Park",
+      "King Kong",
+      "Godzilla"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👨‍🚀🌽🕳️",
+    "answers": [
+      "Interstellar",
+      "Gravity",
+      "The Martian",
+      "Arrival"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🤡🎈🕳️",
+    "answers": [
+      "It",
+      "The Conjuring",
+      "Us",
+      "Poltergeist"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐠🔍🌊",
+    "answers": [
+      "Finding Nemo",
+      "Moana",
+      "Shark Tale",
+      "The Little Mermaid"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🌪️🏠👠",
+    "answers": [
+      "Mary Poppins",
+      "Alice in Wonderland",
+      "The Wizard of Oz",
+      "Twister"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🥊🇺🇸🪜",
+    "answers": [
+      "The Fighter",
+      "Rocky",
+      "Raging Bull",
+      "Million Dollar Baby"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍫🏭🎫",
+    "answers": [
+      "The BFG",
+      "Matilda",
+      "Charlie and the Chocolate Factory",
+      "James and the Giant Peach"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👽🚲🌕",
+    "answers": [
+      "E.T. the Extra-Terrestrial",
+      "Super 8",
+      "Close Encounters of the Third Kind",
+      "Flight of the Navigator"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦇🃏🌃",
+    "answers": [
+      "The Dark Knight",
+      "Joker",
+      "Suicide Squad",
+      "Sin City"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐀👨‍🍳🇫🇷",
+    "answers": [
+      "Chef",
+      "Burnt",
+      "The Aristocats",
+      "Ratatouille"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧸🤠🚀",
+    "answers": [
+      "The Lego Movie",
+      "Coraline",
+      "Small Soldiers",
+      "Toy Story"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎩🐇⏰",
+    "answers": [
+      "Willy Wonka",
+      "Peter Pan",
+      "The Wizard of Oz",
+      "Alice in Wonderland"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦈🏖️🎶",
+    "answers": [
+      "Deep Blue Sea",
+      "Open Water",
+      "Jaws",
+      "The Meg"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "💊🔴🔵🕶️",
+    "answers": [
+      "Total Recall",
+      "The Matrix",
+      "Inception",
+      "Tron"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👴🏠🎈",
+    "answers": [
+      "Coco",
+      "Up",
+      "Inside Out",
+      "Brave"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐢🍕🥷",
+    "answers": [
+      "The Karate Kid",
+      "Kung Fu Panda",
+      "Teenage Mutant Ninja Turtles",
+      "Big Hero 6"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🕶️👽🔫🖊️",
+    "answers": [
+      "Mars Attacks!",
+      "Men in Black",
+      "Independence Day",
+      "District 9"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐉🐺❄️👑",
+    "answers": [
+      "Game of Thrones",
+      "The Witcher",
+      "Vikings",
+      "The Last Kingdom"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧇👧🙃",
+    "answers": [
+      "The X-Files",
+      "Twin Peaks",
+      "Dark",
+      "Stranger Things"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧪👨‍🔬🏜️",
+    "answers": [
+      "The Wire",
+      "Narcos",
+      "Ozark",
+      "Breaking Bad"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🖨️🏢👔",
+    "answers": [
+      "Mad Men",
+      "The Office",
+      "Parks and Recreation",
+      "Suits"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧟‍♂️🚶‍♂️🏚️",
+    "answers": [
+      "Lost",
+      "Falling Skies",
+      "The Last Ship",
+      "The Walking Dead"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👑🇬🇧📺",
+    "answers": [
+      "Downton Abbey",
+      "The Crown",
+      "Bridgerton",
+      "Victoria"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦑🎮🔴🟢",
+    "answers": [
+      "Battle Royale",
+      "Squid Game",
+      "Sweet Home",
+      "Alice in Borderland"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "☢️🏙️1️⃣9️⃣8️⃣6️⃣",
+    "answers": [
+      "Deutschland 83",
+      "Chernobyl",
+      "Band of Brothers",
+      "The Americans"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚬🥃🏢1️⃣9️⃣6️⃣0️⃣",
+    "answers": [
+      "The Sopranos",
+      "Boardwalk Empire",
+      "Suits",
+      "Mad Men"
+    ],
+    "correct": 3,
+    "difficulty": 3
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧙‍♂️⚡🏰",
+    "answers": [
+      "Eragon",
+      "The Worst Witch",
+      "Percy Jackson",
+      "Harry Potter"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐋⚓📖",
+    "answers": [
+      "Moby-Dick",
+      "Twenty Thousand Leagues Under the Sea",
+      "The Old Man and the Sea",
+      "Treasure Island"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐷🚜🚩",
+    "answers": [
+      "Animal Farm",
+      "Charlotte’s Web",
+      "Watership Down",
+      "The Jungle Book"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "1️⃣9️⃣8️⃣4️⃣👁️",
+    "answers": [
+      "Fahrenheit 451",
+      "We",
+      "1984",
+      "Brave New World"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🏹🔥👧",
+    "answers": [
+      "Divergent",
+      "The Hunger Games",
+      "The Maze Runner",
+      "Battle Royale"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐦🔫⚖️",
+    "answers": [
+      "Catch-22",
+      "The Grapes of Wrath",
+      "Of Mice and Men",
+      "To Kill a Mockingbird"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🏝️🐚👦👦",
+    "answers": [
+      "Treasure Island",
+      "The Coral Island",
+      "Lord of the Flies",
+      "Robinson Crusoe"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦇🧛🏰",
+    "answers": [
+      "The Phantom of the Opera",
+      "Dracula",
+      "Frankenstein",
+      "Interview with the Vampire"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⚡👨‍🔬🧟",
+    "answers": [
+      "Dr Jekyll and Mr Hyde",
+      "Dracula",
+      "Frankenstein",
+      "The Invisible Man"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👴🌊🐟",
+    "answers": [
+      "Life of Pi",
+      "The Old Man and the Sea",
+      "The Perfect Storm",
+      "Moby-Dick"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🕵️🔍🎻",
+    "answers": [
+      "Philip Marlowe",
+      "Sherlock Holmes",
+      "Hercule Poirot",
+      "Father Brown"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚢🏝️👣",
+    "answers": [
+      "Lord of the Flies",
+      "Gulliver’s Travels",
+      "Treasure Island",
+      "Robinson Crusoe"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦘🐨🏄",
+    "answers": [
+      "Indonesia",
+      "New Zealand",
+      "Australia",
+      "South Africa"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍕🍝👢",
+    "answers": [
+      "Portugal",
+      "Greece",
+      "Spain",
+      "Italy"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🥐🗼🥖",
+    "answers": [
+      "France",
+      "Belgium",
+      "Austria",
+      "Switzerland"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐼🏯🥢",
+    "answers": [
+      "Vietnam",
+      "South Korea",
+      "China",
+      "Japan"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍣🗻🎌",
+    "answers": [
+      "South Korea",
+      "China",
+      "Japan",
+      "Taiwan"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🌷🚲🧀",
+    "answers": [
+      "Germany",
+      "Belgium",
+      "Denmark",
+      "Netherlands"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍺🥨🚗",
+    "answers": [
+      "Austria",
+      "Czechia",
+      "Poland",
+      "Germany"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐅🍛🕌",
+    "answers": [
+      "India",
+      "Pakistan",
+      "Bangladesh",
+      "Sri Lanka"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "💃🥘🐂",
+    "answers": [
+      "Spain",
+      "Mexico",
+      "Argentina",
+      "Portugal"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍁🏒🦫",
+    "answers": [
+      "Finland",
+      "Sweden",
+      "Norway",
+      "Canada"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⛰️🍫⌚",
+    "answers": [
+      "Austria",
+      "Belgium",
+      "Liechtenstein",
+      "Switzerland"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🌶️🌮💀",
+    "answers": [
+      "Guatemala",
+      "Peru",
+      "Colombia",
+      "Mexico"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍀🎻🥃",
+    "answers": [
+      "Iceland",
+      "Scotland",
+      "Ireland",
+      "Wales"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧿☕🕌",
+    "answers": [
+      "Iran",
+      "Morocco",
+      "Turkey",
+      "Greece"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎿🐟🛢️",
+    "answers": [
+      "Sweden",
+      "Iceland",
+      "Denmark",
+      "Norway"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🗽🍎🚕",
+    "answers": [
+      "Boston",
+      "Toronto",
+      "Chicago",
+      "New York City"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎰💡🏜️",
+    "answers": [
+      "Reno",
+      "Las Vegas",
+      "Atlantic City",
+      "Phoenix"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎬⭐🌴",
+    "answers": [
+      "Cannes",
+      "Los Angeles",
+      "Miami",
+      "San Diego"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚋⛰️🌉",
+    "answers": [
+      "Denver",
+      "Vancouver",
+      "San Francisco",
+      "Seattle"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🏛️🐺🍝",
+    "answers": [
+      "Athens",
+      "Rome",
+      "Florence",
+      "Naples"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🕌🌉🌏🌍",
+    "answers": [
+      "Cairo",
+      "Athens",
+      "Istanbul",
+      "Baku"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚤🎭🌉",
+    "answers": [
+      "Venice",
+      "Amsterdam",
+      "Bruges",
+      "Stockholm"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧜‍♀️🏰🚲",
+    "answers": [
+      "Helsinki",
+      "Copenhagen",
+      "Oslo",
+      "Stockholm"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎡🚌☂️",
+    "answers": [
+      "London",
+      "Dublin",
+      "Manchester",
+      "Paris"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⛩️🎎🍵",
+    "answers": [
+      "Kyoto",
+      "Beijing",
+      "Hong Kong",
+      "Seoul"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎸🕺👑🍔",
+    "answers": [
+      "Johnny Cash",
+      "Buddy Holly",
+      "Chuck Berry",
+      "Elvis Presley"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⚛️👨‍🦳👅",
+    "answers": [
+      "Albert Einstein",
+      "Isaac Newton",
+      "Nikola Tesla",
+      "Stephen Hawking"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎨👂🌻",
+    "answers": [
+      "Claude Monet",
+      "Vincent van Gogh",
+      "Pablo Picasso",
+      "Salvador Dalí"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "☢️👩‍🔬🏅🏅",
+    "answers": [
+      "Ada Lovelace",
+      "Marie Curie",
+      "Lise Meitner",
+      "Rosalind Franklin"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍎🌳📐",
+    "answers": [
+      "Isaac Newton",
+      "Galileo Galilei",
+      "Albert Einstein",
+      "Johannes Kepler"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐒📕⛵🐢",
+    "answers": [
+      "Carl Linnaeus",
+      "Alfred Russel Wallace",
+      "Gregor Mendel",
+      "Charles Darwin"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "✍️🎭💀",
+    "answers": [
+      "William Shakespeare",
+      "Christopher Marlowe",
+      "Oscar Wilde",
+      "Charles Dickens"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🇮🇳🧂🕊️",
+    "answers": [
+      "Nelson Mandela",
+      "Jawaharlal Nehru",
+      "Mahatma Gandhi",
+      "Martin Luther King Jr."
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🕺🌙🧤🎤",
+    "answers": [
+      "James Brown",
+      "Justin Timberlake",
+      "Michael Jackson",
+      "Prince"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎹🦻🎼5️⃣",
+    "answers": [
+      "Johann Sebastian Bach",
+      "Franz Schubert",
+      "Ludwig van Beethoven",
+      "Wolfgang Amadeus Mozart"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🖼️😊🚁🧑‍🎨",
+    "answers": [
+      "Michelangelo",
+      "Leonardo da Vinci",
+      "Raphael",
+      "Sandro Botticelli"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🏀🐐2️⃣3️⃣",
+    "answers": [
+      "Michael Jordan",
+      "Magic Johnson",
+      "Shaquille O’Neal",
+      "Kobe Bryant"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🌧️🐈🐕",
+    "answers": [
+      "The cat’s pyjamas",
+      "Raining cats and dogs",
+      "A dog’s dinner",
+      "Let sleeping dogs lie"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧊🔨",
+    "answers": [
+      "Break the ice",
+      "Ice cold",
+      "Put it on ice",
+      "Skate on thin ice"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐂🏪🍽️",
+    "answers": [
+      "A bull in a china shop",
+      "Bull-headed",
+      "Take the bull by the horns",
+      "A red rag to a bull"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐦🐦1️⃣🪨",
+    "answers": [
+      "Kill two birds with one stone",
+      "A bird in the hand",
+      "Birds of a feather",
+      "The early bird"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🔨🔩🎯",
+    "answers": [
+      "Nail your colours to the mast",
+      "Tough as nails",
+      "Hit the nail on the head",
+      "A hard nut to crack"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🥚🥚🧺",
+    "answers": [
+      "A good egg",
+      "Egg on your face",
+      "Walking on eggshells",
+      "Do not put all your eggs in one basket"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐈🎒🏃",
+    "answers": [
+      "Cat got your tongue",
+      "A cat has nine lives",
+      "Curiosity killed the cat",
+      "Let the cat out of the bag"
+    ],
+    "correct": 3,
+    "difficulty": 3
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍚🐟🇯🇵",
+    "answers": [
+      "Dim sum",
+      "Sushi",
+      "Ramen",
+      "Bibimbap"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐌🧄🧈",
+    "answers": [
+      "Bouillabaisse",
+      "Ceviche",
+      "Calamari",
+      "Escargot"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍜🌿🇻🇳",
+    "answers": [
+      "Pad Thai",
+      "Ramen",
+      "Pho",
+      "Laksa"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍆🧀🇬🇷",
+    "answers": [
+      "Lasagne",
+      "Souvlaki",
+      "Moussaka",
+      "Paella"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🥞🍁🧈",
+    "answers": [
+      "Pancakes",
+      "Waffles",
+      "Crêpes",
+      "French toast"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🏒🥅🧊",
+    "answers": [
+      "Curling",
+      "Lacrosse",
+      "Ice hockey",
+      "Field hockey"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⚽🌍🏆",
+    "answers": [
+      "The Euros",
+      "The Champions League",
+      "The FIFA World Cup",
+      "The Copa América"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🔥🏛️5️⃣⭕",
+    "answers": [
+      "The Commonwealth Games",
+      "The Paralympics",
+      "The Olympic Games",
+      "The World Games"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎾🍓🇬🇧",
+    "answers": [
+      "The US Open",
+      "The Australian Open",
+      "Wimbledon",
+      "Roland Garros"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🏎️🇲🇨🏁",
+    "answers": [
+      "The Daytona 500",
+      "The Monaco Grand Prix",
+      "Le Mans",
+      "The Indy 500"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚴🇫🇷🟨",
+    "answers": [
+      "The Giro d’Italia",
+      "The Tour de France",
+      "The Vuelta a España",
+      "Paris-Roubaix"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧱🐉🇨🇳",
+    "answers": [
+      "The Terracotta Army",
+      "The Great Wall of China",
+      "The Silk Road",
+      "The Forbidden City"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🗿🌊🇨🇱",
+    "answers": [
+      "Easter Island",
+      "Stonehenge",
+      "Machu Picchu",
+      "The Nazca Lines"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🗼🍕📐",
+    "answers": [
+      "The Tower of London",
+      "St Mark’s Campanile",
+      "The Leaning Tower of Pisa",
+      "The Eiffel Tower"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🪨🏜️🇦🇺",
+    "answers": [
+      "Uluru",
+      "Half Dome",
+      "Devils Tower",
+      "Table Mountain"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧱🔨1️⃣9️⃣8️⃣9️⃣",
+    "answers": [
+      "German reunification",
+      "The Prague Spring",
+      "The fall of the Berlin Wall",
+      "The Cuban Missile Crisis"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🚀🌕👨‍🚀1️⃣9️⃣6️⃣9️⃣",
+    "answers": [
+      "The launch of Sputnik",
+      "Yuri Gagarin’s flight",
+      "The first space shuttle flight",
+      "The Apollo 11 Moon landing"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "☕📦🌊🇺🇸",
+    "answers": [
+      "The Boston Tea Party",
+      "The Louisiana Purchase",
+      "The Gold Rush",
+      "The Underground Railroad"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👑🔪🇫🇷1️⃣7️⃣8️⃣9️⃣",
+    "answers": [
+      "The Napoleonic Wars",
+      "The Hundred Years War",
+      "The Russian Revolution",
+      "The French Revolution"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🦠🐀⚰️",
+    "answers": [
+      "The Spanish Flu",
+      "The Great Fire of London",
+      "The Black Death",
+      "The Irish Famine"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "💜🌧️",
+    "answers": [
+      "Blue Velvet",
+      "Yellow Submarine",
+      "Black Hole Sun",
+      "Purple Rain"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🪜🚪☁️",
+    "answers": [
+      "Stairway to Heaven",
+      "Highway to Hell",
+      "Knockin’ on Heaven’s Door",
+      "Bat Out of Hell"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🎸🏨🌵🇺🇸",
+    "answers": [
+      "Sweet Home Alabama",
+      "Hotel California",
+      "Take It Easy",
+      "California Dreamin’"
+    ],
+    "correct": 1,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🌈⬆️🎶",
+    "answers": [
+      "Singin’ in the Rain",
+      "Moon River",
+      "Over the Rainbow",
+      "Blue Skies"
+    ],
+    "correct": 2,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍎⬇️🌍",
+    "answers": [
+      "Inertia",
+      "Friction",
+      "Gravity",
+      "Magnetism"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🧬🪜",
+    "answers": [
+      "A protein chain",
+      "The cell membrane",
+      "A virus capsid",
+      "The DNA double helix"
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🕳️⚫🌌",
+    "answers": [
+      "A quasar",
+      "A supernova",
+      "A black hole",
+      "A nebula"
+    ],
+    "correct": 2,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "☀️🌱💨",
+    "answers": [
+      "Fermentation",
+      "Photosynthesis",
+      "Transpiration",
+      "Respiration"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍄🧫💊",
+    "answers": [
+      "Penicillin",
+      "Insulin",
+      "Aspirin",
+      "Vaccination"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⚛️➗💥",
+    "answers": [
+      "Nuclear fusion",
+      "Radioactive decay",
+      "Chemical combustion",
+      "Nuclear fission"
+    ],
+    "correct": 3,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "👨‍🔧🍄🐢",
+    "answers": [
+      "Crash Bandicoot",
+      "Donkey Kong",
+      "Sonic the Hedgehog",
+      "Super Mario Bros."
+    ],
+    "correct": 3,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🟦🟨🟩🧱",
+    "answers": [
+      "Tetris",
+      "Columns",
+      "Candy Crush",
+      "Bejeweled"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⚔️🧝‍♂️🔺🔺🔺",
+    "answers": [
+      "The Legend of Zelda",
+      "Final Fantasy",
+      "Dragon Quest",
+      "Chrono Trigger"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⛏️🟩🧱🐷",
+    "answers": [
+      "Minecraft",
+      "Terraria",
+      "Roblox",
+      "Fortnite"
+    ],
+    "correct": 0,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "⚡🐭🔴⚪",
+    "answers": [
+      "Digimon",
+      "Pokémon",
+      "Yu-Gi-Oh!",
+      "Tamagotchi"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🍒👻🟡",
+    "answers": [
+      "Donkey Kong",
+      "Pac-Man",
+      "Frogger",
+      "Space Invaders"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🐦🐷💥",
+    "answers": [
+      "Doodle Jump",
+      "Angry Birds",
+      "Cut the Rope",
+      "Fruit Ninja"
+    ],
+    "correct": 1,
+    "difficulty": 1
+  },
+  {
+    "category": "emoji",
+    "type": "mc",
+    "question": "🔫🚗🌆⭐",
+    "answers": [
+      "Grand Theft Auto",
+      "Need for Speed",
+      "Saints Row",
+      "Mafia"
+    ],
+    "correct": 0,
+    "difficulty": 2
+  }
+]

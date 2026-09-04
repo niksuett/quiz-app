@@ -1,0 +1,1192 @@
+[
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which food has been found still edible in 3,000-year-old Egyptian tombs?",
+    "answers": [
+      "Honey",
+      "Bread",
+      "Cheese",
+      "Dried dates"
+    ],
+    "correct": 0,
+    "topic": "food",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Botanically speaking, which of these is a true berry?",
+    "answers": [
+      "A strawberry",
+      "A banana",
+      "A raspberry",
+      "A blackberry"
+    ],
+    "correct": 1,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "A group of flamingos is known as a what?",
+    "answers": [
+      "A parade",
+      "A blush",
+      "A flamboyance",
+      "A shimmer"
+    ],
+    "correct": 2,
+    "topic": "facts",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Roughly how long did the shortest war in recorded history last?",
+    "answers": [
+      "About 40 hours",
+      "About 4 days",
+      "About 40 days",
+      "About 40 minutes"
+    ],
+    "correct": 3,
+    "topic": "history",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country is spread across the most time zones?",
+    "answers": [
+      "France",
+      "Russia",
+      "The United States",
+      "Australia"
+    ],
+    "correct": 0,
+    "topic": "geography",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Cleopatra lived closer in time to which of these?",
+    "answers": [
+      "The building of the Great Pyramid",
+      "The first Moon landing",
+      "The invention of writing",
+      "The first Egyptian dynasty"
+    ],
+    "correct": 1,
+    "topic": "history",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which planet spins on its side, rolling around the Sun like a barrel?",
+    "answers": [
+      "Neptune",
+      "Saturn",
+      "Uranus",
+      "Mercury"
+    ],
+    "correct": 2,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "On which planet does a single day last longer than a whole year?",
+    "answers": [
+      "Mercury",
+      "Mars",
+      "Jupiter",
+      "Venus"
+    ],
+    "correct": 3,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which letter appears in no US state name at all?",
+    "answers": [
+      "Q",
+      "Z",
+      "X",
+      "J"
+    ],
+    "correct": 0,
+    "topic": "language",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What colour is a polar bear's skin underneath its fur?",
+    "answers": [
+      "White",
+      "Black",
+      "Pink",
+      "Pale grey"
+    ],
+    "correct": 1,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "How many bones are in a giraffe's neck?",
+    "answers": [
+      "12",
+      "24",
+      "7",
+      "33"
+    ],
+    "correct": 2,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country drinks the most coffee per person?",
+    "answers": [
+      "Italy",
+      "Brazil",
+      "The United States",
+      "Finland"
+    ],
+    "correct": 3,
+    "topic": "food",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "The croissant is based on the kipferl, a crescent pastry from which country?",
+    "answers": [
+      "Austria",
+      "France",
+      "Belgium",
+      "Switzerland"
+    ],
+    "correct": 0,
+    "topic": "food",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which spice is the most expensive in the world by weight?",
+    "answers": [
+      "Vanilla",
+      "Saffron",
+      "Cardamom",
+      "Cinnamon"
+    ],
+    "correct": 1,
+    "topic": "food",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "In which sport would you perform a 'Fosbury Flop'?",
+    "answers": [
+      "The pole vault",
+      "Diving",
+      "The high jump",
+      "Gymnastics"
+    ],
+    "correct": 2,
+    "topic": "sports",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which sport has been played on the surface of the Moon?",
+    "answers": [
+      "Baseball",
+      "Tennis",
+      "Football",
+      "Golf"
+    ],
+    "correct": 3,
+    "topic": "sports",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which is the only national team to have played in every FIFA World Cup?",
+    "answers": [
+      "Brazil",
+      "Germany",
+      "Italy",
+      "Argentina"
+    ],
+    "correct": 0,
+    "topic": "sports",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "In tennis, what is a score of zero called?",
+    "answers": [
+      "Nil",
+      "Love",
+      "Duck",
+      "Blank"
+    ],
+    "correct": 1,
+    "topic": "sports",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country hosted the first modern Olympic Games in 1896?",
+    "answers": [
+      "France",
+      "England",
+      "Greece",
+      "Italy"
+    ],
+    "correct": 2,
+    "topic": "sports",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country has the only national flag in the world that is not four-sided?",
+    "answers": [
+      "Switzerland",
+      "Vatican City",
+      "Bhutan",
+      "Nepal"
+    ],
+    "correct": 3,
+    "topic": "geography",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which film was the first to feature synchronised spoken dialogue?",
+    "answers": [
+      "The Jazz Singer",
+      "Metropolis",
+      "Nosferatu",
+      "City Lights"
+    ],
+    "correct": 0,
+    "topic": "entertainment",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which was Disney's first feature-length animated film?",
+    "answers": [
+      "Pinocchio",
+      "Snow White and the Seven Dwarfs",
+      "Fantasia",
+      "Bambi"
+    ],
+    "correct": 1,
+    "topic": "entertainment",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which actor has starred in the most official James Bond films?",
+    "answers": [
+      "Sean Connery",
+      "Daniel Craig",
+      "Roger Moore",
+      "Pierce Brosnan"
+    ],
+    "correct": 2,
+    "topic": "entertainment",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "In the original Wizard of Oz book, what colour were Dorothy's slippers?",
+    "answers": [
+      "Ruby red",
+      "Gold",
+      "Emerald green",
+      "Silver"
+    ],
+    "correct": 3,
+    "topic": "entertainment",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What was the very first music video played on MTV?",
+    "answers": [
+      "'Video Killed the Radio Star'",
+      "'Billie Jean'",
+      "'Bohemian Rhapsody'",
+      "'Take On Me'"
+    ],
+    "correct": 0,
+    "topic": "entertainment",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What does the distress signal 'SOS' stand for?",
+    "answers": [
+      "Save Our Souls",
+      "Nothing - it was chosen for its simple Morse code",
+      "Save Our Ship",
+      "Send Out Search"
+    ],
+    "correct": 1,
+    "topic": "language",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What is the dot above a lowercase 'i' called?",
+    "answers": [
+      "A serif",
+      "A jot",
+      "A tittle",
+      "A caret"
+    ],
+    "correct": 2,
+    "topic": "language",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "The word 'ketchup' is thought to come from a sauce name in which language?",
+    "answers": [
+      "French",
+      "Spanish",
+      "Dutch",
+      "Chinese"
+    ],
+    "correct": 3,
+    "topic": "food",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which of these appeared on Earth first?",
+    "answers": [
+      "Sharks",
+      "Trees",
+      "Flowers",
+      "Grass"
+    ],
+    "correct": 0,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which animal can survive being frozen, boiled and exposed to the vacuum of space?",
+    "answers": [
+      "The cockroach",
+      "The tardigrade",
+      "The scorpion",
+      "The desert ant"
+    ],
+    "correct": 1,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "How many compartments does a cow's stomach have?",
+    "answers": [
+      "One",
+      "Two",
+      "Four",
+      "Seven"
+    ],
+    "correct": 2,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which bird is the only one able to fly backwards for sustained periods?",
+    "answers": [
+      "The kingfisher",
+      "The swift",
+      "The wren",
+      "The hummingbird"
+    ],
+    "correct": 3,
+    "topic": "science",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country produces the most coffee?",
+    "answers": [
+      "Brazil",
+      "Colombia",
+      "Vietnam",
+      "Ethiopia"
+    ],
+    "correct": 0,
+    "topic": "food",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "The wasabi served in most sushi restaurants is usually made from what?",
+    "answers": [
+      "Mustard seed",
+      "Horseradish",
+      "Green chilli",
+      "Ginger"
+    ],
+    "correct": 1,
+    "topic": "food",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Carrots were originally most commonly what colour?",
+    "answers": [
+      "Orange",
+      "White",
+      "Purple",
+      "Red"
+    ],
+    "correct": 2,
+    "topic": "food",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Pineapples were once so expensive in Britain that people did what with them?",
+    "answers": [
+      "Buried them with the dead",
+      "Used them as currency",
+      "Gave them as wedding dowries",
+      "Rented them to show off at parties"
+    ],
+    "correct": 3,
+    "topic": "food",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which African country defeated an invading European army at the Battle of Adwa in 1896?",
+    "answers": [
+      "Ethiopia",
+      "Morocco",
+      "Sudan",
+      "Liberia"
+    ],
+    "correct": 0,
+    "topic": "history",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Who was the first person to reach the South Pole?",
+    "answers": [
+      "Robert Falcon Scott",
+      "Roald Amundsen",
+      "Ernest Shackleton",
+      "Fridtjof Nansen"
+    ],
+    "correct": 1,
+    "topic": "history",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "The Hundred Years' War actually lasted how long?",
+    "answers": [
+      "Exactly 100 years",
+      "78 years",
+      "116 years",
+      "132 years"
+    ],
+    "correct": 2,
+    "topic": "history",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "The United States bought Alaska from which country?",
+    "answers": [
+      "Canada",
+      "Britain",
+      "Denmark",
+      "Russia"
+    ],
+    "correct": 3,
+    "topic": "history",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which two countries share the longest land border in the world?",
+    "answers": [
+      "Canada and the United States",
+      "Russia and China",
+      "Chile and Argentina",
+      "Kazakhstan and Russia"
+    ],
+    "correct": 0,
+    "topic": "geography",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which is the only sea on Earth with no coastline?",
+    "answers": [
+      "The Coral Sea",
+      "The Sargasso Sea",
+      "The Bering Sea",
+      "The Tasman Sea"
+    ],
+    "correct": 1,
+    "topic": "geography",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which city was the capital of the Byzantine Empire?",
+    "answers": [
+      "Athens",
+      "Rome",
+      "Constantinople",
+      "Alexandria"
+    ],
+    "correct": 2,
+    "topic": "history",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Sound travels fastest through which of these?",
+    "answers": [
+      "Air",
+      "Water",
+      "A vacuum",
+      "Steel"
+    ],
+    "correct": 3,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which human organ can regrow itself after losing most of its mass?",
+    "answers": [
+      "The liver",
+      "The kidney",
+      "The pancreas",
+      "The lung"
+    ],
+    "correct": 0,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which is the only country that lies in all four hemispheres?",
+    "answers": [
+      "Indonesia",
+      "Kiribati",
+      "Brazil",
+      "Ecuador"
+    ],
+    "correct": 1,
+    "topic": "geography",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Besides Spanish, which language is spoken by the most people in South America?",
+    "answers": [
+      "English",
+      "Quechua",
+      "Portuguese",
+      "German"
+    ],
+    "correct": 2,
+    "topic": "language",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country has the most pyramids in the world?",
+    "answers": [
+      "Egypt",
+      "Mexico",
+      "Peru",
+      "Sudan"
+    ],
+    "correct": 3,
+    "topic": "geography",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Roughly what share of the Solar System's total mass is the Sun?",
+    "answers": [
+      "More than 99%",
+      "About 75%",
+      "About 90%",
+      "About 60%"
+    ],
+    "correct": 0,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which of these metals is light enough to float on water?",
+    "answers": [
+      "Aluminium",
+      "Sodium",
+      "Titanium",
+      "Zinc"
+    ],
+    "correct": 1,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "How much taller does the Eiffel Tower get on a hot summer day?",
+    "answers": [
+      "About 1 millimetre",
+      "About 1.5 metres",
+      "About 15 centimetres",
+      "About 5 metres"
+    ],
+    "correct": 2,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country has the longest national anthem by number of words?",
+    "answers": [
+      "India",
+      "Mexico",
+      "Japan",
+      "Greece"
+    ],
+    "correct": 3,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which animal has fingerprints so similar to ours that they can be confused at a crime scene?",
+    "answers": [
+      "The koala",
+      "The chimpanzee",
+      "The gorilla",
+      "The orangutan"
+    ],
+    "correct": 0,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Bubble wrap was originally invented to be sold as what?",
+    "answers": [
+      "Packing material",
+      "Wallpaper",
+      "Loft insulation",
+      "Mattress filling"
+    ],
+    "correct": 1,
+    "topic": "facts",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What was the Slinky originally designed to be?",
+    "answers": [
+      "A children's toy",
+      "A door closer",
+      "A spring to steady instruments on ships",
+      "A radio antenna"
+    ],
+    "correct": 2,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Play-Doh was first sold as what?",
+    "answers": [
+      "Modelling clay for artists",
+      "A car-cleaning putty",
+      "A children's soap",
+      "A wallpaper cleaner"
+    ],
+    "correct": 3,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "An aircraft's 'black box' flight recorder is actually what colour?",
+    "answers": [
+      "Bright orange",
+      "Black",
+      "Yellow",
+      "Red"
+    ],
+    "correct": 0,
+    "topic": "facts",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country eats the most chocolate per person?",
+    "answers": [
+      "Belgium",
+      "Switzerland",
+      "Germany",
+      "The United States"
+    ],
+    "correct": 1,
+    "topic": "food",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Olympic gold medals were once awarded in which non-sporting category?",
+    "answers": [
+      "Cooking",
+      "Debating",
+      "Art",
+      "Fashion design"
+    ],
+    "correct": 2,
+    "topic": "sports",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "The FIA is the world governing body of which sport?",
+    "answers": [
+      "Sailing",
+      "Fencing",
+      "Archery",
+      "Motor racing"
+    ],
+    "correct": 3,
+    "topic": "sports",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Why is a marathon 42.195 km rather than a round number?",
+    "answers": [
+      "The 1908 London Olympic course was extended to finish at the royal box",
+      "It is the exact distance of the original run from Marathon to Athens",
+      "It was fixed by a coin toss in 1896",
+      "It matches 26 Roman miles"
+    ],
+    "correct": 0,
+    "topic": "sports",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "In which sport can you score a 'turkey'?",
+    "answers": [
+      "Darts",
+      "Ten-pin bowling",
+      "Curling",
+      "Archery"
+    ],
+    "correct": 1,
+    "topic": "sports",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "In which country was the sport of curling invented?",
+    "answers": [
+      "Canada",
+      "Sweden",
+      "Scotland",
+      "Norway"
+    ],
+    "correct": 2,
+    "topic": "sports",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which artist famously cut off part of his own ear?",
+    "answers": [
+      "Pablo Picasso",
+      "Claude Monet",
+      "Paul Gauguin",
+      "Vincent van Gogh"
+    ],
+    "correct": 3,
+    "topic": "entertainment",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which composer wrote his Ninth Symphony while completely deaf?",
+    "answers": [
+      "Ludwig van Beethoven",
+      "Wolfgang Amadeus Mozart",
+      "Johann Sebastian Bach",
+      "Johannes Brahms"
+    ],
+    "correct": 0,
+    "topic": "entertainment",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country produces the most feature films each year?",
+    "answers": [
+      "The United States",
+      "India",
+      "China",
+      "Nigeria"
+    ],
+    "correct": 1,
+    "topic": "entertainment",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What is the best-selling book series of all time?",
+    "answers": [
+      "The Lord of the Rings",
+      "Goosebumps",
+      "Harry Potter",
+      "Sherlock Holmes"
+    ],
+    "correct": 2,
+    "topic": "entertainment",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country has a national anthem with no official lyrics?",
+    "answers": [
+      "Portugal",
+      "Italy",
+      "Austria",
+      "Spain"
+    ],
+    "correct": 3,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which is the most visited museum in the world?",
+    "answers": [
+      "The Louvre",
+      "The British Museum",
+      "The Metropolitan Museum of Art",
+      "The Vatican Museums"
+    ],
+    "correct": 0,
+    "topic": "entertainment",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which city opened the world's first underground railway?",
+    "answers": [
+      "Paris",
+      "London",
+      "New York",
+      "Berlin"
+    ],
+    "correct": 1,
+    "topic": "facts",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country has the oldest parliament still in use today?",
+    "answers": [
+      "The United Kingdom",
+      "Greece",
+      "Iceland",
+      "San Marino"
+    ],
+    "correct": 2,
+    "topic": "history",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country was the first in the world to give women the vote in national elections?",
+    "answers": [
+      "Australia",
+      "Norway",
+      "The United States",
+      "New Zealand"
+    ],
+    "correct": 3,
+    "topic": "history",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What colour was the Statue of Liberty when it was first unveiled?",
+    "answers": [
+      "Brown",
+      "Green",
+      "Grey",
+      "Gold"
+    ],
+    "correct": 0,
+    "topic": "history",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "How many stars are on the flag of Brazil?",
+    "answers": [
+      "13",
+      "27",
+      "21",
+      "32"
+    ],
+    "correct": 1,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which creature has the largest eyes of any animal on Earth?",
+    "answers": [
+      "The blue whale",
+      "The ostrich",
+      "The colossal squid",
+      "The giant octopus"
+    ],
+    "correct": 2,
+    "topic": "science",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which animal reaches the highest speed of any on Earth?",
+    "answers": [
+      "The cheetah",
+      "The sailfish",
+      "The golden eagle",
+      "The peregrine falcon"
+    ],
+    "correct": 3,
+    "topic": "science",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country's alphabet was deliberately invented by a king in the 15th century?",
+    "answers": [
+      "Korea",
+      "Mongolia",
+      "Georgia",
+      "Armenia"
+    ],
+    "correct": 0,
+    "topic": "language",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "What is the most frequently used word in written English?",
+    "answers": [
+      "'I'",
+      "'the'",
+      "'and'",
+      "'you'"
+    ],
+    "correct": 1,
+    "topic": "language",
+    "difficulty": 1
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which of these countries drives on the left?",
+    "answers": [
+      "South Korea",
+      "China",
+      "Japan",
+      "Vietnam"
+    ],
+    "correct": 2,
+    "topic": "geography",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which is the largest country in the world with no permanent rivers?",
+    "answers": [
+      "Libya",
+      "Mongolia",
+      "Kazakhstan",
+      "Saudi Arabia"
+    ],
+    "correct": 3,
+    "topic": "geography",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which US state is at the same time the furthest north, the furthest west and the furthest east?",
+    "answers": [
+      "Alaska",
+      "Hawaii",
+      "Maine",
+      "Washington"
+    ],
+    "correct": 0,
+    "topic": "geography",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which African country has coastline on both the Atlantic and the Indian Ocean?",
+    "answers": [
+      "Egypt",
+      "South Africa",
+      "Kenya",
+      "Namibia"
+    ],
+    "correct": 1,
+    "topic": "geography",
+    "difficulty": 2
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Measured from its base rather than from sea level, which is the tallest mountain on Earth?",
+    "answers": [
+      "Mount Everest",
+      "K2",
+      "Mauna Kea",
+      "Denali"
+    ],
+    "correct": 2,
+    "topic": "geography",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Which country flies the oldest national flag still in use?",
+    "answers": [
+      "England",
+      "The Netherlands",
+      "Scotland",
+      "Denmark"
+    ],
+    "correct": 3,
+    "topic": "facts",
+    "difficulty": 3
+  },
+  {
+    "category": "trivia",
+    "type": "mc",
+    "question": "Percy Spencer invented which appliance after a chocolate bar melted in his pocket?",
+    "answers": [
+      "The microwave oven",
+      "The radar gun",
+      "The electric toaster",
+      "The refrigerator"
+    ],
+    "correct": 0,
+    "topic": "science",
+    "difficulty": 2
+  }
+]

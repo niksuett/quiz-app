@@ -276,7 +276,7 @@
     "reference": { "name": "Acoustic guitar", "icon": "guitar", "sizeM": 1.0, "dim": "length" }, "difficulty": 2 },
 
   { "type": "sizeup", "category": "sizeup", "question": "How long is a tennis racket at the legal maximum next to a 38 cm bowling pin?",
-    "target":    { "name": "Tennis racket", "icon": "tennis-racket", "sizeM": 0.685, "dim": "length" },
+    "target":    { "name": "Tennis racket", "icon": "tennis-racket", "sizeM": 0.737, "dim": "length" },
     "reference": { "name": "Bowling pin", "icon": "bowling-pin", "sizeM": 0.38, "dim": "height" }, "difficulty": 3 },
 
   { "type": "sizeup", "category": "sizeup", "question": "How wide is a football (soccer ball) across the middle, next to a 6.7 cm tennis ball?",
