@@ -483,6 +483,8 @@ function sendStateSnapshot(socket, game) {
       questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
       category: categoryMeta(q.category), timeLimit: mod.timeLimit, remainingMs, paused: game.isPaused,
       payload: game.currentPayload,
+      isLast: game.currentIndex === game.questions.length - 1,
+      multiplier: (game.options.finalDouble && game.currentIndex === game.questions.length - 1) ? 2 : 1,
       answered: !!(me && me.answer),
       myResult: me && me.answer ? { type: mod.type, quality: me.answer.quality, ...me.answer.result } : null,
     });
@@ -597,7 +599,7 @@ function showLeaderboard(game) {
 function endGame(game) {
   clearGameTimer(game);
   game.state = 'gameover';
-  const payload = { leaderboard: buildLeaderboard(game), awards: safe(() => scoring.computeAwards(game), []), totalQuestions: game.currentIndex + 1 };
+  const payload = { leaderboard: buildLeaderboard(game), awards: safe(() => scoring.computeAwards(game), []), totalQuestions: Math.min(game.currentIndex + 1, game.questions.length) };
   game.lastGameOver = payload;
   io.to(game.id).emit('game-over', payload);
   // Keep the game around so players can reload and still see the results

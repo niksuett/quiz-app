@@ -2,331 +2,394 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuizBlast ⚡</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1208">
+  <title>QuizBlast</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="screen-home">
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 1: HOME
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-home" class="screen active">
-    <div class="home-split">
-      <div class="home-left">
-        <svg class="home-globe" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="80" cy="80" r="72" stroke="rgba(212,160,53,.28)" stroke-width="1.5"/>
-          <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(212,160,53,.18)" stroke-width="1"/>
-          <ellipse cx="80" cy="80" rx="72" ry="17" stroke="rgba(212,160,53,.10)" stroke-width="1"/>
-          <line x1="80" y1="8" x2="80" y2="152" stroke="rgba(212,160,53,.15)" stroke-width="1"/>
-          <ellipse cx="80" cy="80" rx="34" ry="72" stroke="rgba(212,160,53,.10)" stroke-width="1"/>
-          <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(212,160,53,.45)" stroke-width="1" stroke-dasharray="5 5" class="globe-spin"/>
-          <circle cx="80" cy="8"   r="3" fill="rgba(212,160,53,.65)"/>
-          <circle cx="80" cy="152" r="2" fill="rgba(212,160,53,.35)"/>
-          <circle cx="80" cy="80"  r="4" fill="rgba(212,160,53,.18)" stroke="rgba(212,160,53,.5)" stroke-width="1"/>
-        </svg>
-        <div class="logo">QuizBlast</div>
-        <p class="subtitle">History · Science · Geography · Culture</p>
-      </div>
-      <div class="home-right">
-        <p class="home-right-prompt">Ready to play?</p>
-        <button class="btn btn-red"  onclick="hostGame()">Host a Game</button>
-        <button class="btn btn-blue" onclick="showScreen('screen-join')">Join a Game</button>
-      </div>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HOW THIS FILE WORKS
+     Every "screen" of the game is a <section class="screen"> below. Only the
+     one with class "active" is visible; client.js switches between them.
+     Game-type specific answer UIs are NOT in this file — they are built by the
+     modules in /games/<type>.js inside the empty #game-area box.
+════════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 1 · HOME
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-home" class="screen active">
+  <div class="home">
+    <div class="home-hero">
+      <svg class="home-globe" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="80" cy="80" r="72" stroke="rgba(212,160,53,.28)" stroke-width="1.5"/>
+        <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(212,160,53,.18)" stroke-width="1"/>
+        <ellipse cx="80" cy="80" rx="72" ry="17" stroke="rgba(212,160,53,.10)" stroke-width="1"/>
+        <line x1="80" y1="8" x2="80" y2="152" stroke="rgba(212,160,53,.15)" stroke-width="1"/>
+        <ellipse cx="80" cy="80" rx="34" ry="72" stroke="rgba(212,160,53,.10)" stroke-width="1"/>
+        <ellipse cx="80" cy="80" rx="72" ry="34" stroke="rgba(212,160,53,.45)" stroke-width="1" stroke-dasharray="5 5" class="globe-spin"/>
+        <circle cx="80" cy="8"   r="3" fill="rgba(212,160,53,.65)"/>
+        <circle cx="80" cy="152" r="2" fill="rgba(212,160,53,.35)"/>
+        <circle cx="80" cy="80"  r="4" fill="rgba(212,160,53,.18)" stroke="rgba(212,160,53,.5)" stroke-width="1"/>
+      </svg>
+      <h1 class="logo">QuizBlast</h1>
+      <p class="tagline">20 ways to play — draw borders, split populations, size up whales…</p>
     </div>
-  </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 2: HOST CONFIG — choose rounds, categories, autoplay
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-host-config" class="screen">
-    <div class="card">
-      <h2>Set Up Your Game</h2>
+    <div class="home-panel">
+      <p class="home-prompt">Ready to play?</p>
+      <button class="btn btn-primary btn-lg" id="btn-host">Host a Game</button>
+      <button class="btn btn-secondary btn-lg" id="btn-join">Join a Game</button>
+
+      <ol class="how-strip" aria-label="How it works">
+        <li><span class="how-num">1</span><span>Host picks the games</span></li>
+        <li><span class="how-num">2</span><span>Friends scan the code</span></li>
+        <li><span class="how-num">3</span><span>Everyone plays together</span></li>
+      </ol>
+    </div>
+
+    <footer class="credits">
+      Data &amp; imagery: Natural Earth · WorldPop · CARTO · Esri · game-icons.net · flagcdn.com
+      <a href="/admin-login.html" target="_blank" rel="noopener">Admin</a>
+    </footer>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 2 · HOST CONFIG  (everything inside is generated from /api/games)
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-config" class="screen screen-top">
+  <div class="card card-wide">
+    <div class="card-head">
+      <h2>Set up your game</h2>
+      <button class="btn-link" id="btn-config-back">← Home</button>
+    </div>
+
+    <div id="config-loading" class="hint">Loading the game catalogue…</div>
+
+    <div id="config-body" class="hidden">
+      <!-- Presets -->
+      <div class="config-section">
+        <h3>Quick picks</h3>
+        <div id="preset-row" class="preset-row"></div>
+      </div>
+
+      <!-- Categories grouped by catalog.groups -->
+      <div class="config-section" id="config-groups"></div>
+
+      <!-- Geographic focus -->
+      <div class="config-section">
+        <h3>Geographic focus</h3>
+        <div id="region-row" class="chip-row"></div>
+      </div>
+
+      <!-- Difficulty -->
+      <div class="config-section">
+        <h3>Difficulty</h3>
+        <div class="segmented" id="difficulty-seg" role="radiogroup">
+          <button type="button" data-value="mixed"  class="active">Mixed</button>
+          <button type="button" data-value="casual">Casual</button>
+          <button type="button" data-value="expert">Expert</button>
+        </div>
+      </div>
 
       <!-- Rounds -->
       <div class="config-section">
-        <h3>Number of Rounds</h3>
-        <div class="round-selector">
-          <button class="round-btn active" data-rounds="5">5</button>
-          <button class="round-btn"        data-rounds="10">10</button>
-          <button class="round-btn"        data-rounds="15">15</button>
-          <button class="round-btn"        data-rounds="20">20</button>
-          <button class="round-btn"        data-rounds="infinite">∞</button>
+        <h3>Rounds</h3>
+        <div class="pill-row" id="rounds-row" role="radiogroup">
+          <button type="button" data-value="5">5</button>
+          <button type="button" data-value="10" class="active">10</button>
+          <button type="button" data-value="15">15</button>
+          <button type="button" data-value="20">20</button>
+          <button type="button" data-value="infinite" aria-label="Endless">∞</button>
         </div>
       </div>
 
-      <!-- Categories -->
+      <!-- Toggles -->
       <div class="config-section">
-        <div class="config-section-header">
-          <h3>Categories</h3>
-          <button type="button" class="btn-deselect" onclick="deselectAllCategories()">Deselect all</button>
-        </div>
-        <div class="category-grid">
-          <label class="cat-card" data-cat="geo-natural">
-            <input type="checkbox" value="geo-natural" checked>
-            <span class="cat-emoji">🏔️</span>
-            <span class="cat-name">Natural Wonders</span>
-          </label>
-          <label class="cat-card" data-cat="geo-built">
-            <input type="checkbox" value="geo-built" checked>
-            <span class="cat-emoji">🏛️</span>
-            <span class="cat-name">Built World</span>
-          </label>
-          <label class="cat-card" data-cat="geo-cities">
-            <input type="checkbox" value="geo-cities" checked>
-            <span class="cat-emoji">🏙️</span>
-            <span class="cat-name">Cities</span>
-          </label>
-          <label class="cat-card" data-cat="geo-history">
-            <input type="checkbox" value="geo-history" checked>
-            <span class="cat-emoji">⚔️</span>
-            <span class="cat-name">Where in History</span>
-          </label>
-          <label class="cat-card" data-cat="timeline">
-            <input type="checkbox" value="timeline" checked>
-            <span class="cat-emoji">📅</span>
-            <span class="cat-name">Timeline</span>
-          </label>
-          <label class="cat-card" data-cat="estimation">
-            <input type="checkbox" value="estimation" checked>
-            <span class="cat-emoji">📏</span>
-            <span class="cat-name">Estimation</span>
-          </label>
-          <label class="cat-card" data-cat="sequence">
-            <input type="checkbox" value="sequence" checked>
-            <span class="cat-emoji">🔢</span>
-            <span class="cat-name">Sequence</span>
-          </label>
-          <label class="cat-card" data-cat="flags">
-            <input type="checkbox" value="flags" checked>
-            <span class="cat-emoji">🏳️</span>
-            <span class="cat-name">Flags</span>
-          </label>
-          <label class="cat-card" data-cat="facts">
-            <input type="checkbox" value="facts" checked>
-            <span class="cat-emoji">📚</span>
-            <span class="cat-name">Facts</span>
-          </label>
-          <label class="cat-card" data-cat="science">
-            <input type="checkbox" value="science" checked>
-            <span class="cat-emoji">🔬</span>
-            <span class="cat-name">Science</span>
-          </label>
-          <label class="cat-card" data-cat="entertainment">
-            <input type="checkbox" value="entertainment" checked>
-            <span class="cat-emoji">🎬</span>
-            <span class="cat-name">Entertainment</span>
-          </label>
-          <label class="cat-card" data-cat="sports">
-            <input type="checkbox" value="sports" checked>
-            <span class="cat-emoji">⚽</span>
-            <span class="cat-name">Sports</span>
-          </label>
-        </div>
+        <h3>Options</h3>
+        <label class="toggle-row">
+          <span class="toggle-text"><strong>Autoplay</strong><small>Next question starts by itself after the leaderboard</small></span>
+          <input type="checkbox" id="opt-autoplay" checked><span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-text"><strong>Round intros</strong><small>A short splash explains each game type before it starts</small></span>
+          <input type="checkbox" id="opt-intros" checked><span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-text"><strong>Final round ×2</strong><small>All points are doubled on the last question</small></span>
+          <input type="checkbox" id="opt-final-double" checked><span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
       </div>
 
-      <!-- Autoplay -->
+      <!-- Display mode -->
       <div class="config-section">
-        <h3>Autoplay</h3>
-        <div class="toggle-row">
-          <label class="toggle-wrap">
-            <input type="checkbox" id="autoplay-toggle" checked>
-            <span class="toggle-track"><span class="toggle-thumb"></span></span>
-          </label>
-          <span id="autoplay-desc" class="toggle-desc">On — next question loads automatically</span>
-        </div>
-      </div>
-
-      <!-- Display Mode -->
-      <div class="config-section">
-        <h3>Display Mode</h3>
-        <div class="scoring-selector" id="mode-selector">
-          <button class="scoring-btn active" data-mode="mobile">
-            <span class="scoring-name">📱 Mobile Mode</span>
-            <span class="scoring-desc">You play too — enter a nickname and join as a regular player. Best for small groups where everyone has their own phone.</span>
+        <h3>Display mode</h3>
+        <div class="mode-grid" id="mode-grid">
+          <button type="button" data-value="mobile" class="mode-card active">
+            <span class="mode-emoji">📱</span>
+            <span class="mode-name">Mobile</span>
+            <span class="mode-desc">You play too, on this device. Best for small groups.</span>
           </button>
-          <button class="scoring-btn" data-mode="tv">
-            <span class="scoring-name">📺 TV Mode</span>
-            <span class="scoring-desc">Your screen shows the questions on a shared display. Players join on their phones to answer — you just watch and control.</span>
+          <button type="button" data-value="tv" class="mode-card">
+            <span class="mode-emoji">📺</span>
+            <span class="mode-name">TV</span>
+            <span class="mode-desc">This screen shows questions on a big display; everyone answers on their phone.</span>
           </button>
         </div>
       </div>
+    </div>
 
-      <button class="btn btn-red"   onclick="createGame()">Create Game →</button>
-      <div id="config-error" class="error-msg hidden"></div>
-      <button class="btn btn-ghost" onclick="showScreen('screen-home')">← Back</button>
-      <div style="text-align:right; margin-top:16px;">
-        <a href="/admin-login.html" target="_blank"
-           style="font-size:0.75rem; color:#8a7040; text-decoration:none; opacity:0.6; letter-spacing:0.03em;">
-          Admin Panel
-        </a>
-      </div>
+    <div class="config-footer">
+      <div id="config-error" class="error-msg hidden" role="alert"></div>
+      <button class="btn btn-primary btn-lg" id="btn-create">Create game →</button>
     </div>
   </div>
+</section>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 3: HOST LOBBY — Game ID + player list
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-host-lobby" class="screen">
-    <div class="card">
-      <h2>Your Game ID</h2>
-      <div class="game-id-box" id="host-game-id">------</div>
-      <p class="hint">Tell players to go to <strong id="lobby-url"></strong><br>and enter this code</p>
-
-      <h3>Players joined: <span id="player-count">0</span></h3>
-      <ul id="player-list" class="player-list"></ul>
-
-      <!-- Mobile mode only: host enters their own nickname to play -->
-      <div id="host-nickname-section" class="hidden">
-        <p class="hint" style="margin-bottom:6px;">You're playing too — enter your nickname:</p>
-        <input type="text" id="host-nickname-input" class="text-input"
-               placeholder="Your nickname" maxlength="16">
-      </div>
-
-      <button class="btn btn-red" id="start-btn" onclick="startGame()">▶ Start Game</button>
-      <div id="start-error" class="error-msg hidden"></div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 4: JOIN
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-join" class="screen">
-    <div class="card center-card">
-      <h2>Join a Game</h2>
-      <input type="text" id="input-game-id"  class="text-input" placeholder="Game ID  (e.g. AB3K7M)" maxlength="6"
-             oninput="this.value = this.value.toUpperCase()">
-      <input type="text" id="input-nickname" class="text-input" placeholder="Your nickname" maxlength="16">
-      <button class="btn btn-red"   onclick="joinGame()">Join!</button>
-      <button class="btn btn-ghost" onclick="showScreen('screen-home')">← Back</button>
-      <div id="join-error" class="error-msg hidden"></div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 5: PLAYER LOBBY — waiting for host
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-player-lobby" class="screen">
-    <div class="card center-card">
-      <div class="big-emoji">🎉</div>
-      <h2>You're in!</h2>
-      <p>Playing as <strong id="lobby-nickname"></strong></p>
-      <p style="margin-top:6px; color:var(--aged);">Game: <strong id="lobby-game-id"></strong></p>
-      <p class="waiting-text">Waiting for the host to start the game…</p>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 6: QUESTION
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-question" class="screen question-screen">
-
-    <div class="question-header">
-      <span id="question-number">Question 1 / 5</span>
-      <!-- Live speed bonus counter — visible to players only, hidden for host -->
-      <div id="speed-bonus-display" class="speed-bonus-display hidden">
-        <span class="speed-bolt">⚡</span>
-        <span id="speed-bonus-value">+500</span>
-      </div>
-      <div class="timer-wrap">
-        <div class="timer-bar">
-          <div class="timer-fill" id="timer-fill"></div>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 3 · HOST LOBBY
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-host-lobby" class="screen screen-top">
+  <div class="card card-wide lobby">
+    <div class="lobby-grid">
+      <div class="lobby-code-panel">
+        <h3>Game code</h3>
+        <div class="game-code" id="host-game-code">------</div>
+        <img id="host-qr" class="qr" alt="QR code to join" src="" hidden>
+        <div class="join-link-row">
+          <span id="host-join-link" class="join-link"></span>
+          <button class="btn-mini" id="btn-copy-link" type="button">Copy</button>
         </div>
-        <span class="timer-text" id="timer-text">20</span>
+        <p class="hint" id="lobby-hint">Scan the code or open the link and enter the game code.</p>
+      </div>
+
+      <div class="lobby-players-panel">
+        <h3>Players <span class="count-badge" id="host-player-count">0</span></h3>
+        <div id="host-player-chips" class="chip-cloud"></div>
+        <p class="hint" id="host-empty-hint">Nobody here yet — share the code!</p>
       </div>
     </div>
 
-    <!-- Host-only: shows how many players have answered -->
-    <div id="answer-progress" class="answer-progress hidden">
-      <span id="progress-text">0 / 0 answered</span>
-    </div>
+    <p class="settings-summary" id="settings-summary"></p>
 
-    <div class="question-box">
-      <!-- Historical photo — shown only when the question has an imageUrl -->
-      <img id="question-photo" class="question-photo hidden" src="" alt="">
-      <p id="question-text">Loading…</p>
-    </div>
-
-    <div class="answers-grid" id="answers-grid"></div>
-
-    <!-- Speed hint: shown for MC/flag questions in Accuracy+Rank mode -->
-    <p id="question-hint" class="question-hint hidden"></p>
-
-    <p id="host-label" class="host-label hidden">👀 You're the host — watch the screen!</p>
-
-    <!-- Pause button: only shown to the host during a live question -->
-    <button id="pause-btn" class="pause-btn hidden" onclick="togglePause()">⏸ Pause</button>
-
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 7: ANSWER RESULT
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-answer-result" class="screen">
-    <div class="result-split">
-      <div class="result-left">
-        <div id="result-icon" class="result-icon">✓</div>
-        <h2  id="result-heading">Correct!</h2>
-        <p   id="result-subtitle" class="result-subtitle hidden"></p>
-        <div id="answer-compare" class="answer-compare hidden"></div>
-      </div>
-      <div class="result-right">
-        <!-- Score breakdown — shown for every answered question -->
-        <!-- Rank pending: shown for all correct answers (points decided at leaderboard time) -->
-        <p id="score-pending" class="score-pending hidden">Rank points — see leaderboard</p>
-
-        <!-- Wrong answers -->
-        <p id="score-zero" class="score-zero hidden">0 points</p>
-
-        <p class="result-coming-up">Leaderboard coming up…</p>
+    <div id="host-nickname-section" class="hidden">
+      <label class="field-label" for="host-nickname-input">Your nickname (you play too)</label>
+      <div class="nick-row">
+        <span class="avatar avatar-lg" id="host-avatar">?</span>
+        <input type="text" id="host-nickname-input" class="text-input" placeholder="Your nickname" maxlength="16" autocomplete="off">
       </div>
     </div>
-  </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 8: LEADERBOARD
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-leaderboard" class="screen">
-    <div class="card">
-      <h2>Leaderboard</h2>
-      <!-- Map reveal — only shown after geography questions -->
-      <div id="leaderboard-map" class="leaderboard-map-wrap hidden"></div>
-      <!-- Timeline reveal — only shown after timeline questions -->
-      <div id="leaderboard-timeline" class="leaderboard-timeline-wrap hidden"></div>
-      <!-- Sequence reveal — only shown after sequence questions -->
-      <div id="leaderboard-sequence" class="leaderboard-sequence-wrap hidden"></div>
-      <div id="correct-reveal" class="correct-reveal"></div>
-      <p id="lb-sort-label" class="lb-sort-label"></p>
-      <ol id="leaderboard-list" class="leaderboard-list"></ol>
-      <p  id="next-hint" class="hint" style="text-align:center; margin-top:16px;"></p>
-      <!-- Only shown to the host when autoplay is off -->
-      <button id="next-question-btn" class="btn btn-red hidden" onclick="nextQuestion()">
-        Next Question →
-      </button>
-      <!-- Pause button: only shown to the host when autoplay is on -->
-      <button id="pause-btn-lb" class="pause-btn hidden" onclick="togglePause()">⏸ Pause</button>
+    <div id="start-error" class="error-msg hidden" role="alert"></div>
+    <button class="btn btn-primary btn-lg" id="btn-start">▶ Start game</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 4 · JOIN
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-join" class="screen">
+  <div class="card card-narrow center">
+    <h2>Join a game</h2>
+    <p class="hint">Ask the host for the 6-letter code.</p>
+
+    <label class="field-label" for="join-code">Game code</label>
+    <input type="text" id="join-code" class="text-input code-input" placeholder="AB3K7M" maxlength="6"
+           autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text">
+
+    <label class="field-label" for="join-nickname">Nickname</label>
+    <div class="nick-row">
+      <span class="avatar avatar-lg" id="join-avatar">?</span>
+      <input type="text" id="join-nickname" class="text-input" placeholder="Your nickname" maxlength="16" autocomplete="off">
+    </div>
+
+    <div id="join-error" class="error-msg hidden" role="alert"></div>
+    <button class="btn btn-primary btn-lg" id="btn-join-go">Join</button>
+    <button class="btn btn-ghost" id="btn-join-back">← Back</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 5 · PLAYER LOBBY
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-player-lobby" class="screen">
+  <div class="card card-narrow center">
+    <span class="avatar avatar-xl" id="player-lobby-avatar">?</span>
+    <h2>You're in!</h2>
+    <p>Playing as <strong id="player-lobby-nick"></strong></p>
+    <p class="hint">Game <strong class="mono" id="player-lobby-code"></strong></p>
+
+    <div id="player-lobby-chips" class="chip-cloud chip-cloud-center"></div>
+
+    <p class="waiting-text"><span class="dots">Waiting for the host to start</span></p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 6 · ROUND INTRO SPLASH (full-bleed ink)
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-intro" class="screen screen-bleed">
+  <div class="intro">
+    <div class="intro-ribbon hidden" id="intro-ribbon">New round type</div>
+    <div class="intro-final hidden" id="intro-final">Final round</div>
+    <div class="intro-emoji" id="intro-emoji">🗺️</div>
+    <div class="intro-round" id="intro-round">Round 1 of 10</div>
+    <h2 class="intro-label" id="intro-label">Cities</h2>
+    <p class="intro-howto" id="intro-howto"></p>
+    <div class="intro-progress"><div class="intro-progress-fill" id="intro-progress"></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 7 · QUESTION
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-question" class="screen screen-top">
+  <div class="question-col">
+
+    <!-- Play bar: category, round counter, timer ring, mute, host menu -->
+    <div class="play-bar">
+      <div class="play-cat" id="play-cat"><span class="play-cat-emoji" id="play-cat-emoji">🗺️</span><span id="play-cat-label">Cities</span></div>
+      <div class="play-round" id="play-round">1 / 10</div>
+      <div class="play-right">
+        <div class="timer-ring" id="timer-ring" aria-live="off">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <circle class="timer-ring-track" cx="24" cy="24" r="20"/>
+            <circle class="timer-ring-fill" id="timer-ring-fill" cx="24" cy="24" r="20"/>
+          </svg>
+          <span class="timer-ring-text" id="timer-text">20</span>
+        </div>
+        <button class="icon-btn mute-btn" type="button" aria-label="Toggle sound" title="Sound">🔊</button>
+        <div class="host-menu" id="host-menu">
+          <button class="icon-btn" id="btn-host-menu" type="button" aria-label="Host controls" aria-haspopup="true">⋯</button>
+          <div class="host-menu-pop hidden" id="host-menu-pop">
+            <button type="button" id="btn-pause">⏸ Pause</button>
+            <button type="button" id="btn-skip">⏭ Skip question</button>
+            <button type="button" id="btn-end" class="danger">■ End game</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="final-badge hidden" id="question-final-badge">Final round · ×2 points</div>
+
+    <!-- Prompt card: optional photo + question text -->
+    <div class="prompt-card" id="prompt-card">
+      <img id="question-photo" class="question-photo" alt="" hidden>
+      <p id="question-text" class="question-text"></p>
+    </div>
+
+    <!-- The game module renders its answering UI in here -->
+    <div id="game-area"></div>
+
+    <div class="locked-banner hidden" id="locked-banner">
+      <span class="locked-icon">🔒</span>
+      <span id="locked-text">Locked in — waiting for others</span>
+    </div>
+
+    <div class="answer-progress hidden" id="answer-progress">
+      <span id="answer-progress-text">0 / 0 answered</span>
+      <div class="progress-track"><div class="progress-fill" id="answer-progress-fill"></div></div>
     </div>
   </div>
+</section>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCREEN 9: GAME OVER
-  ════════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-game-over" class="screen">
-    <div class="card">
-      <h2>🏆 Final Results</h2>
-      <ol id="final-leaderboard" class="leaderboard-list"></ol>
-      <button class="btn btn-red" style="margin-top:24px;" onclick="window.location.reload()">
-        Play Again
-      </button>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 8 · ANSWER RESULT
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-answer-result" class="screen">
+  <div class="result-split">
+    <div class="result-left">
+      <div class="result-icon" id="result-icon">✓</div>
+      <h2 id="result-heading">Correct!</h2>
+      <p id="result-subtitle" class="result-subtitle hidden"></p>
+      <div id="result-html" class="result-html"></div>
+    </div>
+    <div class="result-right">
+      <div class="acc-meter" id="acc-meter">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="acc-track" cx="60" cy="60" r="50"/>
+          <circle class="acc-fill"  cx="60" cy="60" r="50" id="acc-fill"/>
+        </svg>
+        <div class="acc-center">
+          <span class="acc-num" id="acc-num">0</span>
+          <span class="acc-label">accuracy pts</span>
+        </div>
+      </div>
+      <p class="acc-speed hidden" id="acc-speed"></p>
+      <p class="acc-pending" id="acc-pending">Rank bonus decided at the leaderboard</p>
+      <p class="streak-note hidden" id="result-streak"></p>
+      <p class="coming-up"><span class="dots">Leaderboard coming up</span></p>
     </div>
   </div>
+</section>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="client.js"></script>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 9 · LEADERBOARD
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-leaderboard" class="screen screen-top">
+  <div class="card card-wide leaderboard">
+    <div class="lb-head">
+      <h2 id="lb-title">Round 1 of 10</h2>
+      <div class="lb-head-right">
+        <span class="final-badge hidden" id="lb-final-badge">Final round · ×2</span>
+        <button class="icon-btn mute-btn" type="button" aria-label="Toggle sound" title="Sound">🔊</button>
+        <button class="icon-btn hidden" id="btn-lb-pause" type="button" aria-label="Pause">⏸</button>
+      </div>
+    </div>
+
+    <div id="reveal-area" class="reveal-area"></div>
+
+    <div class="correct-banner" id="correct-banner">
+      <span class="cr-tag" id="correct-tag">Cities</span>
+      <span class="cr-answer" id="correct-text"></span>
+    </div>
+
+    <p class="lb-sort-label" id="lb-sort-label">This round</p>
+    <ol id="leaderboard-list" class="lb-list"></ol>
+
+    <div class="lb-footer">
+      <p class="hint" id="lb-hint"></p>
+      <button class="btn btn-primary btn-lg hidden" id="btn-next">Next question →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 10 · GAME OVER
+════════════════════════════════════════════════════════════════════════════ -->
+<section id="screen-game-over" class="screen screen-top">
+  <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+  <div class="card card-wide gameover">
+    <h2 class="gameover-title">Final results</h2>
+    <p class="hint center" id="gameover-sub"></p>
+
+    <div class="podium" id="podium"></div>
+
+    <div id="awards" class="awards"></div>
+
+    <h3 class="standings-title">Standings</h3>
+    <ol id="final-standings" class="lb-list lb-final"></ol>
+
+    <div class="gameover-actions" id="gameover-host-actions">
+      <button class="btn btn-primary btn-lg" id="btn-rematch">🔁 Rematch</button>
+      <button class="btn btn-ghost" id="btn-new-game">New game</button>
+    </div>
+    <p class="waiting-text hidden" id="gameover-wait"><span class="dots">Waiting for the host</span></p>
+  </div>
+</section>
+
+<!-- Small notices (Reconnected, Host paused, …) -->
+<div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="client.js"></script>
 </body>
 </html>

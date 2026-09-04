@@ -1,0 +1,59 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/flag.css — flag questions (type "flag")
+   The buttons and bar chart are styled by mc.css (imported here so flag
+   questions look right even if the core loads this file before mc.css).
+   Prefix: .flag-
+══════════════════════════════════════════════════════════════════════════ */
+@import url('/games/mc.css');
+
+.flag-wrap { width: 100%; text-align: center; }
+
+.flag-prompt {
+  font-family: var(--font-lora);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--parchment);
+  margin: 0 0 14px;
+  opacity: 0;
+  animation: flagFade .3s ease forwards;
+}
+@keyframes flagFade { to { opacity: 1; } }
+
+/* Parchment mat around the flag image */
+.flag-frame {
+  display: inline-block;
+  padding: 8px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  margin-bottom: 18px;
+  opacity: 0;
+  transform: scale(.96);
+  animation: flagPop .38s cubic-bezier(.22,1,.36,1) .05s forwards;
+}
+@keyframes flagPop { to { opacity: 1; transform: scale(1); } }
+.flag-img {
+  display: block;
+  width: min(320px, 78vw);
+  height: auto;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+}
+.flag-frame-sm { margin-bottom: 12px; padding: 6px; }
+.flag-frame-sm .flag-img { width: 140px; }
+
+.flag-choices { width: 100%; }
+.flag-error { color: var(--wrong); font-family: var(--font-garamond); }
+
+/* TV mode */
+.flag-wrap.is-tv .flag-prompt { font-size: 1.5rem; }
+.flag-wrap.is-tv .flag-img    { width: min(440px, 50vw); }
+
+/* Reveal */
+.flag-reveal { width: 100%; text-align: center; }
+.flag-reveal .mc-reveal { text-align: left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flag-prompt, .flag-frame { animation: none !important; opacity: 1; transform: none; }
+}

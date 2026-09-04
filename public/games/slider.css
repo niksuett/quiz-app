@@ -1,0 +1,195 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/slider.css — estimation slider (type "slider")
+   Also imported by timeline.css (the year slider shares every rule here).
+   Prefix: .sl-
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Question card ──────────────────────────────────────────────────────── */
+.sl-wrap {
+  width: 100%;
+  padding: 26px 22px 24px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-top: 2px solid var(--gold);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  text-align: center;
+  opacity: 0;
+  animation: slIn .3s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes slIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.sl-value-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-bottom: 8px; }
+.sl-number {
+  width: 8ch; min-width: 120px; max-width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 2px solid rgba(200,146,42,.4);
+  border-radius: 0;
+  padding: 4px 2px;
+  outline: none;
+  text-align: center;
+  font-family: var(--font-cinzel);
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  transition: border-color .2s;
+}
+.sl-number:focus { border-bottom-color: var(--gold); }
+.sl-number:disabled { opacity: .55; }
+.sl-number::-webkit-outer-spin-button, .sl-number::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sl-number[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.sl-unit { font-family: var(--font-cinzel); font-size: 1.25rem; font-weight: 700; color: var(--gold-muted); white-space: nowrap; }
+.sl-hint { font-family: var(--font-garamond); font-style: italic; color: var(--aged); font-size: .92rem; margin: -2px 0 10px; }
+.sl-hint strong { font-style: normal; color: var(--ink); }
+
+/* Range track: the filled part uses --sl-pct set from JS */
+.sl-track-wrap { padding: 14px 4px 6px; }
+.sl-range {
+  --sl-pct: 50%;
+  width: 100%; height: 44px;                      /* tall hit area for thumbs */
+  margin: 0;
+  -webkit-appearance: none; appearance: none;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.sl-range:focus-visible { outline: none; }
+.sl-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold) 0 var(--sl-pct), var(--parchment-dark) var(--sl-pct) 100%);
+}
+.sl-range::-moz-range-track { height: 6px; border-radius: 3px; background: var(--parchment-dark); }
+.sl-range::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--gold); }
+.sl-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px; height: 30px; margin-top: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--gold));
+  border: 2px solid var(--parchment);
+  box-shadow: 0 2px 8px rgba(200,146,42,.55), 0 0 0 3px rgba(200,146,42,.18);
+  transition: transform .12s ease;
+}
+.sl-range::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--gold));
+  border: 2px solid var(--parchment);
+  box-shadow: 0 2px 8px rgba(200,146,42,.55);
+}
+.sl-range:active::-webkit-slider-thumb, .sl-range:focus-visible::-webkit-slider-thumb { transform: scale(1.18); }
+.sl-range:disabled { cursor: default; opacity: .7; }
+
+.sl-bounds, .sl-ticks {
+  display: flex; justify-content: space-between;
+  margin-top: 2px; padding: 0 2px;
+  font-family: var(--font-cinzel); font-size: .68rem; letter-spacing: .04em;
+  color: var(--aged); font-variant-numeric: tabular-nums;
+}
+.sl-ticks span { flex: 1; text-align: center; white-space: nowrap; }
+.sl-ticks span:first-child { text-align: left; }
+.sl-ticks span:last-child  { text-align: right; }
+
+.sl-lock { margin-top: 18px; width: auto !important; display: inline-block; padding: 14px 40px; min-height: 48px; }
+.sl-lock:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
+.sl-wrap.is-locked .sl-lock { background: var(--correct-bg); color: var(--correct); border-color: var(--correct); opacity: 1; }
+.sl-host-hint { margin-top: 14px; font-family: var(--font-garamond); font-style: italic; color: var(--aged); font-size: 1rem; }
+
+/* TV mode */
+.sl-wrap.is-tv { padding: 34px 40px 30px; }
+.sl-wrap.is-tv .sl-number { font-size: 3.4rem; }
+.sl-wrap.is-tv .sl-bounds, .sl-wrap.is-tv .sl-ticks { font-size: .9rem; }
+.sl-wrap.is-tv .sl-host-hint { font-size: 1.3rem; }
+
+@media (max-width: 400px) { .sl-number { font-size: 2rem; min-width: 100px; } .sl-unit { font-size: 1rem; } }
+
+/* ─── Result screen compare (dark ink panel) ─────────────────────────────── */
+.sl-cmp { display: flex; gap: 8px; margin-top: 14px; width: 100%; max-width: 360px; }
+.sl-cmp-cell {
+  flex: 1; min-width: 0;
+  padding: 10px 12px;
+  border-radius: 3px;
+  background: rgba(245,237,224,.06);
+  border-left: 3px solid rgba(245,237,224,.25);
+  text-align: left;
+}
+.sl-cmp-cell.is-correct { border-left-color: var(--gold); background: rgba(200,146,42,.14); }
+.sl-cmp-label { display: block; font-family: var(--font-cinzel); font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(200,180,140,.6); margin-bottom: 3px; }
+.sl-cmp-value { display: block; font-family: var(--font-cinzel); font-size: 1.05rem; font-weight: 700; color: var(--parchment); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.sl-cmp-cell.is-correct .sl-cmp-value { color: var(--gold-bright); }
+.sl-cmp-diff { margin-top: 8px; font-family: var(--font-garamond); font-style: italic; font-size: .95rem; color: rgba(245,237,224,.7); }
+
+/* ─── Leaderboard axis reveal ────────────────────────────────────────────── */
+.sl-reveal {
+  width: 100%;
+  padding: 16px 18px 12px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: 2px solid var(--gold);
+  border-radius: 4px;
+  overflow: visible;
+}
+.sl-rv-title {
+  text-align: center;
+  font-family: var(--font-cinzel); font-size: .64rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--aged); margin-bottom: 14px;
+}
+.sl-rv-track { position: relative; height: 62px; margin: 0 16px; }
+.sl-rv-axis  { position: absolute; left: 0; right: 0; bottom: 14px; height: 3px; background: var(--ink-mid); border-radius: 2px; }
+.sl-rv-tick  { position: absolute; bottom: 9px; width: 2px; height: 13px; background: var(--ink-mid); transform: translateX(-50%); border-radius: 1px; }
+.sl-rv-labels { position: relative; height: 18px; margin: 4px 16px 0; }
+.sl-rv-ticklabel {
+  position: absolute; transform: translateX(-50%);
+  font-family: var(--font-cinzel); font-size: .68rem; color: var(--ink-light); white-space: nowrap; line-height: 1; letter-spacing: .03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A pin = circle (initial) + stem + triangle tip; the tip touches the axis. */
+.sl-pin {
+  --pin-color: var(--lapis);
+  position: absolute; bottom: 17px;
+  display: flex; flex-direction: column; align-items: center;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: slPinIn .38s cubic-bezier(.22,1,.36,1) forwards;
+  z-index: 1;
+}
+@keyframes slPinIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(.8); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1);  }
+}
+.sl-pin-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--pin-color);
+  border: 2px solid var(--parchment);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-cinzel); font-size: 9.5px; font-weight: 700; color: var(--parchment);
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+.sl-pin-stem { width: 2px; background: var(--pin-color); }
+.sl-pin-tip  { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--pin-color); }
+.sl-pin.is-star { z-index: 3; }
+.sl-pin.is-star .sl-pin-dot { width: 28px; height: 28px; color: var(--ink); font-size: 14px; box-shadow: 0 0 14px rgba(200,146,42,.6), 0 2px 8px rgba(0,0,0,.3); }
+.sl-pin.is-me { z-index: 2; }
+.sl-pin.is-me .sl-pin-dot { box-shadow: 0 0 0 2px var(--ink), 0 2px 8px rgba(0,0,0,.35); }
+
+/* Legend chips under the axis, closest first */
+.sl-rv-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 8px; margin-top: 10px; }
+.sl-rv-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 9px 3px 6px; border-radius: 12px;
+  background: rgba(26,18,8,.05);
+  font-family: var(--font-garamond); font-size: .88rem; color: var(--ink-light);
+  opacity: 0; animation: slChipIn .3s ease forwards;
+}
+@keyframes slChipIn { to { opacity: 1; } }
+.sl-rv-chip i { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.sl-rv-chip b { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sl-rv-chip small { font-size: .78rem; color: var(--aged); font-style: italic; }
+.sl-rv-chip.is-me { background: rgba(30,58,110,.12); box-shadow: 0 0 0 1px var(--lapis) inset; }
+.sl-rv-nobody { font-family: var(--font-garamond); font-style: italic; color: var(--aged); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sl-wrap, .sl-pin, .sl-rv-chip { animation: none !important; opacity: 1; transform: translateX(-50%); }
+  .sl-wrap, .sl-rv-chip { transform: none; }
+}

@@ -6,814 +6,1305 @@
   <title>QuizBlast — Question Editor</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
   <style>
+    /* ═══════════════════════════════════════════════════════════════════════
+       QuizBlast question editor — a dark, utilitarian tool page.
+       Everything on this page is driven by two HTTP calls:
+         GET /api/games        → which game types / categories / regions exist
+         GET /admin/questions  → every question in quiz.db
+       Edits happen in memory; "Save all changes" POSTs the full list back.
+       ═══════════════════════════════════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #07070f;
-      color: #e4e4e7;
-      min-height: 100vh;
-      padding: 0 0 80px;
+    :root {
+      --bg:      #0b0a0f;
+      --panel:   #14131a;
+      --line:    rgba(255,255,255,.08);
+      --line-2:  rgba(255,255,255,.16);
+      --text:    #e6e2da;
+      --muted:   #8a857c;
+      --faint:   #5b5750;
+      --gold:    #c8922a;
+      --gold-2:  #e0ad4a;
+      --lapis:   #4f7bd6;
+      --ok:      #4fbf7a;
+      --bad:     #e0605d;
+      --radius:  10px;
+      --font:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    /* ── Top bar ── */
+    html { color-scheme: dark; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+
+    /* ── Top bar ──────────────────────────────────────────────────────────── */
     .topbar {
-      background: rgba(255,255,255,.035);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      padding: 14px 24px;
+      height: 54px;
+      background: rgba(20,19,26,.9);
+      border-bottom: 1px solid var(--line);
+      padding: 0 20px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       position: sticky;
       top: 0;
       z-index: 100;
       backdrop-filter: blur(12px);
     }
-    .topbar-logo { font-size: 1.1rem; font-weight: 700; color: #a5b4fc; letter-spacing: .02em; }
-    .topbar-title { font-size: 1rem; color: #71717a; }
-    .topbar-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
-    .save-status { font-size: .8rem; color: #52525b; transition: color .3s; }
-    .save-status.ok  { color: #4ade80; }
-    .save-status.err { color: #f87171; }
-
-    /* ── Layout ── */
-    .layout { display: flex; height: calc(100vh - 53px); }
-
-    /* ── Sidebar (categories) ── */
-    .sidebar {
-      width: 200px;
-      flex-shrink: 0;
-      border-right: 1px solid rgba(255,255,255,.07);
-      padding: 16px 0;
-      overflow-y: auto;
+    .topbar-logo {
+      font-family: 'Cinzel', Georgia, serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--gold-2);
+      letter-spacing: .04em;
+      white-space: nowrap;
     }
-    .sidebar h3 {
-      font-size: .65rem;
+    .topbar-title { color: var(--muted); white-space: nowrap; }
+    .topbar-right { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+    .topbar-right a { color: var(--muted); text-decoration: none; font-size: .85rem; }
+    .topbar-right a:hover { color: var(--text); }
+
+    .status {
+      font-size: .8rem;
+      color: var(--faint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .25s;
+      white-space: nowrap;
+    }
+    .status.ok    { color: var(--ok); }
+    .status.err   { color: var(--bad); }
+    .status.dirty { color: var(--gold-2); }
+    .status.dirty::before {
+      content: '';
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold-2);
+      box-shadow: 0 0 0 3px rgba(224,173,74,.2);
+    }
+
+    /* ── Layout ───────────────────────────────────────────────────────────── */
+    .layout { display: flex; min-height: calc(100vh - 54px); }
+
+    /* ── Sidebar (groups + categories, built from /api/games) ─────────────── */
+    .sidebar {
+      width: 236px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--line);
+      padding: 14px 0 90px;
+      overflow-y: auto;
+      position: sticky;
+      top: 54px;
+      height: calc(100vh - 54px);
+    }
+    .side-group {
+      font-size: .66rem;
       text-transform: uppercase;
-      letter-spacing: .1em;
-      color: #52525b;
-      padding: 0 16px 8px;
+      letter-spacing: .12em;
+      color: var(--faint);
+      padding: 14px 16px 6px;
+      display: flex; gap: 6px; align-items: center;
     }
     .cat-btn {
       width: 100%;
       text-align: left;
-      padding: 9px 16px;
+      padding: 9px 14px 9px 16px;
       background: none;
       border: none;
-      color: #a1a1aa;
-      cursor: pointer;
+      border-right: 2px solid transparent;
+      color: var(--muted);
       font-size: .88rem;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      min-height: 40px;
       transition: background .15s, color .15s;
     }
-    .cat-btn:hover  { background: rgba(255,255,255,.04); color: #e4e4e7; }
-    .cat-btn.active { background: rgba(99,102,241,.12); color: #a5b4fc; border-right: 2px solid #6366f1; }
-    .cat-count { font-size: .75rem; background: rgba(255,255,255,.07); padding: 1px 7px; border-radius: 999px; }
-
-    /* ── Main panel ── */
-    .main { flex: 1; overflow-y: auto; padding: 24px; }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
+    .cat-btn .cat-emoji { width: 20px; text-align: center; flex-shrink: 0; }
+    .cat-btn .cat-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cat-btn:hover  { background: rgba(255,255,255,.04); color: var(--text); }
+    .cat-btn.active { background: rgba(200,146,42,.10); color: var(--gold-2); border-right-color: var(--gold); }
+    .cat-count {
+      font-size: .72rem;
+      background: rgba(255,255,255,.07);
+      padding: 1px 7px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
     }
-    .panel-header h2 { font-size: 1.1rem; font-weight: 600; }
-    .btn-add {
-      margin-left: auto;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
-      border: none;
-      padding: 8px 18px;
+    .cat-btn.active .cat-count { background: rgba(200,146,42,.18); color: var(--gold-2); }
+    .cat-btn.empty .cat-label, .cat-btn.empty .cat-emoji { opacity: .55; }
+
+    /* ── Main panel ───────────────────────────────────────────────────────── */
+    .main { flex: 1; min-width: 0; padding: 22px 24px 110px; }
+
+    .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .panel-header h2 { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .panel-header .sub { color: var(--faint); font-size: .85rem; }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line-2);
+      color: var(--text);
+      padding: 0 14px;
+      height: 36px;
       border-radius: 8px;
       font-size: .85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .15s;
+      font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background .15s, border-color .15s, transform .1s;
+      white-space: nowrap;
     }
-    .btn-add:hover { opacity: .85; }
-
-    /* ── Question list ── */
-    .q-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .q-row {
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 10px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: border-color .15s;
-    }
-    .q-row:hover { border-color: rgba(255,255,255,.14); }
-
-    .q-type-badge {
-      font-size: .65rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      padding: 3px 8px;
-      border-radius: 5px;
-      flex-shrink: 0;
+    .btn:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.25); }
+    .btn:active { transform: scale(.97); }
+    .btn.primary {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #1a1208;
       font-weight: 700;
     }
-    .badge-text     { background: rgba(99,102,241,.2);  color: #a5b4fc; }
-    .badge-flag     { background: rgba(14,165,233,.2);  color: #7dd3fc; }
-    .badge-slider   { background: rgba(234,179,8,.2);   color: #fde047; }
-    .badge-timeline { background: rgba(249,115,22,.2);  color: #fdba74; }
-    .badge-map      { background: rgba(34,197,94,.2);   color: #86efac; }
-    .badge-sequence { background: rgba(236,72,153,.2);  color: #f9a8d4; }
+    .btn.primary:hover { background: var(--gold-2); border-color: var(--gold-2); }
+    .btn.danger:hover { background: rgba(224,96,93,.14); border-color: rgba(224,96,93,.5); color: #f0a09e; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-    .q-text { flex: 1; font-size: .88rem; color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .q-detail { font-size: .75rem; color: #52525b; flex-shrink: 0; }
+    /* ── Toolbar (search + type filter) ───────────────────────────────────── */
+    .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap::before {
+      content: '⌕';
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%) scaleX(-1);
+      color: var(--faint); font-size: 1.1rem; pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%; height: 36px;
+      padding: 0 32px 0 32px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .search-wrap .clear {
+      position: absolute; right: 4px; top: 4px;
+      width: 28px; height: 28px; border-radius: 6px;
+      background: none; border: none; color: var(--faint);
+    }
+    .search-wrap .clear:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .toolbar select {
+      height: 36px; padding: 0 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-width: 140px;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold) !important; box-shadow: 0 0 0 3px rgba(200,146,42,.15); }
+    select option { background: #1b1a22; }
 
+    /* ── Error / info panels ──────────────────────────────────────────────── */
+    .panel-msg {
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex; gap: 12px; align-items: flex-start;
+      animation: fadeIn .24s ease-out;
+    }
+    .panel-msg.err  { background: rgba(224,96,93,.10); border: 1px solid rgba(224,96,93,.35); }
+    .panel-msg.ok   { background: rgba(79,191,122,.10); border: 1px solid rgba(79,191,122,.35); }
+    .panel-msg .body { flex: 1; min-width: 0; }
+    .panel-msg strong { display: block; margin-bottom: 4px; }
+    .panel-msg ul { margin: 4px 0 0 18px; font-family: var(--mono); font-size: .78rem; color: #f0b3b1; max-height: 220px; overflow: auto; }
+    .panel-msg .close { background: none; border: none; color: var(--muted); font-size: 1.1rem; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    .panel-msg .close:hover { color: var(--text); background: rgba(255,255,255,.08); }
+
+    /* ── Question list ────────────────────────────────────────────────────── */
+    .q-list { display: flex; flex-direction: column; gap: 6px; }
+    .q-row {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 12px 10px 14px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: "badge text actions" "badge detail actions";
+      column-gap: 12px;
+      row-gap: 3px;
+      align-items: center;
+      transition: border-color .15s, background .15s;
+    }
+    .q-row:hover { border-color: var(--line-2); background: #17161e; }
+    .q-row.highlight { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,146,42,.15); }
+    .q-badge {
+      grid-area: badge;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      min-width: 66px;
+      text-align: center;
+      align-self: start;
+      margin-top: 2px;
+      background: rgba(255,255,255,.08);
+      color: var(--muted);
+    }
+    .badge-mc        { background: rgba(79,123,214,.2);  color: #a9c1f2; }
+    .badge-flag      { background: rgba(14,165,233,.2);  color: #7dd3fc; }
+    .badge-slider    { background: rgba(200,146,42,.22); color: #f0c674; }
+    .badge-timeline  { background: rgba(249,115,22,.2);  color: #fdba74; }
+    .badge-map       { background: rgba(79,191,122,.2);  color: #93e0b1; }
+    .badge-sequence  { background: rgba(236,72,153,.2);  color: #f9a8d4; }
+    .badge-trace     { background: rgba(168,85,247,.2);  color: #d8b4fe; }
+    .badge-sizeup    { background: rgba(20,184,166,.2);  color: #99f6e4; }
+    .badge-halves    { background: rgba(244,63,94,.2);   color: #fda4af; }
+    .badge-curve     { background: rgba(132,204,22,.2);  color: #d9f99d; }
+    .badge-compass   { background: rgba(6,182,212,.2);   color: #a5f3fc; }
+    .badge-tune      { background: rgba(217,70,239,.2);  color: #f0abfc; }
+    .badge-silhouette{ background: rgba(100,116,139,.3); color: #cbd5e1; }
+    .badge-fakes     { background: rgba(245,158,11,.2);  color: #fcd34d; }
+
+    .q-text { grid-area: text; font-size: .92rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 8px; }
+    .q-text .flag-thumb { height: 18px; border-radius: 2px; flex-shrink: 0; border: 1px solid var(--line); }
+    .q-detail { grid-area: detail; font-size: .76rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+    .q-detail .id { color: var(--faint); font-family: var(--mono); font-size: .7rem; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: .68rem;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .chip.region { border-color: rgba(79,123,214,.4); color: #a9c1f2; }
+    .chip.diff-1 { border-color: rgba(79,191,122,.4); color: #93e0b1; }
+    .chip.diff-2 { border-color: rgba(200,146,42,.4); color: #f0c674; }
+    .chip.diff-3 { border-color: rgba(224,96,93,.4);  color: #f0a09e; }
+    .chip.topic  { border-color: rgba(255,255,255,.12); }
+
+    .q-actions { grid-area: actions; display: flex; gap: 4px; }
     .btn-icon {
       background: none;
-      border: 1px solid rgba(255,255,255,.1);
-      color: #71717a;
+      border: 1px solid transparent;
+      color: var(--faint);
       border-radius: 7px;
-      width: 30px; height: 30px;
-      cursor: pointer;
-      font-size: .85rem;
+      width: 34px; height: 34px;
+      font-size: .9rem;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
       transition: background .15s, color .15s, border-color .15s;
     }
-    .btn-icon:hover         { background: rgba(255,255,255,.06); color: #e4e4e7; border-color: rgba(255,255,255,.2); }
-    .btn-icon.delete:hover  { background: rgba(239,68,68,.12); color: #f87171; border-color: rgba(239,68,68,.3); }
+    .btn-icon:hover        { background: rgba(255,255,255,.07); color: var(--text); border-color: var(--line); }
+    .btn-icon.delete:hover { background: rgba(224,96,93,.12); color: #f0a09e; border-color: rgba(224,96,93,.3); }
 
-    /* ── Form drawer ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--faint); }
+    .list-foot { text-align: center; color: var(--faint); font-size: .8rem; padding: 14px; }
+    .list-foot button { background: none; border: none; color: var(--gold-2); text-decoration: underline; }
+
+    /* ── Form drawer ──────────────────────────────────────────────────────── */
+    #form-area, #msg-area, .q-row { scroll-margin-top: 70px; }   /* keep targets clear of the sticky top bar */
     .form-drawer {
-      background: rgba(255,255,255,.025);
-      border: 1px solid rgba(255,255,255,.09);
-      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid rgba(200,146,42,.35);
+      border-radius: 14px;
       padding: 20px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      animation: fadeIn .24s ease-out;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35);
     }
-    .form-drawer h3 { font-size: .95rem; font-weight: 600; margin-bottom: 16px; color: #a5b4fc; }
+    .form-drawer h3 { font-size: 1rem; font-weight: 600; color: var(--gold-2); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .form-drawer h3 .id { color: var(--faint); font-family: var(--mono); font-size: .75rem; font-weight: 400; }
+    .form-section { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: var(--faint); margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); }
 
     .form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-    .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 160px; }
-    .form-group label { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: #71717a; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
+    .form-group.narrow { flex: 0 1 160px; }
+    .form-group.wide   { flex: 1 1 100%; }
+    .form-group label { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+    .form-group label .req { color: var(--bad); }
+    .form-group label small { text-transform: none; letter-spacing: 0; color: var(--faint); font-size: .72rem; }
     .form-group input, .form-group select, .form-group textarea {
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 7px;
-      color: #e4e4e7;
-      padding: 8px 10px;
-      font-size: .88rem;
-      font-family: inherit;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line-2);
+      border-radius: 8px;
+      padding: 9px 11px;
+      min-height: 40px;
       transition: border-color .15s;
       width: 100%;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none;
-      border-color: #6366f1;
-    }
-    .form-group select option { background: #18181b; }
-    .form-group textarea { resize: vertical; min-height: 60px; }
+    .form-group textarea { resize: vertical; min-height: 64px; line-height: 1.45; }
+    .form-group textarea.json { font-family: var(--mono); font-size: .8rem; min-height: 200px; white-space: pre; tab-size: 2; }
+    .form-group textarea.json.bad { border-color: var(--bad); }
+    .form-group textarea.json.good { border-color: rgba(79,191,122,.6); }
+    .hint { font-size: .76rem; color: var(--faint); }
+    .hint.ok  { color: var(--ok); }
+    .hint.bad { color: var(--bad); }
 
-    .answers-grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .answer-wrap { position: relative; }
-    .answer-wrap input { padding-right: 36px; }
-    .correct-radio {
-      position: absolute;
-      right: 8px; top: 50%; transform: translateY(-50%);
-      accent-color: #4ade80;
-      width: 16px; height: 16px;
-      cursor: pointer;
-    }
+    .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .answer-wrap { position: relative; display: flex; align-items: center; }
+    .answer-wrap .n { position: absolute; left: 11px; color: var(--faint); font-size: .75rem; pointer-events: none; }
+    .answer-wrap input { padding-left: 28px; padding-right: 40px; }
+    .answer-wrap input.is-correct { border-color: rgba(79,191,122,.6); background: rgba(79,191,122,.06); }
+    .correct-radio { position: absolute; right: 12px; accent-color: var(--ok); width: 18px; height: 18px; cursor: pointer; }
 
-    .form-actions { display: flex; gap: 10px; margin-top: 16px; }
-    .btn-save-q {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 8px;
-      font-size: .88rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-cancel-q {
-      background: rgba(255,255,255,.05);
-      color: #a1a1aa;
-      border: 1px solid rgba(255,255,255,.1);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: .88rem;
-      cursor: pointer;
-    }
+    .seq-item { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+    .seq-item .n { width: 22px; height: 22px; border-radius: 50%; background: rgba(200,146,42,.18); color: var(--gold-2); font-size: .75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .seq-item input { flex: 1; background: rgba(255,255,255,.04); border: 1px solid var(--line-2); border-radius: 8px; padding: 9px 11px; min-height: 40px; }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: #52525b; font-size: .9rem; }
+    .flag-preview { height: 42px; border-radius: 4px; border: 1px solid var(--line-2); background: rgba(255,255,255,.04); }
 
-    /* ── Global save button ── */
-    .global-save {
-      position: fixed;
-      bottom: 24px; right: 24px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 12px;
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 24px rgba(99,102,241,.4);
-      transition: opacity .15s, transform .1s;
-    }
-    .global-save:hover  { opacity: .9; transform: translateY(-1px); }
-    .global-save:active { transform: translateY(0); }
+    .form-error { background: rgba(224,96,93,.10); border: 1px solid rgba(224,96,93,.35); border-radius: 8px; padding: 10px 12px; font-size: .85rem; color: #f0b3b1; margin-top: 12px; display: none; }
+    .form-error.show { display: block; animation: fadeIn .2s ease-out; }
+    .form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    .form-actions .spacer { flex: 1; }
 
-    /* ── Flag preview ── */
-    .flag-preview { height: 36px; border-radius: 4px; border: 1px solid rgba(255,255,255,.1); vertical-align: middle; }
-
-    /* ── Admin map picker ── */
+    /* ── Map picker ───────────────────────────────────────────────────────── */
     #admin-map {
-      height: 320px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.12);
-      margin-top: 10px;
+      height: min(60vh, 380px);
+      border-radius: 10px;
+      border: 1px solid var(--line-2);
       cursor: crosshair;
+      touch-action: none;
+      background: #222;
     }
-    .map-hint {
-      font-size: .75rem;
-      color: #52525b;
-      margin-top: 5px;
+    .leaflet-container { font-family: var(--font); }
+
+    /* ── Floating save bar ────────────────────────────────────────────────── */
+    .savebar {
+      position: fixed;
+      bottom: 18px; right: 18px;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(20,19,26,.92);
+      border: 1px solid var(--line-2);
+      border-radius: 14px;
+      padding: 8px 8px 8px 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.45);
+      z-index: 90;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .savebar.dirty { border-color: rgba(200,146,42,.6); box-shadow: 0 8px 32px rgba(200,146,42,.18); }
+    .savebar .info { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+    .savebar .btn.primary { height: 40px; padding: 0 20px; }
+    .savebar .btn.primary .dot { width: 8px; height: 8px; border-radius: 50%; background: #1a1208; opacity: 0; transition: opacity .2s; }
+    .savebar.dirty .btn.primary .dot { opacity: 1; animation: pulse 1.4s ease-in-out infinite; }
+
+    kbd { font-family: var(--mono); font-size: .7rem; background: rgba(255,255,255,.08); border: 1px solid var(--line-2); border-radius: 4px; padding: 1px 5px; color: var(--muted); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    @keyframes pulse  { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+    /* ── Small screens: sidebar becomes a horizontal strip ────────────────── */
+    @media (max-width: 820px) {
+      .layout { flex-direction: column; }
+      .sidebar {
+        width: 100%; height: auto; position: static;
+        border-right: none; border-bottom: 1px solid var(--line);
+        display: flex; overflow-x: auto; padding: 8px 10px; gap: 4px;
+      }
+      .side-group { display: none; }
+      .cat-btn { width: auto; border-right: none; border-bottom: 2px solid transparent; border-radius: 8px; padding: 8px 10px; }
+      .cat-btn.active { border-bottom-color: transparent; }
+      .main { padding: 16px 12px 120px; }
+      .q-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "badge actions" "text actions" "detail actions"; }
+      .q-badge { justify-self: start; }
+      .answers-grid { grid-template-columns: 1fr; }
+      .savebar { left: 12px; right: 12px; bottom: 12px; justify-content: space-between; }
+      .topbar-title { display: none; }
     }
   </style>
 </head>
 <body>
 
 <div class="topbar">
-  <span class="topbar-logo">⚡ QuizBlast</span>
+  <span class="topbar-logo">QuizBlast</span>
   <span class="topbar-title">/ Question Editor</span>
   <div class="topbar-right">
-    <span class="save-status" id="save-status"></span>
-    <a href="/" style="color:#71717a; font-size:.8rem; text-decoration:none;">← Back to game</a>
-    <a href="/admin-logout" style="color:#71717a; font-size:.8rem; text-decoration:none;">Log out</a>
+    <span class="status" id="status"></span>
+    <a href="/">← Back to game</a>
+    <a href="/admin-logout">Log out</a>
   </div>
 </div>
 
 <div class="layout">
-  <nav class="sidebar">
-    <h3>Categories</h3>
-    <button class="cat-btn active" data-cat="all" onclick="selectCat('all')">
-      All <span class="cat-count" id="count-all">0</span>
-    </button>
-    <button class="cat-btn" data-cat="facts" onclick="selectCat('facts')">
-      📚 Facts <span class="cat-count" id="count-facts">0</span>
-    </button>
-    <button class="cat-btn" data-cat="science" onclick="selectCat('science')">
-      🔬 Science <span class="cat-count" id="count-science">0</span>
-    </button>
-    <button class="cat-btn" data-cat="sports" onclick="selectCat('sports')">
-      ⚽ Sports <span class="cat-count" id="count-sports">0</span>
-    </button>
-    <button class="cat-btn" data-cat="entertainment" onclick="selectCat('entertainment')">
-      🎬 Entertainment <span class="cat-count" id="count-entertainment">0</span>
-    </button>
-    <button class="cat-btn" data-cat="flags" onclick="selectCat('flags')">
-      🏳️ Flags <span class="cat-count" id="count-flags">0</span>
-    </button>
-    <button class="cat-btn" data-cat="estimation" onclick="selectCat('estimation')">
-      📏 Estimation <span class="cat-count" id="count-estimation">0</span>
-    </button>
-    <button class="cat-btn" data-cat="timeline" onclick="selectCat('timeline')">
-      📅 Timeline <span class="cat-count" id="count-timeline">0</span>
-    </button>
-    <button class="cat-btn" data-cat="geo-built" onclick="selectCat('geo-built')">
-      🏛️ Built World <span class="cat-count" id="count-geo-built">0</span>
-    </button>
-    <button class="cat-btn" data-cat="geo-natural" onclick="selectCat('geo-natural')">
-      🏔️ Natural Wonders <span class="cat-count" id="count-geo-natural">0</span>
-    </button>
-    <button class="cat-btn" data-cat="geo-cities" onclick="selectCat('geo-cities')">
-      🏙️ Cities <span class="cat-count" id="count-geo-cities">0</span>
-    </button>
-    <button class="cat-btn" data-cat="geo-history" onclick="selectCat('geo-history')">
-      ⚔️ Where in History <span class="cat-count" id="count-geo-history">0</span>
-    </button>
-    <button class="cat-btn" data-cat="sequence" onclick="selectCat('sequence')">
-      🔢 Sequence <span class="cat-count" id="count-sequence">0</span>
-    </button>
-  </nav>
+  <nav class="sidebar" id="sidebar"><!-- built by renderSidebar() --></nav>
 
   <main class="main" id="main-panel">
     <div class="panel-header">
-      <h2 id="panel-title">All Questions</h2>
-      <button class="btn-add" onclick="openAddForm()">+ Add Question</button>
+      <h2 id="panel-title">All questions</h2>
+      <span class="sub" id="panel-sub"></span>
+      <div class="header-actions">
+        <button class="btn" onclick="importJson()" title="Append questions from a JSON file">⤓ Import JSON</button>
+        <button class="btn" onclick="exportJson()" title="Download the visible category as JSON">⤒ Export JSON</button>
+        <button class="btn primary" onclick="openAddForm()">+ Add question</button>
+      </div>
     </div>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <input id="search" placeholder="Search prompt, answers, location…" oninput="onSearch(this.value)" autocomplete="off">
+        <button class="clear" id="search-clear" onclick="clearSearch()" title="Clear" hidden>✕</button>
+      </div>
+      <select id="type-filter" onchange="onTypeFilter(this.value)"><option value="">All types</option></select>
+    </div>
+
+    <div id="msg-area"></div>
     <div id="form-area"></div>
     <div class="q-list" id="q-list"></div>
   </main>
 </div>
 
-<button class="global-save" onclick="saveToServer()">Save All Changes</button>
+<div class="savebar" id="savebar">
+  <span class="info" id="savebar-info">All changes saved</span>
+  <button class="btn primary" onclick="saveToServer()" id="btn-save"><span class="dot"></span> Save all changes</button>
+</div>
+
+<!-- hidden file picker used by "Import JSON" -->
+<input type="file" id="import-file" accept=".json,application/json" hidden onchange="onImportFile(this)">
 
 <script>
-// ── Auth guard ─────────────────────────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════════════════════════
+// Auth guard — the server sets this cookie on /admin-auth. Without it every
+// /admin/* request answers 401, so send the browser to the login page early.
+// ═════════════════════════════════════════════════════════════════════════════
 if (!document.cookie.split(';').some(c => c.trim() === 'adminAuth=ilikehistory99')) {
   window.location.href = '/admin-login.html';
 }
 
-// ── State ──────────────────────────────────────────────────────────────────────
-let questions = [];
-let currentCat = 'all';
-let editingIndex = null; // index in `questions` array, or null for "add new"
+// ═════════════════════════════════════════════════════════════════════════════
+// State
+// ═════════════════════════════════════════════════════════════════════════════
+let catalog      = null;   // result of GET /api/games (types, categories, groups, regions)
+let questions    = [];     // every question, in memory. Saved with "Save all changes".
+let currentCat   = 'all';  // sidebar selection: 'all' or a category id
+let searchText   = '';     // search box (lower-cased)
+let typeFilter   = '';     // type filter select ('' = all)
+let editingIndex = null;   // index into `questions` while editing, null while adding
+let dirty        = false;  // true when there are unsaved edits
+let showAll      = false;  // list shows the first 300 rows unless the user asks for all
 
-const CATEGORIES = ['facts','science','sports','entertainment','flags','estimation','timeline',
-                    'geo-built','geo-natural','geo-cities','geo-history','sequence'];
+const LIST_LIMIT = 300;
+const DIFFICULTY_LABEL = { 1: 'casual', 2: 'normal', 3: 'expert' };
+const TOPICS = ['facts', 'science', 'sports', 'entertainment', 'other'];
 
-const TYPE_FOR_CAT = {
-  facts: 'text', science: 'text', sports: 'text', entertainment: 'text',
-  flags: 'flag', estimation: 'slider', timeline: 'timeline',
-  'geo-built': 'map', 'geo-natural': 'map', 'geo-cities': 'map', 'geo-history': 'map',
-  sequence: 'sequence'
+// Field names every question shares. Everything else is "type-specific" and,
+// for types without a dedicated editor, is edited as raw JSON.
+const COMMON_FIELDS = ['id', 'category', 'type', 'question', 'imageUrl', 'region', 'difficulty'];
+
+// Starting JSON for the generic editor (from docs/ARCHITECTURE.md §9).
+const GENERIC_TEMPLATES = {
+  trace:      { pairId: 'FRA-ESP' },
+  sizeup:     { target: { name: 'Eiffel Tower', icon: 'tower', sizeM: 330, dim: 'height' }, reference: { name: 'Blue whale', icon: 'whale', sizeM: 30, dim: 'length' } },
+  halves:     { regionId: 'FRA' },
+  curve:      { series: [[2000, 10], [2010, 20], [2020, 30]], xLabel: 'Year', yLabel: 'Value', yMin: 0, yMax: 50, unit: '', source: '', knownFraction: 0.5 },
+  compass:    { from: { name: 'Paris', lat: 48.8566, lng: 2.3522 }, to: { name: 'Berlin', lat: 52.52, lng: 13.405 } },
+  tune:       { notes: [[60, 1], [62, 1], [64, 1], [65, 1]], bpm: 120, wave: 'square', answers: ['', '', '', ''], correct: 0 },
+  silhouette: { iso3: 'FRA', answers: ['France', 'Spain', 'Italy', 'Germany'], correct: 0 },
+  fakes:      { items: [{ text: '', fake: false }, { text: '', fake: false }, { text: '', fake: false }, { text: '', fake: true }, { text: '', fake: true }, { text: '', fake: true }] },
 };
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════════════════════════
+// Small helpers
+// ═════════════════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function formatYear(y) {
+  const n = Math.round(Number(y));
+  if (Number.isNaN(n)) return '';
+  if (n < 0)    return `${Math.abs(n)} BCE`;
+  if (n < 1000) return `${n} CE`;
+  return String(n);
+}
+function catById(id)      { return catalog.categories.find(c => c.id === id) || null; }
+function typeForCat(id)   { const c = catById(id); return c ? c.type : null; }
+function catsForType(t)   { return catalog.categories.filter(c => c.type === t); }
+function typeIds()        { return catalog.types.map(t => t.type); }
+function hasEditor(type)  { return ['mc', 'flag', 'slider', 'timeline', 'map', 'sequence'].includes(type); }
+function regionLabel(id)  { const r = catalog.regions.find(r => r.id === id); return r ? `${r.emoji} ${r.label}` : id; }
+
+// Fetch wrapper that sends the user back to the login page on a 401.
+async function api(url, opts) {
+  const res = await fetch(url, opts);
+  if (res.status === 401) { window.location.href = '/admin-login.html'; throw new Error('Not authorised'); }
+  return res;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Boot — load the catalog and the questions in parallel, then render.
+// ═════════════════════════════════════════════════════════════════════════════
 async function boot() {
-  const res = await fetch('/admin/questions');
-  questions = await res.json();
-  updateCounts();
+  try {
+    const [gamesRes, qRes] = await Promise.all([api('/api/games'), api('/admin/questions')]);
+    catalog   = await gamesRes.json();
+    questions = await qRes.json();
+  } catch (e) {
+    showMessage('err', 'Could not load the editor', [e.message]);
+    return;
+  }
+  renderTypeFilter();
+  renderSidebar();
   renderList();
+  setDirty(false);
 }
 boot();
 
-// ── Category filter ───────────────────────────────────────────────────────────
+// Warn before leaving with unsaved edits (browsers show their own generic text).
+window.addEventListener('beforeunload', e => {
+  if (!dirty) return;
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+// Keyboard shortcuts: Ctrl/Cmd+S saves to the server, Escape closes the form.
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveToServer(); }
+  if (e.key === 'Escape' && $('form-area').innerHTML) closeForm();
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Sidebar — groups and categories come from the catalog; counts from memory.
+// ═════════════════════════════════════════════════════════════════════════════
+function countsByCategory() {
+  const counts = {};
+  for (const q of questions) counts[q.category] = (counts[q.category] || 0) + 1;
+  return counts;
+}
+
+function renderSidebar() {
+  const counts = countsByCategory();
+  const btn = (id, emoji, label, count) => `
+    <button class="cat-btn ${id === currentCat ? 'active' : ''} ${count === 0 ? 'empty' : ''}" data-cat="${escHtml(id)}" onclick="selectCat('${escHtml(id)}')">
+      <span class="cat-emoji">${emoji}</span><span class="cat-label">${escHtml(label)}</span><span class="cat-count">${count}</span>
+    </button>`;
+
+  let html = btn('all', '☰', 'All questions', questions.length);
+  const seen = new Set();
+  for (const g of catalog.groups) {
+    const cats = catalog.categories.filter(c => c.group === g.id);
+    if (!cats.length) continue;
+    html += `<div class="side-group">${g.emoji} ${escHtml(g.label)}</div>`;
+    for (const c of cats) { seen.add(c.id); html += btn(c.id, c.emoji, c.label, counts[c.id] || 0); }
+  }
+  // Categories in the catalog that belong to no known group, and categories
+  // found in the data that the catalog does not know (e.g. a module was removed).
+  const stray = catalog.categories.filter(c => !seen.has(c.id));
+  const orphan = Object.keys(counts).filter(id => !catById(id));
+  if (stray.length || orphan.length) {
+    html += `<div class="side-group">❔ Other</div>`;
+    for (const c of stray) html += btn(c.id, c.emoji, c.label, counts[c.id] || 0);
+    for (const id of orphan) html += btn(id, '⚠️', id + ' (unknown)', counts[id]);
+  }
+  $('sidebar').innerHTML = html;
+}
+
+function renderTypeFilter() {
+  const sel = $('type-filter');
+  sel.innerHTML = '<option value="">All types</option>' +
+    typeIds().map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
 function selectCat(cat) {
   currentCat = cat;
+  showAll = false;
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
-  const labels = {
-    all: 'All Questions', facts: '📚 Facts', science: '🔬 Science',
-    sports: '⚽ Sports', entertainment: '🎬 Entertainment', flags: '🏳️ Flags',
-    estimation: '📏 Estimation', timeline: '📅 Timeline',
-    'geo-built': '🏛️ Built World', 'geo-natural': '🏔️ Natural Wonders',
-    'geo-cities': '🏙️ Cities', 'geo-history': '⚔️ Where in History',
-    sequence: '🔢 Sequence'
-  };
-  document.getElementById('panel-title').textContent = labels[cat] || cat;
   closeForm();
   renderList();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function updateCounts() {
-  const total = questions.length;
-  document.getElementById('count-all').textContent = total;
-  CATEGORIES.forEach(cat => {
-    const el = document.getElementById('count-' + cat);
-    if (el) el.textContent = questions.filter(q => q.category === cat).length;
-  });
-  // legacy 'geography' cat no longer in sidebar, but keep tally silent
+function onSearch(v)     { searchText = v.trim().toLowerCase(); $('search-clear').hidden = !v; showAll = false; renderList(); }
+function clearSearch()   { $('search').value = ''; onSearch(''); }
+function onTypeFilter(v) { typeFilter = v; showAll = false; renderList(); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Question list
+// ═════════════════════════════════════════════════════════════════════════════
+
+// Text used by the search box: prompt, answers, sequence items, location, etc.
+function searchBlob(q) {
+  const parts = [q.question, q.locationName, q.topic, q.region];
+  if (Array.isArray(q.answers)) parts.push(...q.answers);
+  if (Array.isArray(q.items))   parts.push(...q.items.map(i => typeof i === 'string' ? i : (i && i.text) || ''));
+  if (q.target && q.target.name) parts.push(q.target.name);
+  if (q.reference && q.reference.name) parts.push(q.reference.name);
+  if (q.from && q.from.name) parts.push(q.from.name);
+  if (q.to && q.to.name) parts.push(q.to.name);
+  return parts.filter(Boolean).join(' \n ').toLowerCase();
 }
 
-// ── Render question list ──────────────────────────────────────────────────────
+function visibleQuestions() {
+  return questions.filter(q =>
+    (currentCat === 'all' || q.category === currentCat) &&
+    (!typeFilter || (q.type || 'mc') === typeFilter) &&
+    (!searchText || searchBlob(q).includes(searchText)));
+}
+
+// One-line summary shown under the prompt in the list.
+function detailFor(q) {
+  const type = q.type || 'mc';
+  switch (type) {
+    case 'mc':       return Array.isArray(q.answers) ? `✓ ${q.answers[q.correct] ?? '?'}` : '';
+    case 'flag':     return `${String(q.question).toUpperCase()} · ✓ ${Array.isArray(q.answers) ? q.answers[q.correct] : '?'}`;
+    case 'slider':   return `${q.min} – ${q.max} ${q.unit || ''} · ✓ ${q.correct} ${q.unit || ''}`;
+    case 'timeline': return `${formatYear(q.min)} – ${formatYear(q.max)} · ✓ ${formatYear(q.correct)}`;
+    case 'map': {
+      const bits = [q.locationName || `${q.correctLat}, ${q.correctLng}`];
+      if (q.toleranceKm) bits.push(`±${q.toleranceKm} km`);
+      if (q.satellite)   bits.push(`sat z${q.satellite.zoom}`);
+      return bits.join(' · ');
+    }
+    case 'sequence': return Array.isArray(q.items) ? q.items.join(' → ') : '';
+    default: {
+      const keys = Object.keys(q).filter(k => !COMMON_FIELDS.includes(k));
+      return keys.map(k => `${k}: ${JSON.stringify(q[k])}`).join(' · ').slice(0, 160);
+    }
+  }
+}
+
 function renderList() {
-  const list = document.getElementById('q-list');
-  const filtered = currentCat === 'all' ? questions : questions.filter(q => q.category === currentCat);
+  const list = $('q-list');
+  const rows = visibleQuestions();
+  const cat  = currentCat === 'all' ? null : catById(currentCat);
 
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state">No questions yet. Click "+ Add Question" to create one.</div>';
+  $('panel-title').innerHTML = cat ? `${cat.emoji} ${escHtml(cat.label)}` : (currentCat === 'all' ? 'All questions' : `⚠️ ${escHtml(currentCat)}`);
+  $('panel-sub').textContent = (searchText || typeFilter) ? `${rows.length} match${rows.length === 1 ? '' : 'es'}` : `${rows.length} question${rows.length === 1 ? '' : 's'}`;
+
+  if (!rows.length) {
+    list.innerHTML = `<div class="empty-state">${searchText || typeFilter ? 'Nothing matches the current filter.' : 'No questions here yet — click "+ Add question".'}</div>`;
     return;
   }
 
-  list.innerHTML = filtered.map((q, filteredIdx) => {
+  const shown = showAll ? rows : rows.slice(0, LIST_LIMIT);
+  list.innerHTML = shown.map(q => {
     const realIdx = questions.indexOf(q);
-    const type = q.type || 'text';
-    const badge = `<span class="q-type-badge badge-${type}">${type}</span>`;
-    let text = '';
-    let detail = '';
-
+    const type = q.type || 'mc';
+    let prompt = escHtml(q.question);
     if (type === 'flag') {
-      text = `<img src="https://flagcdn.com/32x24/${q.question}.png" class="flag-preview" alt="${q.question}"> &nbsp;${q.answers[q.correct]}`;
-      detail = q.question.toUpperCase();
-    } else if (type === 'map') {
-      text = q.question;
-      detail = q.locationName;
-    } else if (type === 'slider' || type === 'timeline') {
-      text = q.question;
-      detail = `${q.min} – ${q.max} ${q.unit || ''}  ✓ ${q.correct}`;
-    } else if (type === 'sequence') {
-      text = q.question;
-      detail = q.items ? `${q.items.length} items` : '';
-    } else {
-      text = q.question;
-      detail = `✓ ${q.answers[q.correct]}`;
+      prompt = `<img class="flag-thumb" src="https://flagcdn.com/32x24/${escHtml(q.question)}.png" alt=""> ${escHtml(Array.isArray(q.answers) ? q.answers[q.correct] : q.question)}`;
     }
+    const chips = [];
+    if (q.region)     chips.push(`<span class="chip region">${escHtml(regionLabel(q.region))}</span>`);
+    if (q.difficulty) chips.push(`<span class="chip diff-${q.difficulty}">${DIFFICULTY_LABEL[q.difficulty] || q.difficulty}</span>`);
+    if (q.topic)      chips.push(`<span class="chip topic">${escHtml(q.topic)}</span>`);
+    if (q.imageUrl)   chips.push(`<span class="chip" title="${escHtml(q.imageUrl)}">🖼</span>`);
+    if (currentCat === 'all') { const c = catById(q.category); chips.push(`<span class="chip">${c ? c.emoji + ' ' + escHtml(c.label) : escHtml(q.category)}</span>`); }
 
     return `
       <div class="q-row" id="qrow-${realIdx}">
-        ${badge}
-        <span class="q-text" title="${escHtml(q.question)}">${escHtml(typeof text === 'string' ? text : q.question)}</span>
-        <span class="q-detail">${escHtml(detail)}</span>
-        <button class="btn-icon" onclick="openEditForm(${realIdx})" title="Edit">✏️</button>
-        <button class="btn-icon delete" onclick="deleteQuestion(${realIdx})" title="Delete">🗑</button>
+        <span class="q-badge badge-${escHtml(type)}">${escHtml(type)}</span>
+        <span class="q-text" title="${escHtml(q.question)}">${prompt}</span>
+        <span class="q-detail">${q.id != null ? `<span class="id">#${q.id}</span>` : '<span class="id">new</span>'}${chips.join('')}<span>${escHtml(detailFor(q))}</span></span>
+        <span class="q-actions">
+          <button class="btn-icon" onclick="openEditForm(${realIdx})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="duplicateQuestion(${realIdx})" title="Duplicate">⧉</button>
+          <button class="btn-icon delete" onclick="deleteQuestion(${realIdx})" title="Delete">🗑</button>
+        </span>
       </div>`;
   }).join('');
+
+  if (rows.length > shown.length) {
+    list.innerHTML += `<div class="list-foot">Showing ${shown.length} of ${rows.length} · <button onclick="showAll = true; renderList()">show all</button></div>`;
+  }
 }
 
-function escHtml(str) {
-  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ═════════════════════════════════════════════════════════════════════════════
+// Messages (error panel for server validation, success notes)
+// ═════════════════════════════════════════════════════════════════════════════
+function showMessage(kind, title, details) {
+  $('msg-area').innerHTML = `
+    <div class="panel-msg ${kind}">
+      <div class="body">
+        <strong>${escHtml(title)}</strong>
+        ${details && details.length ? `<ul>${details.map(d => `<li>${escHtml(d)}</li>`).join('')}</ul>` : ''}
+      </div>
+      <button class="close" onclick="clearMessage()" title="Dismiss">✕</button>
+    </div>`;
+  $('msg-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function clearMessage() { $('msg-area').innerHTML = ''; }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Dirty state — one flag drives the top-bar status, the save bar and the
+// beforeunload warning.
+// ═════════════════════════════════════════════════════════════════════════════
+function setDirty(v) {
+  dirty = v;
+  $('savebar').classList.toggle('dirty', v);
+  $('savebar-info').textContent = v ? 'Unsaved changes' : `${questions.length} questions · all saved`;
+  if (v) setStatus('Unsaved changes', 'dirty');
+}
+function setStatus(msg, cls) {
+  const el = $('status');
+  el.textContent = msg;
+  el.className = 'status ' + (cls || '');
 }
 
-// ── Form open / close ─────────────────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════════════════════════
+// Form open / close
+// ═════════════════════════════════════════════════════════════════════════════
 function openAddForm() {
   editingIndex = null;
-  const defaultCat = currentCat === 'all' ? 'facts' : currentCat;
-  renderForm({ category: defaultCat, type: TYPE_FOR_CAT[defaultCat] }, 'Add Question');
+  let cat = currentCat !== 'all' && catById(currentCat) ? currentCat : (typeFilter ? (catsForType(typeFilter)[0] || {}).id : null);
+  if (!cat) cat = catalog.categories[0].id;
+  const type = typeForCat(cat);
+  const q = { category: cat, type };
+  if (!hasEditor(type)) Object.assign(q, JSON.parse(JSON.stringify(GENERIC_TEMPLATES[type] || {})));
+  renderForm(q);
+  $('form-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function openEditForm(idx) {
   editingIndex = idx;
-  renderForm(questions[idx], 'Edit Question');
-  document.getElementById('form-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderForm(questions[idx]);
+  $('form-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function closeForm() {
-  document.getElementById('form-area').innerHTML = '';
+  destroyAdminMap();
+  $('form-area').innerHTML = '';
   editingIndex = null;
 }
 
-// ── Build the form HTML depending on question type ────────────────────────────
-function renderForm(q, title) {
-  const cat  = q.category || 'facts';
-  const type = q.type || 'text';
+// ═════════════════════════════════════════════════════════════════════════════
+// Form rendering — common fields + a per-type block.
+// ═════════════════════════════════════════════════════════════════════════════
+function optionList(items, selected) {
+  return items.map(([v, l]) => `<option value="${escHtml(v)}" ${String(v) === String(selected) ? 'selected' : ''}>${escHtml(l)}</option>`).join('');
+}
 
-  const catOptions = CATEGORIES.map(c =>
-    `<option value="${c}" ${c === cat ? 'selected' : ''}>${c}</option>`
-  ).join('');
-
-  const typeOptions = [
-    ['text','Multiple choice (text)'],['flag','Flag'],
-    ['slider','Estimation (slider)'],['timeline','Timeline'],
-    ['map','Map pin-drop'],['sequence','Sequence (drag-to-order)']
-  ].map(([v,l]) => `<option value="${v}" ${v === type ? 'selected' : ''}>${l}</option>`).join('');
-
-  let typeFields = '';
-
-  if (type === 'text' || type === 'flag') {
-    if (type === 'flag') {
-      typeFields = `
-        <div class="form-row">
-          <div class="form-group" style="flex:1">
-            <label>ISO Country Code (e.g. fr, de, jp)</label>
-            <input id="f-question" value="${escHtml(q.question || '')}" placeholder="e.g. fr"
-              oninput="updateFlagPreview(this.value)">
-          </div>
-          <div class="form-group" style="flex:0 0 auto; justify-content:flex-end;">
-            <label>Preview</label>
-            <img id="flag-prev" src="https://flagcdn.com/64x48/${q.question || 'xx'}.png"
-              class="flag-preview" style="height:48px;" alt="">
-          </div>
-        </div>`;
-    } else {
-      typeFields = `
-        <div class="form-row">
-          <div class="form-group">
-            <label>Question Text</label>
-            <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
-          </div>
-        </div>`;
-    }
-
-    const ans = q.answers || ['','','',''];
-    const cor = q.correct ?? 0;
-    typeFields += `
-      <div class="form-group" style="margin-bottom:12px;">
-        <label>Answers &nbsp;<small style="color:#52525b">(click the circle on the right to mark the correct one)</small></label>
-        <div class="answers-grid-form">
-          ${ans.map((a, i) => `
-            <div class="answer-wrap">
-              <input id="f-ans-${i}" value="${escHtml(a)}" placeholder="Option ${i+1}">
-              <input type="radio" class="correct-radio" name="correct" value="${i}" ${i === cor ? 'checked' : ''}>
-            </div>`).join('')}
-        </div>
-      </div>`;
-
-  } else if (type === 'slider' || type === 'timeline') {
-    const label = type === 'timeline' ? 'Year' : 'Value';
-    typeFields = `
-      <div class="form-row">
-        <div class="form-group">
-          <label>Question Text</label>
-          <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
-        </div>
+function promptField(q, label = 'Question text') {
+  return `
+    <div class="form-row">
+      <div class="form-group wide">
+        <label>${label} <span class="req">*</span></label>
+        <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Min ${label}</label>
-          <input id="f-min" type="number" value="${q.min ?? ''}">
-        </div>
-        <div class="form-group">
-          <label>Max ${label}</label>
-          <input id="f-max" type="number" value="${q.max ?? ''}">
-        </div>
-        <div class="form-group">
-          <label>Step</label>
-          <input id="f-step" type="number" value="${q.step ?? 1}">
-        </div>
-        <div class="form-group">
-          <label>Correct ${label}</label>
-          <input id="f-correct" type="number" value="${q.correct ?? ''}">
-        </div>
-        ${type === 'slider' ? `<div class="form-group">
-          <label>Unit (e.g. km, %, million)</label>
-          <input id="f-unit" value="${escHtml(q.unit || '')}">
-        </div>` : `<input type="hidden" id="f-unit" value="">`}
-      </div>`;
+    </div>`;
+}
 
-  } else if (type === 'map') {
-    typeFields = `
-      <div class="form-row">
-        <div class="form-group">
-          <label>Question Text</label>
-          <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Correct Latitude</label>
-          <input id="f-lat" type="number" step="0.000001" value="${q.correctLat ?? ''}" oninput="syncMarkerFromInputs()">
-        </div>
-        <div class="form-group">
-          <label>Correct Longitude</label>
-          <input id="f-lng" type="number" step="0.000001" value="${q.correctLng ?? ''}" oninput="syncMarkerFromInputs()">
-        </div>
-        <div class="form-group">
-          <label>Location Name (shown after reveal)</label>
-          <input id="f-location" value="${escHtml(q.locationName || '')}">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Tolerance radius (km) — optional, for large/fuzzy features</label>
-          <input id="f-tolerance" type="number" min="0" step="1" value="${q.toleranceKm ?? ''}" placeholder="Leave blank for a single point" oninput="updateToleranceCircle()">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Click the map to set the pin location</label>
-        <div id="admin-map"></div>
-        <p class="map-hint">Click anywhere to place the marker. You can also drag the marker or type coordinates above.</p>
-      </div>`;
-  } else if (type === 'sequence') {
-    const items = q.items || ['', '', '', ''];
-    typeFields = `
-      <div class="form-row">
-        <div class="form-group">
-          <label>Question Text</label>
-          <textarea id="f-question" rows="2">${escHtml(q.question || '')}</textarea>
-        </div>
-      </div>
-      <div class="form-group" style="margin-bottom:12px;">
-        <label>Items in correct order (1 = first, 4 = last)</label>
-        ${items.map((item, i) => `
-          <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-            <span style="color:#71717a; font-size:.8rem; width:18px; flex-shrink:0;">${i + 1}.</span>
-            <input id="f-item-${i}" value="${escHtml(item)}" placeholder="Item ${i + 1}" style="flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:7px; color:#e4e4e7; padding:8px 10px; font-size:.88rem; font-family:inherit;">
+function answersField(q) {
+  const ans = Array.isArray(q.answers) ? q.answers : ['', '', '', ''];
+  const cor = Number.isInteger(q.correct) ? q.correct : 0;
+  return `
+    <div class="form-group wide" style="margin-bottom:12px">
+      <label>Answers <span class="req">*</span> <small>tick the circle on the correct one</small></label>
+      <div class="answers-grid">
+        ${[0, 1, 2, 3].map(i => `
+          <div class="answer-wrap">
+            <span class="n">${String.fromCharCode(65 + i)}</span>
+            <input id="f-ans-${i}" value="${escHtml(ans[i] || '')}" placeholder="Option ${i + 1}" class="${i === cor ? 'is-correct' : ''}">
+            <input type="radio" class="correct-radio" name="correct" value="${i}" ${i === cor ? 'checked' : ''} onchange="markCorrect(${i})">
           </div>`).join('')}
-      </div>`;
-  }
+      </div>
+    </div>`;
+}
+function markCorrect(i) {
+  [0, 1, 2, 3].forEach(k => $('f-ans-' + k).classList.toggle('is-correct', k === i));
+}
 
-  document.getElementById('form-area').innerHTML = `
-    <div class="form-drawer">
-      <h3>${title}</h3>
+// Per-type editors. Each returns the HTML for the fields that belong to the type.
+const EDITORS = {
+  mc(q) {
+    return promptField(q) + `
       <div class="form-row">
+        <div class="form-group narrow">
+          <label>Topic <small>sub-topic tag</small></label>
+          <select id="f-topic">${optionList([['', '— none —'], ...TOPICS.map(t => [t, t])], q.topic || '')}</select>
+        </div>
+      </div>` + answersField(q);
+  },
+
+  flag(q) {
+    return `
+      <div class="form-row">
+        <div class="form-group">
+          <label>ISO country code <span class="req">*</span> <small>2 letters, e.g. fr, de, jp</small></label>
+          <input id="f-question" value="${escHtml(q.question || '')}" placeholder="fr" maxlength="2" oninput="updateFlagPreview(this.value)" style="text-transform:lowercase">
+        </div>
+        <div class="form-group narrow" style="flex:0 0 auto; justify-content:flex-end">
+          <label>Preview</label>
+          <img id="flag-prev" src="https://flagcdn.com/64x48/${escHtml(q.question || 'xx')}.png" class="flag-preview" alt="">
+        </div>
+      </div>` + answersField(q);
+  },
+
+  slider(q) {
+    return promptField(q) + `
+      <div class="form-row">
+        <div class="form-group narrow"><label>Min <span class="req">*</span></label><input id="f-min" type="number" step="any" value="${q.min ?? ''}"></div>
+        <div class="form-group narrow"><label>Max <span class="req">*</span></label><input id="f-max" type="number" step="any" value="${q.max ?? ''}"></div>
+        <div class="form-group narrow"><label>Step</label><input id="f-step" type="number" step="any" min="0" value="${q.step ?? 1}"></div>
+        <div class="form-group narrow"><label>Correct value <span class="req">*</span></label><input id="f-correct" type="number" step="any" value="${q.correct ?? ''}"></div>
+        <div class="form-group narrow"><label>Unit <small>km, %, million…</small></label><input id="f-unit" value="${escHtml(q.unit || '')}"></div>
+      </div>
+      <p class="hint">Scoring falls off linearly across half the range — a tight range makes the question harder.</p>`;
+  },
+
+  timeline(q) {
+    return promptField(q) + `
+      <div class="form-row">
+        <div class="form-group narrow"><label>Min year <span class="req">*</span></label><input id="f-min" type="number" step="1" value="${q.min ?? ''}"></div>
+        <div class="form-group narrow"><label>Max year <span class="req">*</span></label><input id="f-max" type="number" step="1" value="${q.max ?? ''}"></div>
+        <div class="form-group narrow"><label>Correct year <span class="req">*</span></label><input id="f-correct" type="number" step="1" value="${q.correct ?? ''}"></div>
+      </div>
+      <p class="hint">Negative numbers are BCE (−323 shows as "323 BCE"). Years below 1000 show as "800 CE".</p>`;
+  },
+
+  map(q) {
+    const sat = q.satellite && typeof q.satellite.zoom === 'number' ? q.satellite.zoom : '';
+    return promptField(q) + `
+      <div class="form-row">
+        <div class="form-group narrow"><label>Latitude <span class="req">*</span></label><input id="f-lat" type="number" step="0.0001" min="-90" max="90" value="${q.correctLat ?? ''}" oninput="syncMarkerFromInputs()"></div>
+        <div class="form-group narrow"><label>Longitude <span class="req">*</span></label><input id="f-lng" type="number" step="0.0001" min="-180" max="180" value="${q.correctLng ?? ''}" oninput="syncMarkerFromInputs()"></div>
+        <div class="form-group"><label>Location name <small>shown after the reveal</small></label><input id="f-location" value="${escHtml(q.locationName || '')}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group narrow">
+          <label>Tolerance (km) <small>optional — fuzzy features</small></label>
+          <input id="f-tolerance" type="number" min="0" step="1" value="${q.toleranceKm ?? ''}" placeholder="0 = single point" oninput="updateToleranceCircle()">
+        </div>
+        <div class="form-group narrow">
+          <label id="f-satzoom-label">Satellite zoom <small id="f-satzoom-hint">required for Bird's Eye</small></label>
+          <input id="f-satzoom" type="number" min="3" max="19" step="1" value="${sat}" placeholder="e.g. 15">
+        </div>
+      </div>
+      <div class="form-group wide">
+        <label>Pin location <small>click the map, drag the marker, or type coordinates</small></label>
+        <div id="admin-map"></div>
+      </div>`;
+  },
+
+  sequence(q) {
+    const items = Array.isArray(q.items) ? q.items : ['', '', '', ''];
+    return promptField(q) + `
+      <div class="form-group wide" style="margin-bottom:12px">
+        <label>Items in the correct order <span class="req">*</span> <small>1 = first, 4 = last; players see them shuffled</small></label>
+        ${[0, 1, 2, 3].map(i => `
+          <div class="seq-item"><span class="n">${i + 1}</span><input id="f-item-${i}" value="${escHtml(items[i] || '')}" placeholder="Item ${i + 1}"></div>`).join('')}
+      </div>`;
+  },
+
+  // Fallback for types without a dedicated editor: edit the type-specific
+  // fields as JSON. The server validates the result on save.
+  generic(q) {
+    const fields = {};
+    for (const k of Object.keys(q)) if (!COMMON_FIELDS.includes(k)) fields[k] = q[k];
+    const label = q.type === 'silhouette' ? 'Country name' : 'Question text';
+    return promptField(q, label) + `
+      <div class="form-group wide">
+        <label>Type-specific fields (JSON) <small>everything except category / type / question / image / region / difficulty</small></label>
+        <textarea id="f-json" class="json" spellcheck="false" oninput="validateJsonField()">${escHtml(JSON.stringify(fields, null, 2))}</textarea>
+        <span class="hint" id="f-json-hint"></span>
+      </div>`;
+  },
+};
+
+// Type dropdown entries: every catalog type, plus the current one if the
+// server no longer knows it (so old questions can still be opened and fixed).
+function typeOptions(current) {
+  const opts = typeIds().map(t => [t, t + (hasEditor(t) ? '' : ' (JSON)')]);
+  if (current && !typeIds().includes(current)) opts.push([current, current + ' (unknown type)']);
+  return opts;
+}
+
+function renderForm(q) {
+  const type = q.type || 'mc';
+  const cats = catsForType(type);
+  const cat  = cats.find(c => c.id === q.category) ? q.category : (cats[0] ? cats[0].id : q.category);
+  const editorHtml = (EDITORS[type] || EDITORS.generic)(q);
+
+  $('form-area').innerHTML = `
+    <div class="form-drawer">
+      <h3>${editingIndex !== null ? 'Edit question' : 'Add question'} ${q.id != null ? `<span class="id">#${q.id}</span>` : ''}</h3>
+      <div class="form-row">
+        <div class="form-group narrow">
+          <label>Type</label>
+          <select id="f-type" onchange="onTypeChange(this.value)">${optionList(typeOptions(type), type)}</select>
+        </div>
         <div class="form-group">
           <label>Category</label>
-          <select id="f-category" onchange="onCatChange(this.value)">${catOptions}</select>
+          <select id="f-category" onchange="onCatChange(this.value)">${optionList((cats.length ? cats : catalog.categories).map(c => [c.id, `${c.emoji} ${c.label}`]), cat)}</select>
         </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select id="f-type" onchange="onTypeChange(this.value)">${typeOptions}</select>
+        <div class="form-group narrow">
+          <label>Region <small>optional</small></label>
+          <select id="f-region">${optionList([['', '— none —'], ...catalog.regions.map(r => [r.id, `${r.emoji} ${r.label}`])], q.region || '')}</select>
+        </div>
+        <div class="form-group narrow">
+          <label>Difficulty</label>
+          <select id="f-difficulty">${optionList([['', '— unset —'], ['1', '1 · casual'], ['2', '2 · normal'], ['3', '3 · expert']], q.difficulty || '')}</select>
         </div>
       </div>
-      <div id="type-fields">${typeFields}</div>
+      <div class="form-row">
+        <div class="form-group wide">
+          <label>Image URL <small>optional photo shown above the prompt</small></label>
+          <input id="f-image" value="${escHtml(q.imageUrl || '')}" placeholder="https://…">
+        </div>
+      </div>
+      <div class="form-section">${escHtml(type)} fields</div>
+      <div id="type-fields">${editorHtml}</div>
+      <div class="form-error" id="form-error"></div>
       <div class="form-actions">
-        <button class="btn-save-q" onclick="saveQuestion()">Save Question</button>
-        <button class="btn-cancel-q" onclick="closeForm()">Cancel</button>
+        <button class="btn primary" onclick="saveQuestion()">${editingIndex !== null ? 'Apply changes' : 'Add to list'}</button>
+        <button class="btn" onclick="closeForm()">Cancel</button>
+        <span class="spacer"></span>
+        <span class="hint">Changes are kept in memory until you press <b>Save all changes</b> · <kbd>Esc</kbd> closes</span>
       </div>
     </div>`;
 
-  if (type === 'map') {
-    initAdminMap(q.correctLat, q.correctLng);
-  }
+  if (type === 'map') { initAdminMap(q.correctLat, q.correctLng); updateSatZoomHint(); }
+  if (!hasEditor(type)) validateJsonField();
 }
 
-function onCatChange(cat) {
-  const defaultType = TYPE_FOR_CAT[cat] || 'text';
-  document.getElementById('f-type').value = defaultType;
-  onTypeChange(defaultType);
-}
-
+// Switching the type re-renders the form, keeping whatever was typed so far.
 function onTypeChange(type) {
-  const cat = document.getElementById('f-category').value;
-  const partial = { category: cat, type,
-    question: document.getElementById('f-question')?.value || '',
-    answers: [0,1,2,3].map(i => document.getElementById('f-ans-'+i)?.value || ''),
-    correct: Number(document.querySelector('input[name=correct]:checked')?.value ?? 0),
-    items: [0,1,2,3].map(i => document.getElementById('f-item-'+i)?.value || ''),
-  };
-  renderForm(partial, editingIndex !== null ? 'Edit Question' : 'Add Question');
-}
-
-function updateFlagPreview(code) {
-  const img = document.getElementById('flag-prev');
-  if (img) img.src = `https://flagcdn.com/64x48/${code.toLowerCase()}.png`;
-}
-
-// ── Collect form data ─────────────────────────────────────────────────────────
-function collectForm() {
-  const cat  = document.getElementById('f-category').value;
-  const type = document.getElementById('f-type').value;
-  const q    = { category: cat };
-
-  if (type !== 'text') q.type = type;
-
-  if (type === 'flag') {
-    q.question = document.getElementById('f-question').value.trim().toLowerCase();
-    q.answers  = [0,1,2,3].map(i => document.getElementById('f-ans-'+i).value.trim());
-    q.correct  = Number(document.querySelector('input[name=correct]:checked')?.value ?? 0);
-  } else if (type === 'text') {
-    q.question = document.getElementById('f-question').value.trim();
-    q.answers  = [0,1,2,3].map(i => document.getElementById('f-ans-'+i).value.trim());
-    q.correct  = Number(document.querySelector('input[name=correct]:checked')?.value ?? 0);
-  } else if (type === 'slider' || type === 'timeline') {
-    q.question = document.getElementById('f-question').value.trim();
-    q.min      = Number(document.getElementById('f-min').value);
-    q.max      = Number(document.getElementById('f-max').value);
-    q.step     = Number(document.getElementById('f-step').value) || 1;
-    q.correct  = Number(document.getElementById('f-correct').value);
-    q.unit     = document.getElementById('f-unit')?.value?.trim() || '';
-  } else if (type === 'map') {
-    q.question     = document.getElementById('f-question').value.trim();
-    q.correctLat   = Number(document.getElementById('f-lat').value);
-    q.correctLng   = Number(document.getElementById('f-lng').value);
-    q.locationName = document.getElementById('f-location').value.trim();
-    const tolVal   = parseFloat(document.getElementById('f-tolerance').value);
-    if (!isNaN(tolVal) && tolVal > 0) q.toleranceKm = tolVal;
-  } else if (type === 'sequence') {
-    q.question = document.getElementById('f-question').value.trim();
-    q.items    = [0,1,2,3].map(i => document.getElementById('f-item-'+i).value.trim());
+  const partial = collectForm(true);
+  partial.type = type;
+  const cats = catsForType(type);
+  if (!cats.find(c => c.id === partial.category)) partial.category = cats[0] ? cats[0].id : partial.category;
+  if (!hasEditor(type) && !Object.keys(partial).some(k => !COMMON_FIELDS.includes(k))) {
+    Object.assign(partial, JSON.parse(JSON.stringify(GENERIC_TEMPLATES[type] || {})));
   }
+  destroyAdminMap();
+  renderForm(partial);
+}
+function onCatChange(cat) {
+  const type = typeForCat(cat);
+  if (type && type !== $('f-type').value) { $('f-type').value = type; onTypeChange(type); return; }
+  updateSatZoomHint();
+}
+function updateSatZoomHint() {
+  const hint = $('f-satzoom-hint');
+  if (!hint) return;
+  const isBirds = $('f-category').value === 'birdseye';
+  hint.innerHTML = isBirds ? '<span class="req">required</span> for Bird\'s Eye' : 'only used by Bird\'s Eye';
+}
+function updateFlagPreview(code) {
+  const img = $('flag-prev');
+  if (img) img.src = `https://flagcdn.com/64x48/${encodeURIComponent(code.trim().toLowerCase() || 'xx')}.png`;
+}
+function validateJsonField() {
+  const ta = $('f-json'), hint = $('f-json-hint');
+  if (!ta) return null;
+  try {
+    const obj = JSON.parse(ta.value);
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error('must be a JSON object { … }');
+    const keys = Object.keys(obj);
+    ta.classList.remove('bad'); ta.classList.add('good');
+    hint.className = 'hint ok';
+    hint.textContent = `Valid JSON · ${keys.length} field${keys.length === 1 ? '' : 's'}: ${keys.join(', ') || '(none)'}`;
+    return obj;
+  } catch (e) {
+    ta.classList.remove('good'); ta.classList.add('bad');
+    hint.className = 'hint bad';
+    hint.textContent = 'Invalid JSON — ' + e.message;
+    return null;
+  }
+}
 
+// ═════════════════════════════════════════════════════════════════════════════
+// Collect the form into a question object
+// `lenient` = true while switching types (don't fail on missing fields).
+// ═════════════════════════════════════════════════════════════════════════════
+function num(id) { const el = $(id); if (!el || el.value.trim() === '') return undefined; const n = Number(el.value); return Number.isNaN(n) ? undefined : n; }
+function str(id) { const el = $(id); return el ? el.value.trim() : ''; }
+
+function collectForm(lenient) {
+  const type = $('f-type').value;
+  const q = { category: $('f-category').value, type };
+  if (editingIndex !== null && questions[editingIndex].id != null) q.id = questions[editingIndex].id;
+
+  q.question = str('f-question');
+  const image = str('f-image');      if (image) q.imageUrl = image;
+  const region = str('f-region');    if (region) q.region = region;
+  const diff = num('f-difficulty');  if (diff) q.difficulty = diff;
+
+  const answers = () => [0, 1, 2, 3].map(i => str('f-ans-' + i));
+  const correctIdx = () => Number(document.querySelector('input[name=correct]:checked')?.value ?? 0);
+
+  switch (type) {
+    case 'mc': {
+      q.answers = answers(); q.correct = correctIdx();
+      const topic = str('f-topic'); if (topic) q.topic = topic;
+      break;
+    }
+    case 'flag':
+      q.question = q.question.toLowerCase();
+      q.answers = answers(); q.correct = correctIdx();
+      break;
+    case 'slider':
+      q.min = num('f-min'); q.max = num('f-max'); q.correct = num('f-correct');
+      q.step = num('f-step') || 1; q.unit = str('f-unit');
+      break;
+    case 'timeline':
+      q.min = num('f-min'); q.max = num('f-max'); q.correct = num('f-correct');
+      break;
+    case 'map': {
+      q.correctLat = num('f-lat'); q.correctLng = num('f-lng');
+      q.locationName = str('f-location');
+      const tol = num('f-tolerance'); if (tol > 0) q.toleranceKm = tol;
+      const zoom = num('f-satzoom'); if (zoom !== undefined) q.satellite = { zoom };
+      break;
+    }
+    case 'sequence':
+      q.items = [0, 1, 2, 3].map(i => str('f-item-' + i));
+      break;
+    default: {
+      const obj = $('f-json') ? validateJsonField() : null;
+      if (obj) {
+        for (const k of Object.keys(obj)) if (!COMMON_FIELDS.includes(k)) q[k] = obj[k];
+      } else if (!lenient) {
+        q._jsonInvalid = true;
+      }
+    }
+  }
+  // Drop undefined values so JSON.stringify sends a clean object.
+  for (const k of Object.keys(q)) if (q[k] === undefined) delete q[k];
   return q;
 }
 
+// Client-side sanity checks. The server runs the full per-module validation on save.
 function validateQuestion(q) {
-  if (!q.question) return 'Question text / code is required.';
-  if (q.type === 'text' || q.type === 'flag') {
-    if (q.answers.some(a => !a)) return 'All 4 answer options must be filled in.';
+  const errs = [];
+  if (!q.question) errs.push(q.type === 'flag' ? 'The ISO country code is required.' : 'The question text is required.');
+  if (!catById(q.category)) errs.push(`Unknown category "${q.category}".`);
+  if (q.type === 'flag' && !/^[a-z]{2}$/.test(q.question)) errs.push('The ISO code must be exactly 2 letters (e.g. "fr").');
+  if (q.type === 'mc' || q.type === 'flag') {
+    if (q.answers.some(a => !a)) errs.push('All 4 answer options must be filled in.');
   }
-  if ((q.type === 'slider' || q.type === 'timeline') && q.min >= q.max) return 'Min must be less than max.';
-  if (q.type === 'map' && (isNaN(q.correctLat) || isNaN(q.correctLng))) return 'Latitude and longitude are required.';
-  if (q.type === 'sequence' && q.items.some(item => !item)) return 'All 4 items must be filled in.';
-  return null;
+  if (q.type === 'slider' || q.type === 'timeline') {
+    if ([q.min, q.max, q.correct].some(v => typeof v !== 'number')) errs.push('Min, max and the correct value are all required.');
+    else {
+      if (q.min >= q.max) errs.push('Min must be less than max.');
+      if (q.correct < q.min || q.correct > q.max) errs.push('The correct value must lie between min and max.');
+    }
+  }
+  if (q.type === 'map') {
+    if (typeof q.correctLat !== 'number' || typeof q.correctLng !== 'number') errs.push('Latitude and longitude are required — click the map to set them.');
+    if (q.category === 'birdseye' && !q.satellite) errs.push("Bird's Eye questions need a satellite zoom level (3–19).");
+    if (q.satellite && (q.satellite.zoom < 3 || q.satellite.zoom > 19)) errs.push('Satellite zoom must be between 3 and 19.');
+  }
+  if (q.type === 'sequence') {
+    if (q.items.some(i => !i)) errs.push('All 4 items must be filled in.');
+    else if (new Set(q.items).size !== 4) errs.push('The 4 items must be different from each other.');
+  }
+  if (q._jsonInvalid) errs.push('The type-specific JSON is not valid — fix it before adding.');
+  return errs;
 }
 
-// ── Save / delete ─────────────────────────────────────────────────────────────
+function showFormError(errs) {
+  const box = $('form-error');
+  box.innerHTML = errs.map(e => `• ${escHtml(e)}`).join('<br>');
+  box.classList.toggle('show', errs.length > 0);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Add / edit / duplicate / delete (in memory)
+// ═════════════════════════════════════════════════════════════════════════════
 function saveQuestion() {
-  const q = collectForm();
-  const err = validateQuestion(q);
-  if (err) { alert(err); return; }
+  const q = collectForm(false);
+  const errs = validateQuestion(q);
+  if (errs.length) { showFormError(errs); return; }
+  delete q._jsonInvalid;
 
-  if (editingIndex !== null) {
-    questions[editingIndex] = q;
-  } else {
-    questions.push(q);
-  }
+  let idx;
+  if (editingIndex !== null) { questions[editingIndex] = q; idx = editingIndex; }
+  else { questions.push(q); idx = questions.length - 1; }
 
-  updateCounts();
   closeForm();
-  renderList();
-  setStatus('Unsaved changes — click "Save All Changes"', '');
+  afterChange();
+  flashRow(idx);
+}
+
+function duplicateQuestion(idx) {
+  const copy = JSON.parse(JSON.stringify(questions[idx]));
+  delete copy.id;                       // the server assigns a fresh id on save
+  questions.splice(idx + 1, 0, copy);
+  afterChange();
+  openEditForm(idx + 1);
 }
 
 function deleteQuestion(idx) {
   const q = questions[idx];
-  const label = q.type === 'flag' ? q.question.toUpperCase() : q.question;
+  const label = q.type === 'flag' ? String(q.question).toUpperCase() : q.question;
   if (!confirm(`Delete this question?\n\n"${label}"`)) return;
+  if (editingIndex === idx) closeForm();
   questions.splice(idx, 1);
-  updateCounts();
-  renderList();
-  setStatus('Unsaved changes — click "Save All Changes"', '');
+  afterChange();
 }
 
-// ── Server sync ───────────────────────────────────────────────────────────────
+function afterChange() {
+  setDirty(true);
+  renderSidebar();
+  renderList();
+}
+
+function flashRow(idx) {
+  const row = $('qrow-' + idx);
+  if (!row) return;
+  row.classList.add('highlight');
+  row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => row.classList.remove('highlight'), 1800);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Server sync — POST the whole list. The server validates every question with
+// its game module and answers 400 { error, details[] } when something is off.
+// ═════════════════════════════════════════════════════════════════════════════
 async function saveToServer() {
+  const btn = $('btn-save');
+  btn.disabled = true;
   setStatus('Saving…', '');
+  clearMessage();
   try {
-    const res = await fetch('/admin/questions', {
+    const res  = await api('/admin/questions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(questions),
     });
-    const data = await res.json();
-    if (data.ok) setStatus(`Saved — ${data.count} questions`, 'ok');
-    else setStatus('Save failed: ' + JSON.stringify(data), 'err');
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.ok) {
+      // Reload so every question carries the id the database assigned.
+      const fresh = await api('/admin/questions');
+      questions = await fresh.json();
+      setDirty(false);
+      setStatus(`Saved ${data.count} questions`, 'ok');
+      renderSidebar();
+      renderList();
+      setTimeout(() => { if (!dirty) setStatus('', ''); }, 4000);
+    } else {
+      setStatus('Save failed', 'err');
+      showMessage('err', data.error || `Save failed (HTTP ${res.status})`, data.details || []);
+    }
   } catch (e) {
-    setStatus('Save failed: ' + e.message, 'err');
+    setStatus('Save failed', 'err');
+    showMessage('err', 'Save failed', [e.message]);
+  } finally {
+    btn.disabled = false;
   }
 }
 
-function setStatus(msg, cls) {
-  const el = document.getElementById('save-status');
-  el.textContent = msg;
-  el.className = 'save-status ' + cls;
+// ═════════════════════════════════════════════════════════════════════════════
+// Import / export JSON
+// ═════════════════════════════════════════════════════════════════════════════
+function exportJson() {
+  const rows = currentCat === 'all' ? questions : questions.filter(q => q.category === currentCat);
+  const name = `quizblast-${currentCat === 'all' ? 'all' : currentCat}-${new Date().toISOString().slice(0, 10)}.json`;
+  const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setStatus(`Exported ${rows.length} questions`, 'ok');
 }
 
-// ── Admin map picker ──────────────────────────────────────────────────────────
-let _adminMap = null;
-let _adminMarker = null;
+function importJson() { $('import-file').value = ''; $('import-file').click(); }
+
+async function onImportFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  let data;
+  try { data = JSON.parse(await file.text()); }
+  catch (e) { showMessage('err', `Could not read ${file.name}`, ['Not valid JSON: ' + e.message]); return; }
+  if (!Array.isArray(data)) { showMessage('err', `Could not import ${file.name}`, ['Expected a JSON array of question objects.']); return; }
+
+  const problems = [], accepted = [];
+  data.forEach((q, i) => {
+    if (!q || typeof q !== 'object' || Array.isArray(q)) { problems.push(`#${i + 1}: not an object`); return; }
+    if (!q.category || typeof q.category !== 'string')   { problems.push(`#${i + 1}: missing "category"`); return; }
+    if (!q.type) q.type = typeForCat(q.category);        // infer the type from the catalog
+    if (!q.type)                                          { problems.push(`#${i + 1}: unknown category "${q.category}" and no "type"`); return; }
+    if (!catById(q.category))                             { problems.push(`#${i + 1}: unknown category "${q.category}"`); return; }
+    if (typeof q.question !== 'string' || !q.question.trim()) { problems.push(`#${i + 1}: missing "question"`); return; }
+    delete q.id;                                          // avoid clashing with existing ids
+    accepted.push(q);
+  });
+
+  if (accepted.length) {
+    questions.push(...accepted);
+    afterChange();
+  }
+  const title = `Imported ${accepted.length} of ${data.length} questions from ${file.name}`;
+  if (problems.length) showMessage('err', title + ' — some were skipped', problems.slice(0, 50));
+  else showMessage('ok', title, ['They are in the list now — press "Save all changes" to write them to the database.']);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Map picker (Leaflet) — click to place, drag to move, tolerance circle preview
+// ═════════════════════════════════════════════════════════════════════════════
+let _adminMap = null, _adminMarker = null, _toleranceCircle = null;
+
+function destroyAdminMap() {
+  if (_adminMap) { _adminMap.remove(); _adminMap = null; }
+  _adminMarker = null; _toleranceCircle = null;
+}
 
 function initAdminMap(lat, lng) {
-  // Destroy any existing map instance so Leaflet doesn't complain
-  if (_adminMap) { _adminMap.remove(); _adminMap = null; _adminMarker = null; }
-
-  const hasCoords = lat != null && lng != null && !isNaN(lat) && !isNaN(lng);
-  const center = hasCoords ? [lat, lng] : [20, 0];
-  const zoom   = hasCoords ? 6 : 2;
-
-  _adminMap = L.map('admin-map', { zoomControl: true }).setView(center, zoom);
-
+  destroyAdminMap();
+  const hasCoords = typeof lat === 'number' && typeof lng === 'number' && !Number.isNaN(lat) && !Number.isNaN(lng);
+  _adminMap = L.map('admin-map', { zoomControl: true, worldCopyJump: true })
+    .setView(hasCoords ? [lat, lng] : [20, 0], hasCoords ? 6 : 2);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap contributors, © CARTO',
-    maxZoom: 19
+    attribution: '© OpenStreetMap contributors, © CARTO', maxZoom: 19,
   }).addTo(_adminMap);
 
-  if (hasCoords) {
-    _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
-    _adminMarker.on('dragend', () => {
-      const pos = _adminMarker.getLatLng();
-      setLatLngInputs(pos.lat, pos.lng);
-    });
-  }
-
+  if (hasCoords) placeMarker(lat, lng);
   updateToleranceCircle();
 
   _adminMap.on('click', e => {
-    const { lat, lng } = e.latlng;
-    if (_adminMarker) {
-      _adminMarker.setLatLng([lat, lng]);
-    } else {
-      _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
-      _adminMarker.on('dragend', () => {
-        const pos = _adminMarker.getLatLng();
-        setLatLngInputs(pos.lat, pos.lng);
-      });
-    }
-    setLatLngInputs(lat, lng);
+    placeMarker(e.latlng.lat, e.latlng.lng);
+    setLatLngInputs(e.latlng.lat, e.latlng.lng);
     updateToleranceCircle();
   });
+  // Leaflet measures its container on creation; the drawer animates in, so re-measure once.
+  setTimeout(() => _adminMap && _adminMap.invalidateSize(), 260);
+}
+
+function placeMarker(lat, lng) {
+  if (_adminMarker) { _adminMarker.setLatLng([lat, lng]); return; }
+  _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
+  _adminMarker.on('drag',    () => { const p = _adminMarker.getLatLng(); setLatLngInputs(p.lat, p.lng); updateToleranceCircle(); });
+  _adminMarker.on('dragend', () => { const p = _adminMarker.getLatLng(); setLatLngInputs(p.lat, p.lng); updateToleranceCircle(); });
 }
 
 function setLatLngInputs(lat, lng) {
-  const latEl = document.getElementById('f-lat');
-  const lngEl = document.getElementById('f-lng');
-  if (latEl) latEl.value = Math.round(lat * 10000) / 10000;
-  if (lngEl) lngEl.value = Math.round(lng * 10000) / 10000;
+  // Normalise longitude into −180…180 (dragging past the date line can exceed it)
+  lng = ((lng + 540) % 360) - 180;
+  if ($('f-lat')) $('f-lat').value = Math.round(lat * 10000) / 10000;
+  if ($('f-lng')) $('f-lng').value = Math.round(lng * 10000) / 10000;
 }
 
 function syncMarkerFromInputs() {
   if (!_adminMap) return;
-  const lat = parseFloat(document.getElementById('f-lat').value);
-  const lng = parseFloat(document.getElementById('f-lng').value);
-  if (isNaN(lat) || isNaN(lng)) return;
-  if (_adminMarker) {
-    _adminMarker.setLatLng([lat, lng]);
-  } else {
-    _adminMarker = L.marker([lat, lng], { draggable: true }).addTo(_adminMap);
-    _adminMarker.on('dragend', () => {
-      const pos = _adminMarker.getLatLng();
-      setLatLngInputs(pos.lat, pos.lng);
-    });
-  }
+  const lat = parseFloat($('f-lat').value), lng = parseFloat($('f-lng').value);
+  if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+  placeMarker(lat, lng);
   _adminMap.panTo([lat, lng]);
   updateToleranceCircle();
 }
 
-let _toleranceCircle = null;
-
 function updateToleranceCircle() {
   if (!_adminMap) return;
-  const lat = parseFloat(document.getElementById('f-lat').value);
-  const lng = parseFloat(document.getElementById('f-lng').value);
-  const km  = parseFloat(document.getElementById('f-tolerance')?.value);
-
+  const lat = parseFloat($('f-lat')?.value), lng = parseFloat($('f-lng')?.value), km = parseFloat($('f-tolerance')?.value);
   if (_toleranceCircle) { _toleranceCircle.remove(); _toleranceCircle = null; }
-
-  if (!isNaN(lat) && !isNaN(lng) && km > 0) {
+  if (!Number.isNaN(lat) && !Number.isNaN(lng) && km > 0) {
     _toleranceCircle = L.circle([lat, lng], {
-      radius:      km * 1000,
-      color:       '#c9a84c',
-      weight:      1.5,
-      opacity:     0.7,
-      fillColor:   '#c9a84c',
-      fillOpacity: 0.12,
+      radius: km * 1000, color: '#c8922a', weight: 1.5, opacity: .8, fillColor: '#c8922a', fillOpacity: .12, interactive: false,
     }).addTo(_adminMap);
   }
 }

@@ -1,0 +1,195 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   public/games/mc.css — multiple choice (type "mc"); also imported by flag.css
+   Prefix: .mc-
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Answer grid ────────────────────────────────────────────────────────── */
+.mc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+@media (max-width: 520px) { .mc-grid { grid-template-columns: 1fr; gap: 8px; } }
+
+.mc-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 16px 18px;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-left: 5px solid var(--parchment-dark);
+  border-radius: 4px;
+  font-family: var(--font-lora);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.7) inset;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, opacity .24s ease, background .24s ease;
+  opacity: 0;
+  animation: mcEnter .32s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes mcEnter {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+.mc-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.7) inset; }
+.mc-btn:active:not(:disabled){ transform: scale(.96); }
+.mc-btn:disabled { cursor: default; }
+.mc-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.mc-letter {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  font-family: var(--font-cinzel);
+  font-size: .78rem; font-weight: 700;
+  color: var(--aged);
+}
+.mc-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* One accent colour per slot */
+.mc-a { border-left-color: #8b2424; }
+.mc-b { border-left-color: var(--lapis); }
+.mc-c { border-left-color: #3d6b28; }
+.mc-d { border-left-color: #7a5210; }
+
+/* The button the player tapped (before the verdict arrives) */
+.mc-btn.mc-picked {
+  background: #fbf3df;
+  box-shadow: 0 0 0 2px var(--gold) inset, 0 4px 14px rgba(200,146,42,.25);
+}
+.mc-btn.mc-picked .mc-letter { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+
+/* Verdict states (set by handle.onResult) */
+.mc-btn.mc-correct {
+  background: var(--correct-bg);
+  border-color: var(--correct);
+  border-left-color: var(--correct);
+  color: var(--correct);
+  box-shadow: 0 0 0 1px var(--correct) inset, 0 4px 14px rgba(42,110,69,.22);
+  animation: mcFlash .45s ease !important;
+  opacity: 1;
+}
+.mc-btn.mc-correct .mc-letter { background: var(--correct); border-color: var(--correct); color: #fff; }
+.mc-btn.mc-wrong {
+  background: var(--wrong-bg);
+  border-color: var(--wrong);
+  border-left-color: var(--wrong);
+  color: var(--wrong);
+  animation: mcShake .4s ease !important;
+  opacity: 1;
+}
+.mc-btn.mc-wrong .mc-letter { background: var(--wrong); border-color: var(--wrong); color: #fff; }
+.mc-btn.mc-faded { opacity: .35 !important; }
+@keyframes mcFlash { 0% { transform: scale(1); } 40% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes mcShake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); } 40% { transform: translateX(6px); }
+  60% { transform: translateX(-3px); } 80% { transform: translateX(3px); }
+}
+
+.mc-host-hint {
+  margin-top: 14px;
+  text-align: center;
+  font-family: var(--font-garamond);
+  font-style: italic;
+  color: var(--aged);
+  font-size: 1rem;
+}
+
+/* TV mode: bigger everything */
+.mc-grid.is-tv { gap: 14px; }
+.mc-grid.is-tv .mc-btn { min-height: 84px; padding: 22px 24px; font-size: 1.35rem; }
+.mc-grid.is-tv .mc-letter { width: 38px; height: 38px; font-size: .95rem; }
+
+/* ─── Emoji riddles: the core writes the prompt; we just make it big ─────── */
+body.emoji-prompt #question-text {
+  font-size: 2.6rem;
+  letter-spacing: .14em;
+  line-height: 1.45;
+  text-align: center;
+}
+@media (min-width: 1200px) { body.emoji-prompt #question-text { font-size: 3.4rem; } }
+
+/* ─── Result screen compare (rendered on the dark ink panel) ─────────────── */
+.mc-cmp { display: flex; gap: 8px; margin-top: 14px; width: 100%; max-width: 360px; }
+.mc-cmp-cell {
+  flex: 1; min-width: 0;
+  padding: 10px 12px;
+  border-radius: 3px;
+  background: rgba(245,237,224,.06);
+  border-left: 3px solid rgba(245,237,224,.25);
+  text-align: left;
+}
+.mc-cmp-cell.mc-cmp-mine  { border-left-color: var(--wrong); }
+.mc-cmp-cell.mc-cmp-right { border-left-color: var(--correct); background: rgba(42,110,69,.18); }
+.mc-cmp-label {
+  display: block;
+  font-family: var(--font-cinzel);
+  font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(200,180,140,.6);
+  margin-bottom: 3px;
+}
+.mc-cmp-value { display: block; font-family: var(--font-lora); font-size: .9rem; font-weight: 600; color: var(--parchment); overflow-wrap: anywhere; }
+
+/* ─── Leaderboard reveal: bar chart ──────────────────────────────────────── */
+.mc-reveal {
+  width: 100%;
+  padding: 14px 16px 10px;
+  background: var(--parchment-mid);
+  border: 1px solid var(--parchment-dark);
+  border-top: 2px solid var(--gold);
+  border-radius: 4px;
+}
+.mc-rv-row {
+  padding: 8px 0 10px;
+  border-bottom: 1px solid rgba(213,200,180,.6);
+  opacity: 0;
+  animation: mcRowIn .3s ease forwards;
+}
+.mc-rv-row:last-child { border-bottom: none; }
+@keyframes mcRowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+.mc-rv-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.mc-rv-letter {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 3px;
+  background: var(--parchment); border: 1px solid var(--parchment-dark);
+  font-family: var(--font-cinzel); font-size: .68rem; font-weight: 700; color: var(--aged);
+}
+.mc-rv-text { flex: 1 1 auto; min-width: 0; font-family: var(--font-lora); font-size: .92rem; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.mc-rv-count { flex: 0 0 auto; font-family: var(--font-cinzel); font-size: .9rem; font-weight: 700; color: var(--ink-light); font-variant-numeric: tabular-nums; }
+.mc-rv-pct { margin-left: 6px; font-size: .62rem; color: var(--aged); letter-spacing: .04em; }
+.mc-rv-track { height: 10px; background: rgba(26,18,8,.08); border-radius: 5px; overflow: hidden; }
+.mc-rv-bar {
+  height: 100%; width: 0;
+  border-radius: 5px;
+  background: linear-gradient(90deg, var(--aged-light), var(--aged));
+  transition: width .7s cubic-bezier(.22,1,.36,1);
+}
+.mc-rv-row.is-correct .mc-rv-letter { background: var(--correct); border-color: var(--correct); color: #fff; }
+.mc-rv-row.is-correct .mc-rv-text   { color: var(--correct); }
+.mc-rv-row.is-correct .mc-rv-bar    { background: linear-gradient(90deg, #3f8a5c, var(--correct)); }
+.mc-rv-names { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 6px; min-height: 14px; }
+.mc-rv-name {
+  font-family: var(--font-garamond); font-size: .85rem; color: var(--ink-light);
+  padding: 1px 7px; border-radius: 10px; background: rgba(26,18,8,.05);
+}
+.mc-rv-name.is-me { background: var(--lapis); color: var(--parchment); font-weight: 600; }
+.mc-rv-nobody { font-family: var(--font-garamond); font-style: italic; font-size: .82rem; color: var(--aged); }
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mc-btn, .mc-rv-row { animation: none !important; opacity: 1; }
+  .mc-btn, .mc-rv-bar { transition: none !important; }
+}

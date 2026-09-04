@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizBlast — module harness</title>
+
+<!-- Fonts + Leaflet, exactly like the real game page -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- The theme tokens (--gold, --ink, --parchment …) live in the main stylesheet -->
+<link rel="stylesheet" href="/style.css">
+
+<style>
+  /* ── Harness chrome only. Nothing here belongs to the game itself. ───────── */
+  body { margin: 0; padding: 0; background: var(--ink, #1a1208); color: var(--parchment, #f5ede0); font-family: 'Lora', Georgia, serif; }
+  .h-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; background: #0f0b05; border-bottom: 1px solid rgba(200,146,42,.35); position: sticky; top: 0; z-index: 900; }
+  .h-bar h1 { font-family: 'Cinzel', serif; font-size: 15px; margin: 0 10px 0 0; color: var(--gold, #c8922a); letter-spacing: .06em; }
+  .h-bar select, .h-bar button { font: inherit; font-size: 13px; min-height: 34px; padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(200,146,42,.5); background: #241a0c; color: #f0e2c8; cursor: pointer; }
+  .h-bar button:hover { background: #33260f; }
+  .h-bar .h-spacer { flex: 1; }
+  .h-bar label { font-size: 12px; opacity: .75; display: inline-flex; gap: 6px; align-items: center; }
+
+  .h-stage { max-width: 820px; margin: 0 auto; padding: 16px; }
+  .h-stage.is-tv { max-width: 1100px; }
+  .h-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .6; margin: 18px 0 6px; }
+  /* #game-area is a plain full-width block in the real client — keep it identical. */
+  #game-area, #reveal-area { display: block; width: 100%; background: var(--parchment, #f5ede0); color: var(--ink, #1a1208); border-radius: 14px; padding: 14px; box-sizing: border-box; min-height: 40px; }
+  #result-box { background: #16100a; border: 1px solid rgba(200,146,42,.3); border-radius: 14px; padding: 16px; }
+  #result-box .r-icon { font-size: 40px; line-height: 1; }
+  #result-box .r-head { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold, #c8922a); margin: 6px 0 2px; }
+  #result-box .r-sub { opacity: .8; font-size: 14px; margin-bottom: 10px; }
+  pre#log { background: #0c0803; border: 1px solid rgba(200,146,42,.25); border-radius: 10px; padding: 12px; font-size: 12px; color: #cbb98f; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
+  .h-note { font-size: 12px; opacity: .6; padding: 0 16px 24px; max-width: 820px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<div class="h-bar">
+  <h1>Module harness</h1>
+  <select id="type-sel" aria-label="Game type"></select>
+  <button id="btn-mount">Mount</button>
+  <button id="btn-result">Show result</button>
+  <button id="btn-reveal">Show reveal</button>
+  <button id="btn-destroy">Destroy</button>
+  <span class="h-spacer"></span>
+  <label><input type="checkbox" id="opt-tv"> TV view</label>
+  <label><input type="checkbox" id="opt-host"> Host (passive)</label>
+</div>
+
+<div class="h-stage" id="stage">
+  <div class="h-label">mount() → #game-area</div>
+  <div id="game-area"></div>
+
+  <div class="h-label">result()</div>
+  <div id="result-box"><em style="opacity:.6">Press “Show result”.</em></div>
+
+  <div class="h-label">reveal() → #reveal-area</div>
+  <div id="reveal-area"></div>
+
+  <div class="h-label">api.submit() / metric()</div>
+  <pre id="log">nothing submitted yet</pre>
+</div>
+
+<p class="h-note">
+  Standalone test page for one game module — no server game needed.
+  Pick a type (or add <code>?type=map</code> to the URL) and press Mount.
+  Override the sample data with <code>?payload=&lt;urlencoded JSON&gt;</code>.
+</p>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ═════════════════════════════════════════════════════════════════════════════
+// A stand-in for the real window.QuizGames from client.js. It implements the
+// same shape (register / get / util / sound) so a module cannot tell the
+// difference — see docs/ARCHITECTURE.md §5 and §6.
+// ═════════════════════════════════════════════════════════════════════════════
+const COLORS = ['#b8402f', '#1e5aa8', '#2a8a5a', '#c8922a', '#7a3fa0', '#d0642a', '#1f8a98', '#a8286e'];
+const nameIndex = new Map();
+function idxOf(nick) { if (!nameIndex.has(nick)) nameIndex.set(nick, nameIndex.size); return nameIndex.get(nick); }
+
+window.QuizGames = {
+  modules: {},
+  register(mod) { this.modules[mod.type] = mod; log('registered module: ' + mod.type); },
+  get(type) { return this.modules[type] || null; },
+
+  util: {
+    escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); },
+    formatYear(y) { const n = Math.round(y); return n < 0 ? Math.abs(n) + ' BCE' : n < 1000 ? n + ' CE' : String(n); },
+    ordinal(n) { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); },
+    fmtNum(n, unit) { const t = Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); return unit ? t + ' ' + unit : t; },
+    haversineKm(lat1, lng1, lat2, lng2) {
+      const R = 6371, r = d => d * Math.PI / 180;
+      const dLat = r(lat2 - lat1), dLng = r(lng2 - lng1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(r(lat1)) * Math.cos(r(lat2)) * Math.sin(dLng / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    },
+    colorFor(i) { return COLORS[Math.abs(i | 0) % COLORS.length]; },
+    colorForName(nick) { return COLORS[idxOf(nick) % COLORS.length]; },
+    playerInitial(nick) { const s = String(nick || '').trim(); return s ? s[0].toUpperCase() : '?'; },
+    // Same fallback logic as the real client: CARTO needs a key now, Esri does not.
+    tiles: {
+      streets() { return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19, maxNativeZoom: 8 }); },
+      satellite() { return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19 }); },
+    },
+    nextFrame(fn) {
+      let done = false;
+      const run = () => { if (done) return; done = true; clearTimeout(t); cancelAnimationFrame(id); fn(); };
+      const t = setTimeout(run, 32), id = requestAnimationFrame(run);
+      return () => { done = true; clearTimeout(t); cancelAnimationFrame(id); };
+    },
+  },
+
+  // The real sound engine is a Web Audio synth; here we only record the calls.
+  sound: ['correct', 'wrong', 'tick', 'click', 'whoosh', 'lock'].reduce((o, k) => (o[k] = () => log('sound.' + k + '()'), o), {}),
+};
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Sample data — one payload / result / reveal per classic type.
+// ═════════════════════════════════════════════════════════════════════════════
+const PLAYERS = ['Nikki', 'Sam', 'Ada'];
+const SAMPLES = {
+  mc: {
+    payload: { question: 'Which planet is closest to the Sun?', answers: ['Venus', 'Mercury', 'Mars', 'Earth'] },
+    result:  { type: 'mc', quality: 1, isCorrect: true, correctIndex: 1, correctText: 'Mercury', yourText: 'Mercury' },
+    reveal:  { answers: ['Venus', 'Mercury', 'Mars', 'Earth'], correctIndex: 1, counts: [1, 2, 0, 0], pickedBy: [['Sam'], ['Nikki', 'Ada'], [], []] },
+    detail:  { isCorrect: true, index: 1, answerText: 'Mercury' },
+  },
+  flag: {
+    payload: { code: 'pt', answers: ['Spain', 'Portugal', 'Italy', 'Mexico'] },
+    result:  { type: 'flag', quality: null, isCorrect: false, correctIndex: 1, correctText: 'Portugal', yourText: 'Spain' },
+    reveal:  { code: 'pt', answers: ['Spain', 'Portugal', 'Italy', 'Mexico'], correctIndex: 1, counts: [1, 1, 1, 0], pickedBy: [['Nikki'], ['Sam'], ['Ada'], []] },
+    detail:  { isCorrect: false, index: 0, answerText: 'Spain' },
+  },
+  slider: {
+    payload: { question: 'How tall is the Eiffel Tower?', min: 100, max: 600, step: 1, unit: 'm' },
+    result:  { type: 'slider', quality: .88, yourAnswer: 300, correctValue: 330, diff: 30, unit: 'm', accuracyPct: 88 },
+    reveal:  { correctValue: 330, unit: 'm', min: 100, max: 600,
+               guesses: [{ nickname: 'Nikki', value: 300, diff: 30 }, { nickname: 'Sam', value: 420, diff: 90 }, { nickname: 'Ada', value: 335, diff: 5 }] },
+    detail:  { value: 300, diff: 30, unit: 'm' },
+  },
+  timeline: {
+    payload: { question: 'In what year was the Colosseum completed?', min: -200, max: 500 },
+    result:  { type: 'timeline', quality: .93, yourAnswer: 60, correctValue: 80, diff: 20, accuracyPct: 93 },
+    reveal:  { correctValue: 80, min: -200, max: 500,
+               guesses: [{ nickname: 'Nikki', value: 60, diff: 20 }, { nickname: 'Sam', value: -50, diff: 130 }, { nickname: 'Ada', value: 120, diff: 40 }] },
+    detail:  { value: 60, diff: 20 },
+  },
+  map: {
+    payload: { question: 'Where is Reykjavík?', imageUrl: null, toleranceKm: 0, satellite: null },
+    result:  { type: 'map', quality: .62, distanceKm: 214, insideTolerance: false, locationName: 'Reykjavík, Iceland', correctLat: 64.146, correctLng: -21.94, accuracyPct: 62 },
+    reveal:  { correctLat: 64.146, correctLng: -21.94, locationName: 'Reykjavík, Iceland', toleranceKm: 150, satelliteZoom: null,
+               pins: [{ nickname: 'Nikki', lat: 63.2, lng: -19.5, distanceKm: 214 }, { nickname: 'Sam', lat: 59.9, lng: 10.7, distanceKm: 1860 }, { nickname: 'Ada', lat: 64.5, lng: -22.6, distanceKm: 52 }] },
+    detail:  { lat: 63.2, lng: -19.5, distanceKm: 214, effectiveKm: 64 },
+  },
+  sequence: {
+    payload: { question: 'Order these from earliest to latest', items: ['Moon landing', 'Fall of the Berlin Wall', 'First flight', 'Titanic sinks'] },
+    result:  { type: 'sequence', quality: .83, correctCount: 2, totalItems: 4, pairsCorrect: 5, pairsTotal: 6,
+               correctOrder: ['First flight', 'Titanic sinks', 'Moon landing', 'Fall of the Berlin Wall'],
+               playerOrder:  ['First flight', 'Moon landing', 'Titanic sinks', 'Fall of the Berlin Wall'] },
+    reveal:  { correctOrder: ['First flight', 'Titanic sinks', 'Moon landing', 'Fall of the Berlin Wall'],
+               playerAnswers: [
+                 { nickname: 'Nikki', correctCount: 2, playerOrder: ['First flight', 'Moon landing', 'Titanic sinks', 'Fall of the Berlin Wall'] },
+                 { nickname: 'Sam',   correctCount: 4, playerOrder: ['First flight', 'Titanic sinks', 'Moon landing', 'Fall of the Berlin Wall'] }] },
+    detail:  { playerOrder: ['First flight', 'Moon landing', 'Titanic sinks', 'Fall of the Berlin Wall'], correctCount: 2, pairsCorrect: 5, pairsTotal: 6 },
+  },
+};
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Harness plumbing
+// ═════════════════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+let handle = null, revealHandle = null, currentType = null, logLines = [];
+
+function log(line) {
+  logLines.push(line);
+  if (logLines.length > 40) logLines.shift();
+  if ($('log')) $('log').textContent = logLines.join('\n');
+}
+
+// The api object a module receives from the real core (docs/ARCHITECTURE.md §5).
+function makeApi(type) {
+  const host = $('opt-host').checked;
+  const api = {
+    locked: false,
+    isHost: host,
+    role: host ? 'host' : 'player',
+    tvMode: $('opt-tv').checked,
+    timeLimit: 30,
+    myNickname: 'Nikki',
+    sound: QuizGames.sound,
+    util: QuizGames.util,
+    remainingSeconds: () => 30,
+    onTick(fn) { log('onTick() registered'); void fn; },
+    submit(answer) {
+      if (api.locked) { log('submit() ignored — already locked'); return; }
+      api.locked = true;
+      log('api.submit(' + JSON.stringify(answer) + ')');
+      const mod = QuizGames.get(type);
+      if (mod && mod.metric) { try { log('metric(sample detail) → "' + mod.metric(SAMPLES[type].detail) + '"'); } catch (e) { log('metric() threw: ' + e.message); } }
+    },
+  };
+  return api;
+}
+
+function payloadFor(type) {
+  const raw = params.get('payload');
+  if (raw) { try { return JSON.parse(raw); } catch (e) { log('bad ?payload= JSON: ' + e.message); } }
+  return SAMPLES[type] ? SAMPLES[type].payload : {};
+}
+
+// Load /games/<type>.js (+ its optional .css) once, then mount.
+const loaded = {};
+function loadModule(type) {
+  if (loaded[type]) return loaded[type];
+  loaded[type] = new Promise((resolve, reject) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = '/games/' + type + '.css';
+    document.head.appendChild(link);                       // a missing .css is fine
+    const s = document.createElement('script');
+    s.src = '/games/' + type + '.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('could not load /games/' + type + '.js'));
+    document.head.appendChild(s);
+  });
+  return loaded[type];
+}
+
+function destroyAll() {
+  if (handle && handle.destroy) { try { handle.destroy(); } catch (e) { log('destroy() threw: ' + e.message); } }
+  if (revealHandle && revealHandle.destroy) { try { revealHandle.destroy(); } catch (e) { log('reveal destroy() threw: ' + e.message); } }
+  handle = revealHandle = null;
+  $('game-area').innerHTML = '';
+  $('reveal-area').innerHTML = '';
+  $('result-box').innerHTML = '<em style="opacity:.6">Press “Show result”.</em>';
+  log('destroyed');
+}
+
+async function mount() {
+  const type = $('type-sel').value;
+  destroyAll();
+  currentType = type;
+  $('stage').classList.toggle('is-tv', $('opt-tv').checked);
+  try { await loadModule(type); } catch (e) { log(e.message); return; }
+  const mod = QuizGames.get(type);
+  if (!mod) return log('module did not register type "' + type + '"');
+  try { handle = mod.mount($('game-area'), payloadFor(type), makeApi(type)) || { destroy() {} }; log('mount() ok'); }
+  catch (e) { log('mount() threw: ' + e.message); console.error(e); }
+}
+
+function showResult() {
+  const mod = QuizGames.get(currentType);
+  if (!mod || !SAMPLES[currentType]) return log('mount a module first');
+  const data = SAMPLES[currentType].result;
+  if (handle && handle.onResult) { try { handle.onResult(data); log('handle.onResult() called'); } catch (e) { log('onResult() threw: ' + e.message); } }
+  let r;
+  try { r = mod.result(data); } catch (e) { return log('result() threw: ' + e.message); }
+  $('result-box').innerHTML =
+    '<div class="r-icon" style="color:' + (r.iconColor || 'var(--gold)') + '">' + (r.icon || '') + '</div>' +
+    '<div class="r-head">' + QuizGames.util.escapeHtml(r.heading || '') + '</div>' +
+    (r.subtitle ? '<div class="r-sub">' + QuizGames.util.escapeHtml(r.subtitle) + '</div>' : '') +
+    (r.html || '');
+  log('result() ok');
+}
+
+function showReveal() {
+  const mod = QuizGames.get(currentType);
+  if (!mod || !SAMPLES[currentType]) return log('mount a module first');
+  if (revealHandle && revealHandle.destroy) { try { revealHandle.destroy(); } catch (e) { /* ignore */ } }
+  $('reveal-area').innerHTML = '';
+  const ctx = { myNickname: 'Nikki', isHost: $('opt-host').checked, players: PLAYERS.map(n => ({ nickname: n, score: 100 })) };
+  try { revealHandle = mod.reveal($('reveal-area'), SAMPLES[currentType].reveal, ctx) || null; log('reveal() ok'); }
+  catch (e) { log('reveal() threw: ' + e.message); console.error(e); }
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+$('type-sel').innerHTML = Object.keys(SAMPLES).map(t => '<option>' + t + '</option>').join('');
+if (params.get('type')) $('type-sel').value = params.get('type');
+$('btn-mount').addEventListener('click', mount);
+$('btn-result').addEventListener('click', showResult);
+$('btn-reveal').addEventListener('click', showReveal);
+$('btn-destroy').addEventListener('click', destroyAll);
+$('type-sel').addEventListener('change', mount);
+['opt-tv', 'opt-host'].forEach(id => $(id).addEventListener('change', mount));
+mount();
+</script>
+</body>
+</html>

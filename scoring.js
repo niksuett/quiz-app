@@ -117,8 +117,8 @@ function computeAwards(game) {
     let n = 0, sum = 0;
     for (const t of mapTypes) { const b = p.stats.byType[t]; if (b) { n += b.n; sum += b.sumAccuracy; } }
     return { p, n, avg: n ? sum / n : -1 };
-  }).filter(x => x.n >= 2), x => x.avg);
-  if (carto) give('🧭', 'Master Cartographer', carto.p, `${Math.round(carto.avg)} avg on map rounds`);
+  }).filter(x => x.n >= 2 && x.avg >= 25), x => x.avg);
+  if (carto) give('🧭', 'Master Cartographer', carto.p, `${Math.round(carto.avg)} avg accuracy on map rounds`);
 
   // Comeback Kid: biggest climb from the mid-game rank to the final rank
   const finalOrder = [...game.players].sort((a, b) => b.score - a.score);
