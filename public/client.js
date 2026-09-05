@@ -127,9 +127,31 @@ window.QuizGames = {
             attribution: '© OpenStreetMap © CARTO', maxZoom: 19,
           });
         }
-        return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+        // The physical map only exists up to zoom 8, so on its own it turns into
+        // a blur as soon as a player zooms in on a country. Fix: stack Esri's
+        // satellite imagery (label-free, sharp at every zoom) on top and fade it
+        // in from zoom 9 — wide views keep the parchment-friendly terrain
+        // colours, close-ups become crisp aerial photography.
+        const physical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
           attribution: '© Esri', maxZoom: 19, maxNativeZoom: 8,
         });
+        const closeUp = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '© Esri', maxZoom: 19, minZoom: 9, opacity: 0,
+        });
+        const group = L.layerGroup([physical, closeUp]);
+        const opacityFor = z => (z < 9 ? 0 : z < 10 ? 0.55 : z < 11 ? 0.85 : 1);
+        const baseOnAdd = group.onAdd, baseOnRemove = group.onRemove;
+        group.onAdd = function (map) {
+          baseOnAdd.call(this, map);
+          this._qbZoom = () => closeUp.setOpacity(opacityFor(map.getZoom()));
+          map.on('zoomend', this._qbZoom);
+          this._qbZoom();
+        };
+        group.onRemove = function (map) {
+          if (this._qbZoom) map.off('zoomend', this._qbZoom);
+          baseOnRemove.call(this, map);
+        };
+        return group;
       },
       satellite() {
         return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -208,6 +230,7 @@ const Sound = (() => {
     whoosh,
     question() { note(440, 0.09); note(554, 0.14, 'sine', 0.2, 0.1); },
     fanfare()  { note(392, 0.1, 'sine', 0.18); note(523, 0.1, 'sine', 0.18, 0.12); note(659, 0.22, 'sine', 0.22, 0.24); },
+    timeUp()   { note(330, 0.28, 'triangle', 0.16); note(247, 0.36, 'triangle', 0.14, 0.2); },
     gameOver() { note(523, 0.1, 'sine', 0.2); note(659, 0.1, 'sine', 0.2, 0.12); note(784, 0.1, 'sine', 0.2, 0.24); note(1047, 0.4, 'sine', 0.25, 0.36); },
   };
   return api;
@@ -416,6 +439,7 @@ function readConfigFromUI() {
   config.regions = regions.length ? regions : null;
   const activeValue = (sel, fallback) => { const el = document.querySelector(sel); return el ? el.dataset.value : fallback; };
   config.difficulty  = activeValue('#difficulty-seg .active', 'mixed');
+  config.pace        = activeValue('#pace-seg .active', 'normal');
   config.rounds      = activeValue('#rounds-row .active', '10');
   config.gameMode    = activeValue('#mode-grid .active', 'mobile');
   config.autoplay    = $('opt-autoplay').checked;
@@ -499,7 +523,7 @@ function buildConfigScreen(cat) {
   });
 
   // Segmented / pill / mode selectors share one behaviour: one active button
-  ['difficulty-seg', 'rounds-row', 'mode-grid'].forEach(id => {
+  ['difficulty-seg', 'pace-seg', 'rounds-row', 'mode-grid'].forEach(id => {
     $(id).addEventListener('click', e => {
       const btn = e.target.closest('button[data-value]'); if (!btn) return;
       $(id).querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
@@ -529,6 +553,7 @@ function applyConfigToUI(cat) {
 
   const pick = (id, value) => $(id).querySelectorAll('button[data-value]').forEach(b => b.classList.toggle('active', b.dataset.value === String(value)));
   pick('difficulty-seg', ['mixed', 'casual', 'expert'].includes(config.difficulty) ? config.difficulty : 'mixed');
+  pick('pace-seg', ['brisk', 'normal', 'relaxed'].includes(config.pace) ? config.pace : 'normal');
   pick('rounds-row', config.rounds || '10');
   pick('mode-grid', config.gameMode === 'tv' ? 'tv' : 'mobile');
   $('opt-autoplay').checked = config.autoplay !== false;
@@ -600,7 +625,7 @@ function createGame() {
   const testIds = new URLSearchParams(location.search).get('testIds') || undefined;
   socket.emit('create-game', {
     rounds: config.rounds, categories: config.categories, regions: config.regions,
-    difficulty: config.difficulty, autoplay: config.autoplay, gameMode: config.gameMode,
+    difficulty: config.difficulty, pace: config.pace, autoplay: config.autoplay, gameMode: config.gameMode,
     finalDouble: config.finalDouble, intros: config.intros, testIds,
   });
 }
@@ -614,6 +639,7 @@ function settingsSummary() {
   else parts.push('Worldwide');
   parts.push(config.difficulty === 'mixed' ? 'Mixed difficulty' : config.difficulty[0].toUpperCase() + config.difficulty.slice(1));
   parts.push(state.autoplay ? 'Autoplay' : 'Manual advance');
+  if (config.pace && config.pace !== 'normal') parts.push(config.pace[0].toUpperCase() + config.pace.slice(1) + ' pace');
   if (config.finalDouble) parts.push('Final ×2');
   parts.push(state.gameMode === 'tv' ? 'TV mode' : 'Mobile mode');
   return parts.join(' · ');
@@ -833,9 +859,10 @@ async function showQuestion(data) {
   if (payload.imageUrl) { photo.src = payload.imageUrl; photo.hidden = false; } else { photo.removeAttribute('src'); photo.hidden = true; }
   $('prompt-card').classList.toggle('hidden', !hasText && !payload.imageUrl);
 
-  // Locked banner (only when reconnecting after having answered)
-  $('locked-banner').classList.toggle('hidden', !data.answered);
-  $('locked-text').textContent = 'Locked in — waiting for others';
+  // Locked banner (only when reconnecting after having answered, or after time is up)
+  $('locked-banner').classList.toggle('hidden', !(data.answered || data.closed));
+  $('locked-text').textContent = data.answered ? 'Locked in — waiting for others' : '⏱ Time’s up';
+  $('game-area').classList.toggle('is-closed', !!(data.closed && !data.answered));
 
   // Host's "N / M answered" line
   $('answer-progress').classList.toggle('hidden', !state.amHost);
@@ -849,12 +876,12 @@ async function showQuestion(data) {
   // Timer
   const totalMs = (data.timeLimit || 30) * 1000;
   const remainingMs = typeof data.remainingMs === 'number' ? data.remainingMs : totalMs;
-  startTimer(remainingMs, totalMs);
+  startTimer(data.closed ? 0 : remainingMs, totalMs);
   if (data.paused) pauseTimer(remainingMs);
 
   // Module API
   const api = {
-    locked: !!data.answered,
+    locked: !!(data.answered || data.closed),
     isHost: state.amHost,
     role: myRole(),
     // "Am I the big shared screen?" — true only on the TV-mode host's device.
@@ -1354,6 +1381,22 @@ socket.on('answer-rejected', msg => {
   toast(msg || 'Answer rejected — try again', { kind: 'warn' });
 });
 socket.on('answer-progress', ({ answered, total }) => setAnswerProgress(answered, total));
+
+// The server closed the question (timer ran out). Freeze whatever the player
+// was still doing; the leaderboard follows a couple of seconds later.
+socket.on('time-up', () => {
+  if (currentScreen !== 'screen-question') return;
+  stopTimer();
+  $('timer-text').textContent = '0';
+  timerPaint(0);
+  if (state.api && !state.api.locked) {
+    state.api.locked = true;
+    $('locked-banner').classList.remove('hidden');
+    $('locked-text').textContent = myRole() === 'host' ? '⏱ Time’s up' : '⏱ Time’s up — no answer';
+    $('game-area').classList.add('is-closed');
+    if (myRole() !== 'host') { Sound.timeUp(); vibrate([40, 40, 40]); }
+  }
+});
 
 socket.on('game-paused', ({ remainingMs, state: gstate }) => {
   state.paused = true;

@@ -65,6 +65,20 @@ function fmtSize(m) {
   return `${Math.round(m).toLocaleString('en-US')} m`;
 }
 
+// ── Difficulty tiers ─────────────────────────────────────────────────────────
+// The host's difficulty pick (game.setup.difficulty) decides how much help the
+// answering screen gives. The truth and the scoring never change.
+//   casual  → a metre ruler on the canvas + the live size readout of the guess
+//   mixed   → the live size readout, no ruler
+//   expert  → no numbers for the guess at all: judge it by eye against the
+//             reference (whose size always stays visible — it is the yardstick)
+function tierFor(game) {
+  const d = game && game.setup && game.setup.difficulty;
+  if (d === 'casual') return 'casual';
+  if (d === 'expert') return 'expert';
+  return 'mixed';
+}
+
 // "tall" / "long" from the dim field — used in the reveal banner text.
 const DIM_WORD = { height: 'tall', length: 'long' };
 
@@ -84,7 +98,7 @@ module.exports = {
   categories: [
     { id: 'sizeup', label: 'Size It Up', emoji: '📐', group: 'draw', order: 40,
       blurb: 'How big is a blue whale next to a bus? Resize it.',
-      howTo:  'Drag the slider (or pinch) until the red silhouette looks the right size next to the brown reference, then lock in.' },
+      howTo:  'Drag the red silhouette until it looks the right size next to the brown reference. Zoom in or out if you need to, then lock in.' },
   ],
   timeLimit: 30,
   revealPause: 10,
@@ -129,7 +143,7 @@ module.exports = {
   // The truth is NEVER sent. The slider range is randomised around the truth so
   // that the midpoint of the slider carries no information: min = truth / r1 and
   // max = truth × r2 with r1, r2 drawn independently from [4, 14].
-  payload(q) {
+  payload(q, game) {
     const truth = q.target.sizeM;
     const r1 = 4 + Math.random() * 10;
     const r2 = 4 + Math.random() * 10;
@@ -142,6 +156,7 @@ module.exports = {
       target:    { name: q.target.name, dim: q.target.dim, icon: iconPayload(q.target.icon) },
       reference: { name: q.reference.name, dim: q.reference.dim, sizeM: q.reference.sizeM, icon: iconPayload(q.reference.icon) },
       range: { min, max },
+      tier: tierFor(game),
       credit: LIB.credit || '',
     };
   },

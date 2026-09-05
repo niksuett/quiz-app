@@ -1,10 +1,11 @@
 # 📐 Size It Up (`sizeup`)
 
-Two silhouettes stand side by side. The **brown reference** has a size printed on
-it ("City bus — 12 m long"). The **red target** ("Blue whale") starts at some
-arbitrary size and the player drags a slider until the red shape *looks* the
-right size next to the brown one. Lock in. The reveal shows the true size and
-where everybody landed.
+Two silhouettes stand side by side on a canvas. The **brown reference** has a
+size printed on it ("City bus — 12 m long"). The **red target** ("Blue whale")
+starts at some random size and the player **drags the red shape (or its corner
+handle) bigger or smaller** until it *looks* the right size next to the brown
+one; the canvas can be zoomed in and out (buttons, pinch, wheel). Lock in. The
+reveal shows the true size and where everybody landed.
 
 Adapted from [magnitudle.com/size-it-up](https://magnitudle.com/size-it-up).
 
@@ -12,7 +13,7 @@ Adapted from [magnitudle.com/size-it-up](https://magnitudle.com/size-it-up).
 |---|---|
 | Category | `sizeup` — "Size It Up" 📐, group `draw` |
 | Server module | `games/sizeup.js` |
-| Client module | `public/games/sizeup.js` (+ `.css`) — **to be written** |
+| Client module | `public/games/sizeup.js` (+ `.css`) |
 | Data | `data/silhouettes.json` (117 icons, 185 KB), built by `tools/build-silhouettes.js` |
 | Content | `content/sizeup.json` (71 questions) |
 | `timeLimit` | 30 s |
@@ -73,10 +74,22 @@ gives nothing away and the same question feels different every game.
     "sizeM": 12,                       // the reference size IS public — it is the yardstick
     "icon": { "key": "bus", "body": "…", "w": 512, "h": 512, "flip": false }
   },
-  "range": { "min": 3.2, "max": 150 },  // randomised, log-scale slider bounds
+  "range": { "min": 3.2, "max": 150 },  // randomised resize limits (log-scale)
+  "tier": "mixed",                       // 'casual' | 'mixed' | 'expert' — see 2a
   "credit": "Silhouettes from game-icons.net (CC BY 3.0) — https://game-icons.net"
 }
 ```
+
+### 2a. Difficulty tiers (`payload.tier`, from the host's difficulty pick)
+
+The truth and the scoring never change; only the help on the answering canvas does.
+
+| | casual | mixed | expert |
+|---|---|---|---|
+| reference size label | yes | yes | yes (it is the yardstick) |
+| live readout of the guess ("24 m · 2.0× as long as the bus") | yes | yes | no — shows "?" / "judge it by eye" |
+| metre ruler + faint guide lines on the canvas | yes | no | no |
+| target's dimension-bracket label while answering | "?" | "?" | "?" |
 
 `icon.body` is the inner markup of a `w × h` SVG (always 512 × 512) using
 `fill="currentColor"`, so the colour comes from CSS. Render it as:
@@ -166,38 +179,41 @@ leaderboard row.
 
 ## 8. UI guidance for the client module
 
-### Answering screen (`mount`)
+### Answering screen (`mount`) — how it is built
 
-* **Layout.** A wide drawing area with both silhouettes **standing on a common
-  baseline** (a thin ink line), reference on the left, target on the right.
-  * Reference: `color: var(--ink)` / a warm brown (`#7a4a1e` works on parchment),
-    with its size label under it — *always visible*, it is the yardstick.
-  * Target: a red (`#b4402e` / `var(--wrong)`-ish) silhouette, no size label
-    while answering — the number belongs on the slider, not on the shape.
-* **Scaling rule.** Both icons are 512 × 512 boxes but the *drawing* inside does
-  not fill it. Measure the real ink extent once per icon (render it offscreen and
-  read `getBBox()` on a `<g>` wrapping the body) and scale so that
-  **the bbox's `dim` axis** (`height` → bbox height, `length` → bbox width)
-  equals `sizeM × pxPerMetre`.
-* **pxPerMetre.** Recompute every frame from the *larger* of the two current
-  sizes so the pair always fills the box:
-  `pxPerMetre = usableHeight / max(referenceSizeM, currentGuessM) * 0.9`.
-  This means the reference visibly shrinks as the player drags the target up —
-  that is exactly the feeling from the original game and it is what makes it
-  fun. Keep a floor so the reference never becomes an invisible speck: if the
-  reference would render under ~6 px, draw it at 6 px and put a "not to scale"
-  hairline under it.
-* **Slider.** Horizontal, **logarithmic**: the slider position `t ∈ [0,1]` maps
-  to `sizeM = exp(ln(min) + t·(ln(max) − ln(min)))`. Start the thumb at a random
-  `t` in `[0.15, 0.85]` (never the middle — no anchoring). Show the current value
-  above the thumb using the same formatting rule as the server: mm below 1 cm,
-  cm below 1 m, 1 decimal below 10 m, whole metres above.
-* **Pinch.** On touch, a two-finger pinch on the drawing area should also resize
-  the target (map the pinch scale onto the log slider). `touch-action: none` on
-  the surface.
-* **Lock in** button; after `api.locked` freeze the slider and dim the control.
-* Put the `credit` string in small type at the bottom of the surface (CC BY 3.0
-  requires attribution) — once per screen is enough.
+* **The canvas is the control.** One `<svg>` paints a sky gradient, a ground strip
+  and both silhouettes standing on the ground line, reference left, target right.
+  Each figure is an icon body inside a `<g>` whose `fill` is a gradient from the
+  SVG `<defs>` (the icon's own `fill="currentColor"` attributes are stripped so the
+  gradient applies). A soft drop shadow lifts them off the sky.
+* **Scaling rule.** Both icons are 512 × 512 boxes but the drawing inside does not
+  fill it. The real ink extent is measured once per icon (`getBBox()`) and cached;
+  the bbox's `dim` axis (`height` → bbox height, `length` → bbox width) is drawn at
+  `sizeM × pxPerMetre`.
+* **Fit vs. manual zoom.** By default (*fit*) one shared `pxPerMetre` is recomputed
+  every frame from the larger of the two figures, so both always fill the stage
+  and the reference visibly shrinks as the target is pulled bigger — the feeling
+  from the original game. The − / + buttons, a two-finger pinch or the mouse
+  wheel switch to a *manual* scale that stays put; **Fit** returns to fit mode
+  (it pulses when the target is clipped). In manual mode the layout keeps the
+  target on screen and lets the reference run off the left edge. If a manual
+  zoom runs out of room while dragging, the canvas falls back to fit by itself.
+* **Resizing.** A one-finger drag anywhere on the canvas that is not the
+  reference figure (or a button) resizes the target: the size is multiplied by
+  the ratio of the pointer's distance from the target's foot now vs. one move
+  ago (both measured in the same frame, so a zoom change between moves never
+  makes the size jump). A gold corner handle with a resize glyph marks the
+  affordance; it is clamped inside the stage so a clipped target can still be
+  grabbed. Small − / + nudge buttons (±6 %) and the arrow keys (±3 %) give fine
+  control. Size is clamped to `payload.range`.
+* **Dimension brackets** show what is being measured: vertical with a label for
+  `height`, along the ground for `length`. The reference's label is its size; the
+  target's is "?" while answering.
+* **Start size** is log-uniform in `[0.15, 0.85]` of the range — never the middle.
+* **Readout** under the canvas: target name, current size, and how it compares to
+  the reference ("1.7× as long as the City bus"). Hidden at expert (see 2a).
+* **Lock in** freezes the canvas (handle, zoom and nudge controls disappear).
+* The `credit` string sits in small type under the canvas (CC BY 3.0 attribution).
 
 ### Reveal
 
@@ -214,6 +230,6 @@ leaderboard row.
 
 ### Host / TV mode
 
-`api.isHost && api.tvMode` → show the same drawing but with **no slider**: the
-big question text, the two silhouettes with the target at a neutral size, and
-the answered-count. The reveal is identical for host and players.
+`api.role === 'host'` (TV-mode host) → the same canvas with no controls; the
+target slowly "breathes" between sizes so the big screen looks alive without
+revealing anything. The reveal is identical for host and players.

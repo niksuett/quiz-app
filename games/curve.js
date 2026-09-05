@@ -21,13 +21,40 @@ const ZERO_MAE     = 0.30;   // mean error of 30 % of the axis (or worse) scores
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
 
+// ── Difficulty tiers ────────────────────────────────────────────────────────
+// How much of the lead-in the payload gives away, driven by the host's
+// difficulty pick (game.setup.difficulty). The truth and the scoring never
+// change — evaluate()/reveal() always score against the SAME split that was
+// shown at play time (both re-derive `tier` from the same `game`, see below)
+// — only how much of the series the player gets to see before drawing changes.
+//
+//   casual  → knownFraction + 0.15 (more lead-in, capped at 0.5) — axis values shown.
+//   mixed   → knownFraction, unchanged — axis values shown.
+//   expert  → knownFraction − 0.1 (less lead-in, floored at 0.1) — axis VALUE
+//             labels are hidden on the answering screen too (see
+//             public/games/curve.js), so the player has to judge the
+//             magnitude by eye, not just guess where the line goes.
+// 'normal' exists in the type system (ARCHITECTURE.md §2) but is not offered
+// on the config screen; it is treated the same as 'mixed'.
+function tierFor(game) {
+  const d = game && game.setup && game.setup.difficulty;
+  if (d === 'casual') return 'casual';
+  if (d === 'expert') return 'expert';
+  return 'mixed';
+}
+
 // Split the series into the revealed part and the hidden part.
-// The known part = every point whose x ≤ xMin + knownFraction × (xMax − xMin), but at least 2 points
-// (so the player always sees a direction) and never the whole series.
-function splitSeries(q) {
+// The known part = every point whose x ≤ xMin + fraction × (xMax − xMin), but at least 2 points
+// (so the player always sees a direction) and never the whole series. `fraction` starts from the
+// question's own `knownFraction` and is shifted by the tier (see tierFor() above).
+function splitSeries(q, tier) {
   const s = q.series;
   const xMin = s[0][0], xMax = s[s.length - 1][0];
-  const cut  = xMin + (q.knownFraction ?? 0.25) * (xMax - xMin);
+  const base = q.knownFraction ?? 0.25;
+  const fraction = tier === 'casual' ? Math.min(0.5, base + 0.15)
+                 : tier === 'expert' ? Math.max(0.1, base - 0.1)
+                 : base;
+  const cut = xMin + fraction * (xMax - xMin);
   let n = s.filter(p => p[0] <= cut).length;
   n = Math.max(2, Math.min(n, s.length - 1));
   return { known: s.slice(0, n), hidden: s.slice(n), xMin, xMax };
@@ -104,21 +131,29 @@ module.exports = {
 
   // ── What every client receives when the question starts ────────────────────
   // Only the known points carry values; the hidden years are listed as bare x's.
-  payload(q) {
-    const { known, xMin, xMax } = splitSeries(q);
+  // `tier` rides along so the client can show a hint about it AND hide the
+  // y-axis value labels at expert (see public/games/curve.js) — the split
+  // itself already came from the tier-adjusted knownFraction above.
+  payload(q, game) {
+    const tier = tierFor(game);
+    const { known, xMin, xMax } = splitSeries(q, tier);
     return {
       question: q.question,
       xs: q.series.map(p => p[0]),
       known,
       xMin, xMax, yMin: q.yMin, yMax: q.yMax,
       xLabel: q.xLabel || 'Year', yLabel: q.yLabel || '', unit: q.unit || '', decimals: q.decimals ?? 2,
+      tier,
     };
   },
 
   // ── Judge one answer: { ys: [number|null, …] } — one entry per hidden x ────
-  evaluate(q, answer) {
+  // ctx.game carries the SAME game the payload was built for, so tierFor()
+  // reproduces the exact same split — answer.ys must line up 1:1 with the
+  // hidden years the player actually saw, or an honest answer gets rejected.
+  evaluate(q, answer, ctx) {
     if (!answer || typeof answer !== 'object' || !Array.isArray(answer.ys)) return null;
-    const { hidden } = splitSeries(q);
+    const { hidden } = splitSeries(q, tierFor(ctx && ctx.game));
     if (answer.ys.length !== hidden.length) return null;
     const range = q.yMax - q.yMin;
     const ys = [];
@@ -146,8 +181,11 @@ module.exports = {
   },
 
   // ── Leaderboard reveal (everyone) ──────────────────────────────────────────
-  reveal(q, answers) {
-    const { known, xMin, xMax } = splitSeries(q);
+  // Same tierFor(game) as payload()/evaluate() — the reveal's "known" prefix
+  // (where every player's continuation starts drawing from) must match what
+  // was actually shown, at whatever tier this game was played at.
+  reveal(q, answers, game) {
+    const { known, xMin, xMax } = splitSeries(q, tierFor(game));
     return {
       xs: q.series.map(p => p[0]),
       truth: q.series,

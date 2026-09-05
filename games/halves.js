@@ -69,7 +69,31 @@ function prepare(c) {
   const values = Array.from(sums, v => max ? Math.round(255 * Math.sqrt(v / max)) : 0);
   const heat = { cols: hcols, rows: hrows, values, bbox: [minLng, +(maxLat - hrows * hf * cellH).toFixed(4), +(minLng + hcols * hf * cellW).toFixed(4), maxLat] };
 
-  return { ...c, total, cos, cx, cy, w, heat, cellWs: cellW * cos, cellH };
+  // Population hubs for the casual tier: the centres of the densest heat cells,
+  // translated back into lat/lng. `sums` (pre-sqrt) sorts the same way `values`
+  // would since the sqrt scaling is monotonic, so we can rank on it directly.
+  // A candidate is skipped if it lands within HUB_MIN_KM of the capital or of a
+  // hub already picked — otherwise one sprawling city (many dense cells side by
+  // side) would hand out three markers stacked on top of each other instead of
+  // three markers that actually spread the player's attention around the map.
+  const HUB_MIN_KM = 80, HUB_COUNT = 3;
+  const cellCandidates = [];
+  for (let r = 0; r < hrows; r++) {
+    for (let col = 0; col < hcols; col++) {
+      const v = sums[r * hcols + col];
+      if (v > 0) cellCandidates.push({ v, lat: maxLat - (r + 0.5) * hf * cellH, lng: minLng + (col + 0.5) * hf * cellW });
+    }
+  }
+  cellCandidates.sort((a, b) => b.v - a.v);
+  const hubs = [];
+  for (const cand of cellCandidates) {
+    if (hubs.length >= HUB_COUNT) break;
+    const tooCloseToCapital = c.capital && haversineKm(c.capital.lat, c.capital.lng, cand.lat, cand.lng) < HUB_MIN_KM;
+    const tooCloseToHub = hubs.some(h => haversineKm(h.lat, h.lng, cand.lat, cand.lng) < HUB_MIN_KM);
+    if (!tooCloseToCapital && !tooCloseToHub) hubs.push({ lat: +cand.lat.toFixed(4), lng: +cand.lng.toFixed(4) });
+  }
+
+  return { ...c, total, cos, cx, cy, w, heat, hubs, cellWs: cellW * cos, cellH };
 }
 
 // ── Line maths ────────────────────────────────────────────────────────────────
@@ -160,6 +184,29 @@ function split(c, a, b) {
 
 function imbalanceQuality(imbalance) { return clamp(1 - imbalance / 0.8, 0, 1); }
 
+// ── Difficulty tiers ────────────────────────────────────────────────────────
+// How much of the population pattern the payload gives away before the player
+// draws, driven by the host's difficulty pick (game.setup.difficulty). The
+// truth and the scoring never change — evaluate()/reveal() always work from
+// the real population grid — only what the player sees beforehand changes.
+//
+//   casual  → capital marker + up to 3 unlabelled "population hub" dots (the
+//             centres of the densest cells of the heat grid, spread apart —
+//             see prepare() above), so the player can reason about several
+//             population centres at once, not just the capital.
+//   mixed   → capital marker only (this was the only behaviour before tiers
+//             existed, so it stays the default).
+//   expert  → outline only. No capital, no hubs — the player has to know
+//             where a country's people actually live from memory.
+// 'normal' exists in the type system (§2 of ARCHITECTURE.md) but is not
+// offered on the config screen; it is treated the same as 'mixed'.
+function tierFor(game) {
+  const d = game && game.setup && game.setup.difficulty;
+  if (d === 'casual') return 'casual';
+  if (d === 'expert') return 'expert';
+  return 'mixed';
+}
+
 // Answer sanitising: two distinct [lng, lat] points with finite numbers.
 function readPoint(p) {
   if (!Array.isArray(p) || p.length < 2) return null;
@@ -197,11 +244,19 @@ module.exports = {
   fromRow(row, extra) { return { regionId: extra.regionId }; },
 
   // ── What every client receives when the question starts ────────────────────
-  // Shape and capital only. NEVER the population grid.
-  payload(q) {
+  // Shape always; capital and hubs depend on the tier — see tierFor() above.
+  // NEVER the population grid itself, at any tier.
+  payload(q, game) {
     const c = COUNTRIES[q.regionId];
     if (!c) throw new Error(`no halves data for ${q.regionId}`);
-    return { question: q.question, ...publicShape(c) };
+    const tier = tierFor(game);
+    const out = { question: q.question, ...publicShape(c), tier };
+    if (tier === 'expert') {
+      out.capital = null;               // draw the whole thing from memory
+    } else if (tier === 'casual') {
+      out.hubs = c.hubs;                // capital already included via publicShape()
+    }
+    return out;
   },
 
   // ── Judge one answer: { a:[lng,lat], b:[lng,lat] } ─────────────────────────

@@ -98,6 +98,17 @@
   text-shadow: 0 0 3px var(--parchment), 0 0 6px var(--parchment), 0 0 9px var(--parchment);
 }
 
+/* Population hub markers (casual tier only, payload.hubs): small unlabeled
+   warm dots — a much lighter hint than the named capital marker, just enough
+   to say "people also live around here" without pointing at one exact place. */
+.hv-hub {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold-bright);
+  border: 2px solid var(--parchment);
+  box-shadow: 0 1px 4px rgba(0,0,0,.45);
+  opacity: .92;
+}
+
 /* Toolbar: Line/Pan toggle on the left, zoom buttons on the right. */
 .hv-tools {
   display: flex; align-items: center; justify-content: space-between;

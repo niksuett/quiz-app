@@ -57,6 +57,32 @@ Only the **from** city has coordinates (so the client can draw a small locator m
 The target has a name only — its position is the secret. Test: `JSON.stringify(payload)` must not
 contain `to.lat` / `to.lng`.
 
+### Difficulty tiers
+
+How much of the **from** city the payload gives away — never the truth or the scoring, which are
+identical at every difficulty — depends on `game.setup.difficulty` via `tierFor()` in
+`games/compass.js`. The payload carries the result as `tier: 'casual' | 'mixed' | 'expert'` so the
+client can word its hint, and the fields below are added or omitted per tier:
+
+| Field                   | casual | mixed (and the internal `'normal'`) | expert |
+|-------------------------|:------:|:------------------------------------:|:------:|
+| `from.lat` / `from.lng` | ✅     | ✅ — today's behaviour, unchanged     | ❌ — `from` is `{ name }` only |
+| `distanceKm`            | ✅     | ❌                                     | ❌ |
+
+* **casual** — same coordinates as before, plus a `distanceKm` hint (great-circle distance between
+  the two cities, rounded) so the client can show "About 1,200 km away".
+* **mixed** — exactly today's payload: `from` has coordinates (so the locator map still draws), no
+  `distanceKm`.
+* **expert** — `from` drops to `{ name }` only. No coordinates means no locator map either — the
+  player has to know where *both* cities are, not just aim from a map pin. `distanceKm` is dropped
+  too (a hint with no map to anchor it against would be a bare number, not a fair one).
+
+**The client module must treat `from.lat`/`from.lng` and `distanceKm` as possibly absent** — no
+locator map, and no "About N km away" line, when the server left them out; the tier hint described
+below stands in for them instead. `evaluate()` / `reveal()` are untouched: they read `q.from` /
+`q.to` straight off the stored question, never off the payload, so the truth and every point value
+are identical regardless of what the player was shown before aiming.
+
 ### `answer` — what the client module submits
 
 ```json
@@ -159,8 +185,12 @@ are broken by speed. `speedScored` is false, so answering fast does not raise ac
    degree — it lets players who "know" a bearing dial it in precisely.
 5. Optional but nice: a tiny (≈ 120 px) inset locator map centred on `payload.from` at world zoom
    (Leaflet with `util.tiles.streets()`, no interaction), just to remind people where the start city
-   is. Never show the target on it.
-6. A **Lock in** button (theme primary style). Disabled state after submit.
+   is. Never show the target on it. **Only draw it when `payload.from.lat`/`.lng` are present** — at
+   the expert tier `from` is `{ name }` only (see "Difficulty hint" below) and the map must be
+   skipped cleanly, not shown empty or thrown at with `NaN` coordinates.
+6. When `payload.distanceKm` is present (casual tier only), show a small "About 1,200 km away" line
+   near the prompt — omit it entirely rather than showing "about 0 km" when the field is absent.
+7. A **Lock in** button (theme primary style). Disabled state after submit.
 
 **Interaction**
 
@@ -180,6 +210,21 @@ are broken by speed. `speedScored` is false, so answering fast does not raise ac
   no lock-in button (the audience should not be shown a hint), plus the answered-count the core renders.
 * Recompute the rose size on `ResizeObserver` / `orientationchange`; it should be `min(containerWidth,
   60vh)` square.
+
+**Difficulty hint (`payload.tier`)**
+
+The idle hint line (shown before the player has moved the needle) doubles as the difficulty tell,
+the same trick `public/games/trace.js` uses:
+
+| `payload.tier` | Idle hint |
+|----------------|-----------|
+| `casual`       | "Casual: your starting point is shown, with how far away the target is" |
+| `mixed`        | "You're shown where you're starting from" |
+| `expert`       | "Expert: no locator map — you'll need to know both cities" |
+
+The result screen and the leaderboard reveal are unaffected: both come from `evaluate()` /
+`reveal()` on the server, which always carry the full `from`/`to` coordinates regardless of what
+the player was shown while aiming.
 
 ### result(resultData)
 

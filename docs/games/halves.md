@@ -79,7 +79,9 @@ computed once at load time and is only exposed via `reveal()`, after everyone ha
   bbox: [24.7, 22.0, 36.9, 31.7],
   outline: [ [[lng,lat], …], … ],
   total: 96172587,
-  capital: { name: "Cairo", lat: 30.04, lng: 31.24 },
+  tier: "casual",                              // "casual" | "mixed" | "expert" — see §3a below
+  capital: { name: "Cairo", lat: 30.04, lng: 31.24 },  // null at the expert tier
+  hubs: [ { lat: 31.2, lng: 29.9 }, … ],        // casual tier only, up to 3 points, no names
 }
 ```
 
@@ -99,6 +101,41 @@ computed once at load time and is only exposed via `reveal()`, after everyone ha
   both ends have been placed.
 - `capital` is provided as a landmark players can reason from ("half of Argentina lives around
   Buenos Aires") — show it as a small dot + label on the map, always visible before submission.
+
+---
+
+## 3a. Difficulty tiers
+
+Set by the host's difficulty pick (`game.setup.difficulty`), read via `tierFor(game)` in
+`games/halves.js` — the same pattern `games/trace.js` uses for Border Draw / River Run. The
+population grid and the scoring never change between tiers; only what `payload()` sends before the
+player draws changes. `payload()` always includes a `tier` field so the client can show a matching
+hint line.
+
+| Field     | casual | mixed (default) | expert |
+|-----------|--------|------------------|--------|
+| `outline` | ✓ | ✓ | ✓ |
+| `capital` | ✓ | ✓ | `null` |
+| `hubs`    | up to 3 `{lat,lng}` points | *(absent)* | *(absent)* |
+
+`hubs` are computed once per country at load time (`prepare()` in `games/halves.js`), from the
+same low-resolution heat grid used for the reveal: the densest heat cells are translated back to
+lat/lng and greedily kept if they sit at least 80 km from the capital and from every hub already
+picked — so a single sprawling city can't hand out three markers stacked on itself, and the three
+dots actually spread the player's attention around the map. Hubs carry no name and no population
+figure, just a position — a much lighter hint than the named capital marker. Because `hubs` is
+derived from the heat grid (not the raw pop grid) it costs nothing extra at question time; it's
+folded into the same one-time `prepare()` pass that already builds the reveal's heat map.
+
+The client (`public/games/halves.js`) draws `hubs` as small unlabeled warm dots (`.hv-hub`,
+distinct from the capital's named lapis-and-label style) when the field is present, and shows a
+tier-aware idle hint ("Casual: capital + population hubs marked…" / "Expert: no capital or
+population hubs — the outline is all you get"). `capital: null` at the expert tier is handled the
+same way a payload with no capital always was — `drawCapital()` already no-ops on missing
+coordinates.
+
+The leaderboard reveal (`reveal()`) is unaffected by tier: it always sends the real `capital` and
+the full `heat` grid, since by then the round is over and there's nothing left to hide.
 
 ---
 

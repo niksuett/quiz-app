@@ -167,7 +167,9 @@
   }
 
   // The capital city: a small lapis dot with its name — the landmark players
-  // reason from ("a third of Argentina lives around Buenos Aires").
+  // reason from ("a third of Argentina lives around Buenos Aires"). Only sent
+  // by the server at the casual/mixed tiers (games/halves.js tierFor()) — at
+  // expert, capital is null and this quietly does nothing.
   function drawCapital(map, capital) {
     if (!capital || !Number.isFinite(capital.lat) || !Number.isFinite(capital.lng)) return null;
     const icon = L.divIcon({
@@ -176,6 +178,21 @@
       iconSize: [12, 12], iconAnchor: [6, 6],
     });
     return L.marker([capital.lat, capital.lng], { icon, interactive: false, keyboard: false, zIndexOffset: 400 }).addTo(map);
+  }
+
+  // Population hubs — casual tier only (payload.hubs, up to 3 points). Small,
+  // unlabeled warm dots: a much lighter hint than the capital's named marker,
+  // just enough to say "people also live around here" without pointing at any
+  // one place. Silently draws nothing when hubs is missing/empty (mixed and
+  // expert tiers, and any older/dev-harness payload that predates this field).
+  function drawHubs(map, hubs) {
+    const markers = [];
+    for (const h of hubs || []) {
+      if (!h || !Number.isFinite(h.lat) || !Number.isFinite(h.lng)) continue;
+      const icon = L.divIcon({ className: 'hv-icon-reset', html: '<div class="hv-hub"></div>', iconSize: [10, 10], iconAnchor: [5, 5] });
+      markers.push(L.marker([h.lat, h.lng], { icon, interactive: false, keyboard: false, zIndexOffset: 350 }).addTo(map));
+    }
+    return markers;
   }
 
   // Turn the revealed heat grid into a single small PNG (one image beats hundreds
@@ -223,6 +240,10 @@
       const passive = api.role === 'host';               // TV host: watch only, no controls
       const bbox = payload.bbox || [-10, -10, 10, 10];
       const cos  = cosOf(bbox);
+      // 'mixed' matches the pre-tier behaviour (capital only, no hubs), so it
+      // is also the safe fallback for a payload without a tier field at all
+      // (e.g. an older reveal, or a hand-built dev-harness payload).
+      const tier = payload.tier || 'mixed';
 
       const wrap = document.createElement('div');
       wrap.className = 'hv-wrap' + (api.tvMode ? ' is-tv' : '') + (passive ? ' is-passive' : '');
@@ -261,9 +282,16 @@
       const takeOver   = () => { userMoved = true; };
 
       function hint(text) { if (hintEl) hintEl.textContent = text; }
+      // The idle hint doubles as the difficulty tell, same pattern as trace.js:
+      // casual/expert say plainly what is (or isn't) marked on the map; mixed
+      // keeps the original wording since it's the tier nothing changed for.
+      const idleHint =
+        tier === 'expert' ? 'Expert: no capital or population hubs — the outline is all you get'
+        : tier === 'casual' ? 'Casual: capital + population hubs marked · drag the two ends to aim the line'
+        : 'Drag the two ends to aim the line · drag the map to slide it';
       hint(passive ? 'Players are slicing the country…'
                    : api.locked ? 'Locked in — waiting for the others'
-                                : 'Drag the two ends to aim the line · drag the map to slide it');
+                                : idleHint);
 
       // ── Draw / redraw the line (and its parchment halo underneath) ─────────
       function redraw() {
@@ -295,6 +323,7 @@
 
         drawOutline(map, payload.outline, { color: '#8c6b2e', weight: 2, fillColor: '#c8922a', fillOpacity: .12 });
         drawCapital(map, payload.capital);
+        drawHubs(map, payload.hubs);
 
         // The line: a wide pale halo so it stays visible over any terrain, plus
         // the line itself on top.

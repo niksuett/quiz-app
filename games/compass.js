@@ -52,6 +52,29 @@ function resolveCity(c) {
 const publicCity = c => ({ name: c.name, lat: c.lat, lng: c.lng });
 const trueBearingOf = q => Math.round(bearingDeg(q.from.lat, q.from.lng, q.to.lat, q.to.lng) * 10) / 10;
 
+// ── Difficulty tiers ────────────────────────────────────────────────────────
+// How much of the "from" city the payload gives away, driven by the host's
+// difficulty pick (game.setup.difficulty). The truth and the scoring never
+// change — evaluate()/reveal() read q.from/q.to straight off the stored
+// question, never off the payload — only what the player sees before they
+// aim the needle changes.
+//
+//   casual  → today's coordinates (so the locator map can be drawn) PLUS a
+//             distanceKm hint ("about 1,200 km away").
+//   mixed   → today's coordinates, no distance hint. This was the only
+//             behaviour before difficulty tiers existed.
+//   expert  → no coordinates at all for the "from" city (just its name) — no
+//             locator map, no distance. The player has to know where BOTH
+//             cities are, not just aim from a map pin.
+// 'normal' exists in the type system (§2 of ARCHITECTURE.md) but is not
+// offered on the config screen; it is treated the same as 'mixed'.
+function tierFor(game) {
+  const d = game && game.setup && game.setup.difficulty;
+  if (d === 'casual') return 'casual';
+  if (d === 'expert') return 'expert';
+  return 'mixed';
+}
+
 module.exports = {
   type: 'compass',
   categories: [
@@ -91,9 +114,19 @@ module.exports = {
   },
 
   // ── What every client receives when the question starts ────────────────────
-  // Only the FROM city has coordinates; the target's position is the secret.
-  payload(q) {
-    return { question: q.question, from: publicCity(q.from), to: { name: q.to.name } };
+  // The target's position is always the secret. Whether the FROM city's
+  // coordinates (and a distance hint) are included depends on the difficulty
+  // tier — see tierFor() above and docs/games/compass.md §"Difficulty tiers".
+  payload(q, game) {
+    const tier = tierFor(game);
+    const out = {
+      question: q.question,
+      from: tier === 'expert' ? { name: q.from.name } : publicCity(q.from),
+      to: { name: q.to.name },
+      tier,
+    };
+    if (tier === 'casual') out.distanceKm = Math.round(haversineKm(q.from.lat, q.from.lng, q.to.lat, q.to.lng));
+    return out;
   },
 
   // ── Judge one answer: { bearing } in degrees ───────────────────────────────

@@ -2,7 +2,7 @@
 // games/flag.js — flag image + 4 country names. `question` holds the ISO 3166-1
 // alpha-2 code (lowercase); the client builds the image URL from it.
 // ─────────────────────────────────────────────────────────────────────────────
-const { validateMC, validateCommon, evaluateMC, revealMC } = require('./_shared');
+const { validateMC, validateCommon, mcAnswers, evaluateMC, revealMC } = require('./_shared');
 
 module.exports = {
   type: 'flag',
@@ -26,10 +26,10 @@ module.exports = {
   toRow(q)            { return { correct: String(q.correct), extra: { answers: q.answers } }; },
   fromRow(row, extra) { return { answers: extra.answers, correct: parseInt(row.correct, 10) }; },
 
-  payload(q) { return { code: q.question, answers: q.answers }; },
+  payload(q, game) { return { code: q.question, answers: mcAnswers(q, game) }; },   // options shuffled per game
 
-  evaluate(q, answer) { return evaluateMC(q, answer); },
-  reveal(q, answers)  { return { ...revealMC(q, answers), code: q.question }; },
+  evaluate(q, answer, ctx) { return evaluateMC(q, answer, ctx && ctx.game); },
+  reveal(q, answers, game) { return { ...revealMC(q, answers, game), code: q.question }; },
   correctText(q)      { return q.answers[q.correct]; },
   sampleAnswer()      { return { index: Math.floor(Math.random() * 4) }; },
 };

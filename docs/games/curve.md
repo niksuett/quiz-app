@@ -74,12 +74,35 @@ scoring), `extra = { series, xLabel, yLabel, unit, yMin, yMax, knownFraction, de
   "known": [[1960, 3.03], [1962, 3.14], [1964, 3.28], [1966, 3.41]],
   "xMin": 1960, "xMax": 2024,
   "yMin": 0, "yMax": 11,
-  "xLabel": "Year", "yLabel": "Population (billions)", "unit": "bn", "decimals": 2
+  "xLabel": "Year", "yLabel": "Population (billions)", "unit": "bn", "decimals": 2,
+  "tier": "mixed"
 }
 ```
 
 `known` is a prefix of `xs`/the real series (with y-values). Every x in `xs` **after** `known`'s
 last entry is hidden — the player must supply a y for each of those, in order.
+
+### Difficulty tiers
+
+How much lead-in the player gets to see — never the truth or the scoring, which are identical at
+every difficulty — depends on `game.setup.difficulty` via `tierFor()` in `games/curve.js`. The
+payload carries the result as `tier: 'casual' | 'mixed' | 'expert'` so the client can word its hint
+and adjust its own display; `payload()`, `evaluate()` and `reveal()` all call `tierFor(game)` on the
+same `game`, so the split every one of them uses for a given question is always identical — the
+hidden-x list the client draws for is exactly what `evaluate()` scores `answer.ys` against.
+
+| Tier | Effective `knownFraction` | Y-axis value labels (answering screen only) |
+|------|---------------------------|-----------------------------------------------|
+| `casual` | `min(0.5, knownFraction + 0.15)` — more lead-in | shown |
+| `mixed` (and the internal `'normal'`) | `knownFraction`, unchanged | shown |
+| `expert` | `max(0.1, knownFraction − 0.1)` — less lead-in | **hidden** — the axis line and gridlines stay, only the numbers next to them disappear, so the player has to judge the magnitude by eye too |
+
+Nothing about `series`/`yMin`/`yMax`/the scoring curve changes between tiers — only `splitSeries(q,
+tier)`'s cut point (which points end up in `known` vs. hidden) and, client-side only, whether the
+y-axis tick labels are drawn. The reveal screen (`reveal(q, answers, game)`) always uses the same
+tier the question was actually played at, so every player's line still joins the truth at the right
+point — but it never hides anything itself; hiding the axis numbers is only ever a question-screen
+thing (see `public/games/curve.js`'s `hideYLabels` on `makeChart()`).
 
 ### UI guidance — question screen
 - Draw a line chart on a fixed-size canvas/SVG mapping `[xMin, xMax] × [yMin, yMax]` to pixels.

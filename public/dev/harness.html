@@ -102,7 +102,18 @@ window.QuizGames = {
     playerInitial(nick) { const s = String(nick || '').trim(); return s ? s[0].toUpperCase() : '?'; },
     // Same fallback logic as the real client: CARTO needs a key now, Esri does not.
     tiles: {
-      streets() { return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19, maxNativeZoom: 8 }); },
+      // Mirrors QuizGames.util.tiles.streets() in client.js: the physical map
+      // (native to zoom 8) with label-free satellite imagery fading in from zoom 9.
+      streets() {
+        const physical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19, maxNativeZoom: 8 });
+        const closeUp  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19, minZoom: 9, opacity: 0 });
+        const group = L.layerGroup([physical, closeUp]);
+        const opacityFor = z => (z < 9 ? 0 : z < 10 ? 0.55 : z < 11 ? 0.85 : 1);
+        const baseOnAdd = group.onAdd, baseOnRemove = group.onRemove;
+        group.onAdd = function (map) { baseOnAdd.call(this, map); this._qbZoom = () => closeUp.setOpacity(opacityFor(map.getZoom())); map.on('zoomend', this._qbZoom); this._qbZoom(); };
+        group.onRemove = function (map) { if (this._qbZoom) map.off('zoomend', this._qbZoom); baseOnRemove.call(this, map); };
+        return group;
+      },
       satellite() { return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19 }); },
     },
     nextFrame(fn) {

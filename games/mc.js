@@ -2,7 +2,7 @@
 // games/mc.js — plain multiple choice (4 buttons, one correct).
 // Categories: trivia (merged facts/science/sports/entertainment) and emoji riddles.
 // ─────────────────────────────────────────────────────────────────────────────
-const { validateMC, validateCommon, evaluateMC, revealMC } = require('./_shared');
+const { validateMC, validateCommon, mcAnswers, evaluateMC, revealMC } = require('./_shared');
 
 module.exports = {
   type: 'mc',
@@ -33,12 +33,14 @@ module.exports = {
     return out;
   },
 
-  payload(q) {
-    return { question: q.question, answers: q.answers, imageUrl: q.imageUrl || null, topic: q.topic || null };
+  // The four options are shuffled per game (seeded, see _shared.js mcOrder) so
+  // the stored order never becomes a tell.
+  payload(q, game) {
+    return { question: q.question, answers: mcAnswers(q, game), imageUrl: q.imageUrl || null, topic: q.topic || null };
   },
 
-  evaluate(q, answer) { return evaluateMC(q, answer); },
-  reveal(q, answers)  { return revealMC(q, answers); },
+  evaluate(q, answer, ctx)  { return evaluateMC(q, answer, ctx && ctx.game); },
+  reveal(q, answers, game)  { return revealMC(q, answers, game); },
   correctText(q)      { return q.answers[q.correct]; },
   sampleAnswer()      { return { index: Math.floor(Math.random() * 4) }; },
 };

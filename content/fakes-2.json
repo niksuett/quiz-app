@@ -1,0 +1,362 @@
+[
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Beatles song or made up? Tap the FAKES",
+    "items": [
+      { "text": "Hey Jude", "fake": false },
+      { "text": "Marigold Avenue", "fake": true },
+      { "text": "Let It Be", "fake": false },
+      { "text": "Copper Lantern Blues", "fake": true },
+      { "text": "Yesterday", "fake": false },
+      { "text": "Come Together", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Pixar film or made up? Tap the FAKES",
+    "items": [
+      { "text": "Coco", "fake": false },
+      { "text": "Skyward Bound", "fake": true },
+      { "text": "Ratatouille", "fake": false },
+      { "text": "Glimmer Falls", "fake": true },
+      { "text": "Brave", "fake": false },
+      { "text": "Windward Grove", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Summer Olympic sport or made up? Tap the FAKES",
+    "items": [
+      { "text": "Fencing", "fake": false },
+      { "text": "Stonevault", "fake": true },
+      { "text": "Judo", "fake": false },
+      { "text": "Archery", "fake": false },
+      { "text": "Ridgeball", "fake": true },
+      { "text": "Handball", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Ben & Jerry's flavour or made up? Tap the FAKES",
+    "items": [
+      { "text": "Cherry Garcia", "fake": false },
+      { "text": "Velvet Storm Swirl", "fake": true },
+      { "text": "Chunky Monkey", "fake": false },
+      { "text": "Phish Food", "fake": false },
+      { "text": "Maple Rocket Crunch", "fake": true },
+      { "text": "Half Baked", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Windows version or made up? Tap the FAKES",
+    "items": [
+      { "text": "Windows XP", "fake": false },
+      { "text": "Windows Horizon", "fake": true },
+      { "text": "Windows Vista", "fake": false },
+      { "text": "Windows 98", "fake": false },
+      { "text": "Windows Quantum", "fake": true },
+      { "text": "Windows 11", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Disney princess or made up? Tap the FAKES",
+    "items": [
+      { "text": "Belle", "fake": false },
+      { "text": "Princess Liora", "fake": true },
+      { "text": "Jasmine", "fake": false },
+      { "text": "Moana", "fake": false },
+      { "text": "Princess Sable", "fake": true },
+      { "text": "Tiana", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real Star Wars film or made up? Tap the FAKES",
+    "items": [
+      { "text": "The Empire Strikes Back", "fake": false },
+      { "text": "The Crimson Eclipse", "fake": true },
+      { "text": "Return of the Jedi", "fake": false },
+      { "text": "Legacy of Shadows", "fake": true },
+      { "text": "Rogue One", "fake": false },
+      { "text": "The Last Jedi", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real zodiac sign or made up? Tap the FAKES",
+    "items": [
+      { "text": "Leo", "fake": false },
+      { "text": "Velmira", "fake": true },
+      { "text": "Scorpio", "fake": false },
+      { "text": "Aquarius", "fake": false },
+      { "text": "Duskarion", "fake": true },
+      { "text": "Capricorn", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real chess piece or made up? Tap the FAKES",
+    "items": [
+      { "text": "King", "fake": false },
+      { "text": "Herald", "fake": true },
+      { "text": "Rook", "fake": false },
+      { "text": "Queen", "fake": false },
+      { "text": "Warden", "fake": true },
+      { "text": "Bishop", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 1,
+    "question": "Real South American country or made up? Tap the FAKES",
+    "items": [
+      { "text": "Peru", "fake": false },
+      { "text": "Valcera", "fake": true },
+      { "text": "Chile", "fake": false },
+      { "text": "Colombia", "fake": false },
+      { "text": "Meridonia", "fake": true },
+      { "text": "Uruguay", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Monopoly property or made up? Tap the FAKES",
+    "items": [
+      { "text": "Boardwalk", "fake": false },
+      { "text": "Sterling Court", "fake": true },
+      { "text": "Park Place", "fake": false },
+      { "text": "Marvin Gardens", "fake": false },
+      { "text": "Cambridge Row", "fake": true },
+      { "text": "Ventnor Avenue", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real world currency or made up? Tap the FAKES",
+    "items": [
+      { "text": "Rupee", "fake": false },
+      { "text": "Solen", "fake": true },
+      { "text": "Baht", "fake": false },
+      { "text": "Dirham", "fake": false },
+      { "text": "Kastro", "fake": true },
+      { "text": "Won", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Marvel superhero or made up? Tap the FAKES",
+    "items": [
+      { "text": "Black Panther", "fake": false },
+      { "text": "Nightforge", "fake": true },
+      { "text": "Doctor Strange", "fake": false },
+      { "text": "Crimson Warden", "fake": true },
+      { "text": "Ant-Man", "fake": false },
+      { "text": "Ironclad Vex", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Formula 1 team or made up? Tap the FAKES",
+    "items": [
+      { "text": "Ferrari", "fake": false },
+      { "text": "Talbon Racing", "fake": true },
+      { "text": "McLaren", "fake": false },
+      { "text": "Williams", "fake": false },
+      { "text": "Voss Grand Prix", "fake": true },
+      { "text": "Mercedes", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real pasta shape or made up? Tap the FAKES",
+    "items": [
+      { "text": "Fusilli", "fake": false },
+      { "text": "Torcelli", "fake": true },
+      { "text": "Orecchiette", "fake": false },
+      { "text": "Farfalle", "fake": false },
+      { "text": "Vellani", "fake": true },
+      { "text": "Cavatappi", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real type of tea or made up? Tap the FAKES",
+    "items": [
+      { "text": "Oolong", "fake": false },
+      { "text": "Velvetleaf Chai", "fake": true },
+      { "text": "Darjeeling", "fake": false },
+      { "text": "Sencha", "fake": false },
+      { "text": "Moonpetal Green", "fake": true },
+      { "text": "Rooibos", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real painter or made up? Tap the FAKES",
+    "items": [
+      { "text": "Vermeer", "fake": false },
+      { "text": "Belmoreau", "fake": true },
+      { "text": "Caravaggio", "fake": false },
+      { "text": "Klimt", "fake": false },
+      { "text": "Verrantine", "fake": true },
+      { "text": "Goya", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "One of the New Seven Wonders or made up? Tap the FAKES",
+    "items": [
+      { "text": "Petra", "fake": false },
+      { "text": "Sunken Palace", "fake": true },
+      { "text": "Machu Picchu", "fake": false },
+      { "text": "Chichen Itza", "fake": false },
+      { "text": "Ashen Obelisk", "fake": true },
+      { "text": "Christ the Redeemer", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real Premier League club or made up? Tap the FAKES",
+    "items": [
+      { "text": "Everton", "fake": false },
+      { "text": "Redcliffe United", "fake": true },
+      { "text": "Fulham", "fake": false },
+      { "text": "Aston Villa", "fake": false },
+      { "text": "Ashford Rovers", "fake": true },
+      { "text": "Crystal Palace", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Actor who really played James Bond, or made up? Tap the FAKES",
+    "items": [
+      { "text": "Sean Connery", "fake": false },
+      { "text": "Julian Ashcombe", "fake": true },
+      { "text": "Daniel Craig", "fake": false },
+      { "text": "Marcus Thorne", "fake": true },
+      { "text": "Pierce Brosnan", "fake": false },
+      { "text": "Alistair Voss", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real gemstone or made up? Tap the FAKES",
+    "items": [
+      { "text": "Emerald", "fake": false },
+      { "text": "Solendite", "fake": true },
+      { "text": "Amethyst", "fake": false },
+      { "text": "Topaz", "fake": false },
+      { "text": "Marisette", "fake": true },
+      { "text": "Peridot", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 2,
+    "question": "Real NFL team or made up? Tap the FAKES",
+    "items": [
+      { "text": "Denver Broncos", "fake": false },
+      { "text": "Austin Marshals", "fake": true },
+      { "text": "Seattle Seahawks", "fake": false },
+      { "text": "Pittsburgh Steelers", "fake": false },
+      { "text": "Portland Cyclones", "fake": true },
+      { "text": "Miami Dolphins", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real wine grape variety or made up? Tap the FAKES",
+    "items": [
+      { "text": "Sangiovese", "fake": false },
+      { "text": "Belmorine", "fake": true },
+      { "text": "Tempranillo", "fake": false },
+      { "text": "Grenache", "fake": false },
+      { "text": "Castavelle", "fake": true },
+      { "text": "Nebbiolo", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real Tour de France winner or made up? Tap the FAKES",
+    "items": [
+      { "text": "Eddy Merckx", "fake": false },
+      { "text": "Henrik Dalman", "fake": true },
+      { "text": "Bernard Hinault", "fake": false },
+      { "text": "Greg LeMond", "fake": false },
+      { "text": "Pierre Vasseau", "fake": true },
+      { "text": "Chris Froome", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real Nobel Prize-winning physicist or made up? Tap the FAKES",
+    "items": [
+      { "text": "Niels Bohr", "fake": false },
+      { "text": "Aldric Voss", "fake": true },
+      { "text": "Richard Feynman", "fake": false },
+      { "text": "Werner Heisenberg", "fake": false },
+      { "text": "Tobias Renfrew", "fake": true },
+      { "text": "Enrico Fermi", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real moon of Jupiter or made up? Tap the FAKES",
+    "items": [
+      { "text": "Io", "fake": false },
+      { "text": "Thessara", "fake": true },
+      { "text": "Europa", "fake": false },
+      { "text": "Korvantis", "fake": true },
+      { "text": "Ganymede", "fake": false },
+      { "text": "Ambrivel", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real mathematician or made up? Tap the FAKES",
+    "items": [
+      { "text": "Euler", "fake": false },
+      { "text": "Voltmann", "fake": true },
+      { "text": "Gauss", "fake": false },
+      { "text": "Fibonacci", "fake": false },
+      { "text": "Hesterlind", "fake": true },
+      { "text": "Riemann", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3, "fakeLabel": "Moves",
+    "question": "Shark species or wrestling move? Tap the MOVES",
+    "items": [
+      { "text": "Hammerhead", "fake": false },
+      { "text": "Suplex", "fake": true },
+      { "text": "Mako", "fake": false },
+      { "text": "Clothesline", "fake": true },
+      { "text": "Bull Shark", "fake": false },
+      { "text": "DDT", "fake": true }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real country bordering Germany or made up? Tap the FAKES",
+    "items": [
+      { "text": "Austria", "fake": false },
+      { "text": "Vallenmark", "fake": true },
+      { "text": "Switzerland", "fake": false },
+      { "text": "Poland", "fake": false },
+      { "text": "Korvenia", "fake": true },
+      { "text": "Denmark", "fake": false }
+    ]
+  },
+  {
+    "category": "fakes", "type": "fakes", "difficulty": 3,
+    "question": "Real Baroque composer or made up? Tap the FAKES",
+    "items": [
+      { "text": "Vivaldi", "fake": false },
+      { "text": "Rendholm", "fake": true },
+      { "text": "Handel", "fake": false },
+      { "text": "Telemann", "fake": false },
+      { "text": "Castavieri", "fake": true },
+      { "text": "Corelli", "fake": false }
+    ]
+  }
+]

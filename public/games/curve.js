@@ -80,11 +80,15 @@
   // ═══════════════════════════════════════════════════════════════════════════
   // 2. makeChart — axes, gridlines, ticks. Returns the <svg> plus the scale
   //    functions and an empty <g> ("plot") that callers draw their lines into.
-  //    cfg = { w, h, xMin, xMax, yMin, yMax, unit, decimals, xLabel, yLabel, compact }
+  //    cfg = { w, h, xMin, xMax, yMin, yMax, unit, decimals, xLabel, yLabel, compact, hideYLabels }
+  //    hideYLabels: true drops the numeric text on the y ticks (used at the
+  //    expert difficulty tier, see mount() below) — the gridlines and the axis
+  //    line itself stay, only the "how much is this worth" numbers disappear.
   // ═══════════════════════════════════════════════════════════════════════════
   function makeChart(cfg) {
     const w = cfg.w, h = cfg.h;
     const compact = !!cfg.compact;                    // the small chart on the result panel
+    const hideYLabels = !!cfg.hideYLabels;
     const fs      = compact ? 9 : 11;                 // tick font size
     const yTickN  = compact ? 3 : 5;
 
@@ -94,8 +98,10 @@
     for (let v = Math.ceil(cfg.yMin / yStep - 1e-9) * yStep; v <= cfg.yMax + 1e-9; v += yStep) {
       yTicks.push({ v: +v.toFixed(6), label: fmtTick(+v.toFixed(6), cfg.unit, cfg.decimals) });
     }
+    // With the labels hidden there is nothing to reserve room for — just a
+    // slim margin for the axis line, same as the compact chart's right margin.
     const widest = yTicks.reduce((m, t) => Math.max(m, t.label.length), 1);
-    const ml = clamp(Math.round(widest * fs * 0.58) + 10, 30, Math.round(w * 0.34));
+    const ml = hideYLabels ? (compact ? 12 : 16) : clamp(Math.round(widest * fs * 0.58) + 10, 30, Math.round(w * 0.34));
     const mr = compact ? 8 : 12;
     const mt = compact ? 8 : 14;
     const mb = (compact ? 20 : 26) + (cfg.xLabel ? (compact ? 11 : 15) : 0);
@@ -136,7 +142,7 @@
 
     // Tick labels
     const labels = svgEl('g', { class: 'curve-ticklabels', 'font-size': fs });
-    yTicks.forEach(t => {
+    if (!hideYLabels) yTicks.forEach(t => {
       const el = svgEl('text', { x: ml - 6, y: yOf(t.v) + fs * 0.35, 'text-anchor': 'end' });
       el.textContent = t.label;
       labels.appendChild(el);
@@ -204,6 +210,19 @@
       const unit      = payload.unit || '';
       const decimals  = payload.decimals ?? 2;
       const lastKnown = known[known.length - 1] || [payload.xMin, (yMin + yMax) / 2];
+      // casual | mixed | expert — see games/curve.js tierFor(). Expert hides the
+      // y-axis value labels below (via hideYLabels on the answering chart only —
+      // the result and reveal screens always show everything).
+      const tier      = payload.tier || 'mixed';
+      const hideYLabels = tier === 'expert';
+      // The idle hint doubles as the difficulty tell, same convention as
+      // public/games/trace.js's idleHint: casual/expert name what changed,
+      // mixed keeps the plain original instruction.
+      const idleHint = tier === 'expert'
+        ? 'Expert: less of the line is given, and the axis numbers are hidden — go by feel'
+        : tier === 'casual'
+          ? 'Casual: more of the line is given — drag right from the dot to continue it'
+          : 'Drag right from the dot to draw how it continued';
 
       // The answer we are building: one value per hidden year, null = not drawn yet.
       const ys = new Array(hiddenXs.length).fill(null);
@@ -241,7 +260,7 @@
       function setHint() {
         if (passive)             { hintEl.textContent = 'Players are drawing…'; return; }
         if (frozen || api.locked) { hintEl.textContent = 'Locked in — waiting for the others'; return; }
-        if (!drawnCount)      { hintEl.textContent = 'Drag right from the dot to draw how it continued'; return; }
+        if (!drawnCount)      { hintEl.textContent = idleHint; return; }
         if (drawnCount < ys.length) { hintEl.textContent = 'Keep going — draw to the right edge'; return; }
         hintEl.textContent = 'Line complete — lock it in';
       }
@@ -261,6 +280,7 @@
         chart = makeChart({
           w, h, xMin: payload.xMin, xMax: payload.xMax, yMin, yMax,
           unit, decimals, xLabel: payload.xLabel || '', ariaLabel: payload.question || 'Chart',
+          hideYLabels,
         });
         addHiddenBand(chart, lastKnown[0]);
         addKnownLine(chart, known);

@@ -17,7 +17,7 @@
 // question, not the answer) and again in the reveal, so the leaderboard can
 // replay the tune with the title shown.
 // ─────────────────────────────────────────────────────────────────────────────
-const { validateMC, validateCommon, evaluateMC, revealMC } = require('./_shared');
+const { validateMC, validateCommon, mcAnswers, evaluateMC, revealMC } = require('./_shared');
 
 // ── Limits (also documented in docs/games/tune.md) ────────────────────────────
 const MIN_NOTES = 8, MAX_NOTES = 40;      // long enough to recognise, short enough to fit the timer
@@ -97,28 +97,28 @@ module.exports = {
   // The melody plus the four titles. The correct index is NOT included — the
   // title of the played piece is simply one of the four options, as in any
   // multiple-choice question.
-  payload(q) {
+  payload(q, game) {
     return {
       prompt: PROMPT,
       notes:  q.notes,
       bpm:    q.bpm,
       wave:   q.wave || DEFAULT_WAVE,
-      answers: q.answers,
+      answers: mcAnswers(q, game),   // options shuffled per game (seeded, see _shared.js)
     };
   },
 
   // ── One player's answer: { index: 0–3 } ────────────────────────────────────
   // evaluateMC is already defensive: anything that is not an integer 0–3
   // (undefined, a string, null, an object…) makes it return null = rejected.
-  evaluate(q, answer) {
-    return evaluateMC(q, answer);
+  evaluate(q, answer, ctx) {
+    return evaluateMC(q, answer, ctx && ctx.game);
   },
 
   // ── Leaderboard reveal (everyone) ──────────────────────────────────────────
   // The melody rides along so the reveal can replay it now that the title is known.
-  reveal(q, answers) {
+  reveal(q, answers, game) {
     return {
-      ...revealMC(q, answers),
+      ...revealMC(q, answers, game),
       notes: q.notes,
       bpm:   q.bpm,
       wave:  q.wave || DEFAULT_WAVE,

@@ -12,7 +12,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 const fs   = require('fs');
 const path = require('path');
-const { validateMC, validateCommon, evaluateMC, revealMC } = require('./_shared');
+const { validateMC, validateCommon, mcAnswers, evaluateMC, revealMC } = require('./_shared');
 
 // ── Load the shape data once, synchronously, when the server starts ──────────
 // { FRA: { iso3, iso2, name, region, rings, bbox, centroid, areaKm2 }, … } ≈ 0.7 MB
@@ -60,15 +60,15 @@ module.exports = {
   fromRow(row, extra) { return { answers: extra.answers, iso3: extra.iso3, correct: parseInt(row.correct, 10) }; },
 
   // ── What every client gets when the question starts (no name, no code!) ────
-  payload(q) {
+  payload(q, game) {
     const c = shapeFor(q);
-    return { prompt: PROMPT, rings: c.rings, bbox: c.bbox, answers: q.answers };
+    return { prompt: PROMPT, rings: c.rings, bbox: c.bbox, answers: mcAnswers(q, game) };   // options shuffled per game
   },
 
   // ── One player's answer: { index: 0–3 } ────────────────────────────────────
   // evaluateMC returns null for anything that is not an integer 0–3.
-  evaluate(q, answer) {
-    const out = evaluateMC(q, answer);
+  evaluate(q, answer, ctx) {
+    const out = evaluateMC(q, answer, ctx && ctx.game);
     if (!out) return null;
     const c = COUNTRIES[q.iso3] || {};
     out.result = { ...out.result, name: c.name || q.question, iso2: c.iso2 || null, rings: c.rings || [], bbox: c.bbox || null };
@@ -76,9 +76,9 @@ module.exports = {
   },
 
   // ── Leaderboard reveal (everyone) ──────────────────────────────────────────
-  reveal(q, answers) {
+  reveal(q, answers, game) {
     const c = COUNTRIES[q.iso3] || {};
-    return { ...revealMC(q, answers), rings: c.rings || [], bbox: c.bbox || null, name: c.name || q.question, iso2: c.iso2 || null };
+    return { ...revealMC(q, answers, game), rings: c.rings || [], bbox: c.bbox || null, name: c.name || q.question, iso2: c.iso2 || null };
   },
 
   correctText(q) { const c = COUNTRIES[q.iso3]; return (c && c.name) || q.answers[q.correct]; },

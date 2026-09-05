@@ -3,18 +3,17 @@
    Prefix: .su-      Theme tokens come from style.css.
 
    Sections
-     1. Colours & the question card
-     2. The stage (baseline + two silhouettes + captions)
-     3. The log slider, its value bubble and the lock button
-     4. Result screen mini comparison (sits in the dark ink panel)
-     5. Leaderboard reveal (true scene + a row of everyone's guess)
-     6. TV mode, small phones, reduced motion
+     1. The question card
+     2. The canvas: sky, ground, silhouettes, brackets, ruler
+     3. Interaction chrome: resize handle, dashed box, zoom + nudge buttons
+     4. Readout + lock button under the canvas
+     5. Result screen mini comparison (sits in the dark ink panel)
+     6. Leaderboard reveal (true scene + a row of everyone's guess)
+     7. TV mode, small phones, reduced motion
 ══════════════════════════════════════════════════════════════════════════ */
 
-/* ─── 1. Colours & question card ─────────────────────────────────────────── */
+/* ─── 1. Question card ───────────────────────────────────────────────────── */
 .su-wrap {
-  --su-ref: #8c6b2e;                 /* brown reference silhouette (= --gold-muted) */
-  --su-tgt: #a33;                    /* red target silhouette */
   width: 100%;
   padding: 18px 16px 20px;
   background: var(--parchment);
@@ -36,6 +35,9 @@
   margin-bottom: 10px;
 }
 .su-hint b { font-style: normal; font-weight: 600; color: var(--ink-light); }
+.su-tierhint { display: block; margin-top: 3px; font-size: .86rem; color: var(--aged-light); }
+.tier-expert .su-tierhint { color: var(--wrong); opacity: .85; }
+.tier-casual .su-tierhint { color: var(--gold-muted); }
 
 .su-credit {
   margin-top: 6px;
@@ -45,33 +47,57 @@
   opacity: .75;
 }
 
-/* ─── 2. The stage ───────────────────────────────────────────────────────── */
-/* The SVG fills the box above the caption band; both silhouettes stand on the
-   baseline drawn at its bottom edge. touch-action:none lets us handle the
-   two-finger pinch ourselves instead of the browser zooming the page. */
+/* ─── 2. The canvas ──────────────────────────────────────────────────────── */
+/* The SVG paints its own sky + ground; the HTML caption band sits under it.
+   touch-action:none — every finger on the canvas is ours (resize / pinch). */
 .su-stage {
   position: relative;
-  height: clamp(190px, 40vh, 330px);
+  height: clamp(230px, 44vh, 360px);
   padding-bottom: 38px;                     /* caption band */
-  background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(213,200,180,.18));
   border: 1px solid var(--parchment-dark);
-  border-radius: 4px;
+  border-radius: 6px;
+  background: var(--parchment-mid);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 3px rgba(26,18,8,.08);
   touch-action: none;
   user-select: none; -webkit-user-select: none;
   overflow: hidden;
+  outline: none;
 }
-.su-stage.is-pinching { cursor: grabbing; }
+.su-stage.is-interactive { cursor: grab; }
+.su-stage.is-dragging, .su-stage.is-pinching { cursor: grabbing; }
+.su-stage:focus-visible { box-shadow: 0 0 0 3px rgba(200,146,42,.35); }
 .su-svg { display: block; width: 100%; height: 100%; }
 
-.su-ground { stroke: var(--ink-light); stroke-width: 1.5; opacity: .5; }
-.su-shadow { fill: rgba(26,18,8,.13); }
-.su-fig-ref { color: var(--su-ref); }
-.su-fig-tgt { color: var(--su-tgt); transition: none; }
-/* The stage lives inside .su-wrap during the question and inside .su-reveal in
-   the leaderboard — repeat the colours so both parents work. */
-.su-reveal .su-fig-ref { color: #8c6b2e; }
-.su-reveal .su-fig-tgt { color: #a33; }
+.su-groundfill { opacity: .95; }
+.su-ground { stroke: #5b3f1a; stroke-width: 1.2; opacity: .55; }
+.su-shadow { fill: rgba(26,18,8,.16); }
 
+/* Silhouettes: gradient fill comes from the SVG <defs>; a soft drop shadow
+   lifts them off the sky. */
+.su-fig { filter: drop-shadow(0 2px 2px rgba(26,18,8,.28)); }
+.su-fig-tgt { transition: none; }
+.su-stage.is-locked .su-fig-tgt, .su-wrap.is-locked .su-fig-tgt { filter: drop-shadow(0 2px 2px rgba(26,18,8,.28)) saturate(.8); }
+
+/* Dimension brackets — the "|←——→|" lines that say what is being measured. */
+.su-br-line { stroke: var(--ink-light); stroke-width: 1; opacity: .55; }
+.su-br-tick { stroke: var(--ink-light); stroke-width: 1.2; opacity: .7; }
+.su-br-label {
+  font-family: var(--font-cinzel); font-size: 11px; font-weight: 700;
+  fill: var(--ink-light); letter-spacing: .03em;
+  paint-order: stroke; stroke: rgba(251,245,232,.85); stroke-width: 3px; stroke-linejoin: round;
+}
+.su-bracket-tgt .su-br-label { fill: #8c2a22; }
+.su-bracket-tgt .su-br-line, .su-bracket-tgt .su-br-tick { stroke: #8c2a22; }
+.su-bracket.is-hidden { display: none; }
+
+/* Metre ruler (casual tier) along the left edge, with faint guides across. */
+.su-rl-axis  { stroke: var(--ink-light); stroke-width: 1; opacity: .5; }
+.su-rl-major { stroke: var(--ink-light); stroke-width: 1.2; opacity: .6; }
+.su-rl-minor { stroke: var(--ink-light); stroke-width: 1; opacity: .35; }
+.su-rl-guide { stroke: var(--ink-light); stroke-width: 1; opacity: .09; stroke-dasharray: 3 5; }
+.su-rl-label { font-family: var(--font-cinzel); font-size: 9.5px; fill: var(--aged); font-variant-numeric: tabular-nums; }
+
+/* Captions under the figures */
 .su-caps { position: absolute; left: 0; right: 0; bottom: 4px; height: 34px; }
 .su-cap {
   position: absolute;
@@ -89,94 +115,93 @@
   font-family: var(--font-cinzel); font-size: .68rem; font-variant-numeric: tabular-nums;
   color: var(--gold-muted); white-space: nowrap;
 }
-.su-cap-ref .su-cap-size { color: var(--gold-muted); }
+.su-cap-tgt .su-cap-name { color: #8c2a22; }
 .su-cap-tgt .su-cap-size { color: var(--gold); font-weight: 700; }
 .su-cap.is-tiny .su-cap-size { font-style: italic; opacity: .8; }
 
-/* ─── 3. Controls: log slider + bubble + lock ────────────────────────────── */
+/* ─── 3. Interaction chrome ──────────────────────────────────────────────── */
+/* Dashed box around the target + the corner handle. Both only exist on the
+   answering screen; the box shows while dragging (or hovering on desktop). */
+.su-tgtbox {
+  fill: none; stroke: #8c2a22; stroke-width: 1; stroke-dasharray: 4 4;
+  opacity: 0; transition: opacity .18s ease;
+}
+.su-stage.is-interactive:hover .su-tgtbox { opacity: .35; }
+.su-stage.is-dragging .su-tgtbox { opacity: .7; }
+.su-stage:not(.is-interactive) .su-tgtbox, .su-stage:not(.is-interactive) .su-handle { display: none; }
+
+.su-handle { cursor: nwse-resize; transition: transform .08s ease; }
+.su-handle-ring {
+  fill: var(--gold-bright); stroke: var(--parchment); stroke-width: 2.5;
+  filter: drop-shadow(0 2px 5px rgba(200,146,42,.55));
+}
+.su-handle-glyph { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.su-stage.is-dragging .su-handle-ring { fill: var(--gold); r: 17; }
+@keyframes suHandlePulse { 0%, 100% { filter: drop-shadow(0 2px 5px rgba(200,146,42,.55)); } 50% { filter: drop-shadow(0 0 12px rgba(232,201,122,.95)); } }
+.su-stage.is-interactive:not(.is-dragging) .su-handle-ring { animation: suHandlePulse 2.2s ease-in-out infinite; }
+
+/* Zoom buttons (top right) and fine-tune nudge (top left) float over the sky. */
+.su-zoom, .su-nudge {
+  position: absolute; top: 8px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px;
+  background: rgba(26,18,8,.72);
+  border: 1px solid rgba(232,201,122,.35);
+  border-radius: 999px;
+  backdrop-filter: blur(3px);
+  z-index: 3;
+}
+.su-zoom { right: 8px; }
+.su-nudge { left: 8px; }
+.su-stage.has-ruler .su-nudge { left: 40px; }
+.su-zbtn, .su-nbtn {
+  min-width: 34px; height: 34px; padding: 0 10px;
+  border: 0; border-radius: 999px;
+  background: transparent; color: var(--gold-pale);
+  font-family: var(--font-cinzel); font-size: 1.05rem; font-weight: 700; line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.su-zbtn:hover, .su-nbtn:hover { background: rgba(232,201,122,.16); }
+.su-zbtn:active, .su-nbtn:active { background: rgba(232,201,122,.3); }
+.su-zfit { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: 0 12px; }
+.su-zfit.is-active { color: var(--gold-bright); background: rgba(232,201,122,.12); }
+.su-stage.is-clipped .su-zfit { animation: suFitPulse 1.1s ease-in-out infinite; }
+@keyframes suFitPulse { 0%, 100% { background: rgba(232,201,122,.12); } 50% { background: rgba(232,201,122,.42); color: #fff; } }
+.su-nlabel { font-family: var(--font-cinzel); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-pale); opacity: .8; padding: 0 2px; }
+.su-stage:not(.is-interactive) .su-zoom, .su-stage:not(.is-interactive) .su-nudge { display: none; }
+
+/* ─── 4. Readout + lock ──────────────────────────────────────────────────── */
 .su-controls { margin-top: 14px; }
 
-.su-track { position: relative; padding: 30px 0 4px; }
-.su-range {
-  --su-pct: 50%;
-  width: 100%; height: 44px;                 /* 44px = comfortable tap target */
-  margin: 0;
-  -webkit-appearance: none; appearance: none;
-  background: transparent;
-  cursor: pointer;
-  touch-action: pan-y;
-}
-.su-range::-webkit-slider-runnable-track {
-  height: 6px; border-radius: 3px;
-  background: linear-gradient(90deg, var(--gold) 0 var(--su-pct), var(--parchment-dark) var(--su-pct) 100%);
-}
-.su-range::-moz-range-track    { height: 6px; border-radius: 3px; background: var(--parchment-dark); }
-.su-range::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--gold); }
-.su-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 30px; height: 30px; margin-top: -12px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--gold));
-  border: 2px solid var(--parchment);
-  box-shadow: 0 2px 8px rgba(200,146,42,.55), 0 0 0 3px rgba(200,146,42,.18);
-  transition: transform .12s ease;
-}
-.su-range::-moz-range-thumb {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--gold));
-  border: 2px solid var(--parchment);
-  box-shadow: 0 2px 8px rgba(200,146,42,.55);
-}
-.su-range:active::-webkit-slider-thumb, .su-range:focus-visible::-webkit-slider-thumb { transform: scale(1.15); }
-.su-range:disabled { opacity: .7; cursor: default; }
-
-/* The value bubble rides above the thumb. */
-.su-bubble {
-  position: absolute; top: 0; left: 50%;
-  transform: translateX(-50%);
-  padding: 3px 12px;
+.su-readout {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 12px;
+  padding: 8px 14px 10px;
   background: var(--ink);
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.28);
-  pointer-events: none;
-  white-space: nowrap;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
-.su-bubble::after {
-  content: ''; position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%);
-  border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--ink);
+.su-ro-name {
+  font-family: var(--font-cinzel); font-size: .74rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: rgba(232,201,122,.75);
 }
-.su-bubble-val {
-  font-family: var(--font-cinzel); font-size: 1.18rem; font-weight: 900;
-  color: var(--gold-bright); font-variant-numeric: tabular-nums;
+.su-ro-val {
+  font-family: var(--font-cinzel); font-size: 1.55rem; font-weight: 900;
+  color: var(--gold-bright); font-variant-numeric: tabular-nums; line-height: 1.1;
 }
+.su-ro-rel {
+  flex-basis: 100%;
+  font-family: var(--font-garamond); font-style: italic; font-size: .92rem;
+  color: rgba(245,237,224,.7);
+}
+.su-readout.is-hidden-nums .su-ro-val { color: rgba(245,237,224,.45); }
 
-/* A small marker on the track showing where the reference size sits. */
-.su-refmark {
-  position: absolute; bottom: 4px; left: 50%;
-  transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center;
-  pointer-events: none;
-}
-.su-refmark i { width: 2px; height: 10px; background: var(--gold-muted); opacity: .7; border-radius: 1px; }
-.su-refmark span {
-  font-family: var(--font-cinzel); font-size: .58rem; letter-spacing: .04em;
-  color: var(--gold-muted); white-space: nowrap; margin-top: 1px; opacity: .85;
-}
-
-.su-bounds {
-  display: flex; justify-content: space-between;
-  margin-top: 14px; padding: 0 2px;
-  font-family: var(--font-cinzel); font-size: .68rem; letter-spacing: .04em;
-  color: var(--aged); font-variant-numeric: tabular-nums;
-}
-
-.su-lock { margin-top: 16px; width: auto !important; display: inline-block; padding: 14px 40px; min-height: 48px; }
+.su-lock { margin-top: 14px; width: auto !important; display: inline-block; padding: 14px 40px; min-height: 48px; }
 .su-lock:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
 .su-wrap.is-locked .su-lock { background: var(--correct-bg); color: var(--correct); border-color: var(--correct); opacity: 1; }
 .su-wrap.is-locked .su-stage { opacity: .92; }
-.su-wrap.is-locked .su-bubble { background: var(--correct); }
-.su-wrap.is-locked .su-bubble::after { border-top-color: var(--correct); }
-.su-wrap.is-locked .su-bubble-val { color: #eaf6ee; }
+.su-wrap.is-locked .su-readout { background: var(--correct); }
+.su-wrap.is-locked .su-ro-val, .su-wrap.is-locked .su-ro-name, .su-wrap.is-locked .su-ro-rel { color: #eaf6ee; }
 
 .su-host-hint {
   margin-top: 6px;
@@ -184,7 +209,7 @@
   color: var(--aged); font-size: 1rem;
 }
 
-/* ─── 4. Result screen mini comparison (dark ink panel) ──────────────────── */
+/* ─── 5. Result screen mini comparison (dark ink panel) ──────────────────── */
 .su-rcmp {
   display: flex; align-items: flex-end; justify-content: center; gap: 22px;
   margin-top: 14px; width: 100%; max-width: 360px;
@@ -206,7 +231,7 @@
 .su-rcell.is-truth .su-rsize { color: var(--gold-bright); }
 .su-rdiff { margin-top: 8px; font-family: var(--font-garamond); font-style: italic; font-size: .95rem; color: rgba(245,237,224,.72); }
 
-/* ─── 5. Leaderboard reveal ──────────────────────────────────────────────── */
+/* ─── 6. Leaderboard reveal ──────────────────────────────────────────────── */
 .su-reveal {
   width: 100%;
   padding: 14px 16px 12px;
@@ -222,7 +247,7 @@
   color: var(--aged); margin-bottom: 10px;
 }
 .su-rv-title2 { margin-top: 16px; }
-.su-rv-scene .su-stage { height: clamp(170px, 32vh, 280px); background: linear-gradient(180deg, rgba(255,255,255,.4), rgba(213,200,180,.12)); }
+.su-rv-scene .su-stage { height: clamp(170px, 32vh, 280px); }
 .su-rv-punch {
   margin-top: 10px; text-align: center;
   font-family: var(--font-garamond); font-size: 1.02rem; color: var(--ink-light);
@@ -258,27 +283,29 @@
 .su-rv-item.is-me { background: rgba(30,58,110,.10); box-shadow: 0 0 0 1px var(--lapis) inset; }
 .su-rv-nobody { font-family: var(--font-garamond); font-style: italic; color: var(--aged); }
 
-/* ─── 6. TV mode, small phones, reduced motion ───────────────────────────── */
+/* ─── 7. TV mode, small phones, reduced motion ───────────────────────────── */
 .su-wrap.is-tv { padding: 26px 34px 28px; }
-.su-wrap.is-tv .su-stage { height: clamp(300px, 52vh, 620px); }
+.su-wrap.is-tv .su-stage { height: clamp(320px, 54vh, 640px); padding-bottom: 56px; }
 .su-wrap.is-tv .su-hint { font-size: 1.3rem; }
 .su-wrap.is-tv .su-cap-name { font-size: 1.2rem; }
 .su-wrap.is-tv .su-cap-size { font-size: 1.05rem; }
 .su-wrap.is-tv .su-caps { height: 52px; }
-.su-wrap.is-tv .su-stage { padding-bottom: 56px; }
-.su-wrap.is-tv .su-bubble-val { font-size: 1.7rem; }
-.su-wrap.is-tv .su-bounds { font-size: .9rem; }
+.su-wrap.is-tv .su-br-label { font-size: 15px; }
 .su-wrap.is-tv .su-host-hint { font-size: 1.4rem; }
 
 @media (max-width: 400px) {
   .su-wrap { padding: 14px 10px 16px; }
   .su-hint { font-size: .88rem; }
-  .su-bubble-val { font-size: 1rem; }
+  .su-tierhint { font-size: .78rem; }
   .su-cap-name { font-size: .66rem; }
   .su-cap-size { font-size: .6rem; }
+  .su-ro-val { font-size: 1.3rem; }
+  .su-zbtn, .su-nbtn { min-width: 30px; height: 30px; padding: 0 8px; font-size: .95rem; }
+  .su-nlabel { display: none; }
   .su-rv-item { min-width: 38px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .su-wrap, .su-rv-item, .su-rv-punch { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .su-handle-ring, .su-zfit { animation: none !important; }
 }

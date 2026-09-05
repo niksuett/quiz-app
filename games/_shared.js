@@ -59,32 +59,73 @@ function validateCommon(q) {
   return errors;
 }
 
-// Evaluate an MC answer. answer = { index }. Returns the contract object.
-function evaluateMC(q, answer) {
+// ── Seeded shuffle ────────────────────────────────────────────────────────────
+// FNV-1a string hash → 32-bit seed, then mulberry32 for a tiny deterministic
+// random generator. Same seed in → same order out, every time. Used wherever a
+// question's items must be shown in a random order that every client — and a
+// reconnecting client — sees identically, without storing per-game state.
+function hashString(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function seededOrder(n, seed) {
+  let t = seed;
+  const rnd = () => {
+    t = (t + 0x6D2B79F5) | 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  return order;
+}
+
+// The order in which the four options are SHOWN in this game: order[displayed]
+// = stored index. Seeded by game id + question id so that every player, and a
+// player who reconnects mid-question, gets the same buttons in the same places,
+// while the same question is laid out differently in the next game — nobody
+// can learn "the answer is always the second button". Without a game (dev
+// harness, unit tests) the stored order is kept.
+function mcOrder(q, game) {
+  if (!game || !game.id) return [0, 1, 2, 3];
+  return seededOrder(4, hashString(`${game.id}:${q.id !== undefined ? q.id : q.question}`));
+}
+// The answers as the players see them.
+function mcAnswers(q, game) { return mcOrder(q, game).map(i => q.answers[i]); }
+
+// Evaluate an MC answer. answer = { index } is the DISPLAYED position (0–3).
+// Everything sent back to the client is in displayed positions too, so the
+// module can highlight buttons without knowing about the shuffle.
+function evaluateMC(q, answer, game) {
   const index = answer && Number.isInteger(answer.index) ? answer.index : -1;
   if (index < 0 || index > 3) return null;
-  const isCorrect = index === q.correct;
+  const order     = mcOrder(q, game);
+  const stored    = order[index];
+  const isCorrect = stored === q.correct;
   return {
     quality: isCorrect ? 1 : null,
-    detail:  { isCorrect, index, answerText: q.answers[index] },
+    detail:  { isCorrect, index, answerText: q.answers[stored] },
     result:  {
       isCorrect,
-      correctIndex: q.correct,
+      correctIndex: order.indexOf(q.correct),
       correctText:  q.answers[q.correct],
-      yourText:     q.answers[index],
+      yourText:     q.answers[stored],
     },
   };
 }
 
-// Reveal for MC types: how many players picked each option.
-function revealMC(q, answers) {
+// Reveal for MC types: how many players picked each (displayed) option.
+function revealMC(q, answers, game) {
+  const order  = mcOrder(q, game);
   const counts = [0, 0, 0, 0];
   const pickedBy = [[], [], [], []];
   for (const a of answers) {
     const i = a.detail && a.detail.index;
     if (Number.isInteger(i) && i >= 0 && i < 4) { counts[i]++; pickedBy[i].push(a.nickname); }
   }
-  return { answers: q.answers, correctIndex: q.correct, counts, pickedBy };
+  return { answers: order.map(i => q.answers[i]), correctIndex: order.indexOf(q.correct), counts, pickedBy };
 }
 
-module.exports = { shuffle, clamp, haversineKm, bearingDeg, formatYear, REGIONS, validateMC, validateCommon, evaluateMC, revealMC };
+module.exports = { shuffle, clamp, haversineKm, bearingDeg, formatYear, REGIONS, validateMC, validateCommon, hashString, seededOrder, mcOrder, mcAnswers, evaluateMC, revealMC };

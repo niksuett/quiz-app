@@ -26,6 +26,14 @@
 }
 .cp-wrap.is-locked .cp-hint { color: var(--correct); }
 
+/* Difficulty distance hint ("About 1,200 km away") — only present at the
+   casual tier (see games/compass.js tierFor()). Styled like trace's .trace-len. */
+.cp-dist-hint {
+  font-family: var(--font-garamond); font-style: italic;
+  font-size: .9rem; color: var(--aged);
+  margin: -6px 0 12px;
+}
+
 /* Rose stage: the SVG plus a from-city label overlaid at the hub */
 .cp-stage { position: relative; width: min(100%, 60vh, 340px); margin: 0 auto; touch-action: none; }
 .cp-rose-host { width: 100%; }

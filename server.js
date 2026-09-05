@@ -183,6 +183,32 @@ function connectedPlayers(game) { return game.players.filter(p => p.connected); 
 function clearGameTimer(game) { if (game.timer) { clearTimeout(game.timer); game.timer = null; } }
 function scaleMs(game, ms)    { return game.options.fast ? Math.min(ms, 150) : ms; }
 
+// ── Pacing ───────────────────────────────────────────────────────────────────
+// Every pause that is not the question timer itself lives here, so the rhythm
+// of a game can be tuned in one place. The host's "pace" option (brisk / normal
+// / relaxed) scales all of them; the per-type answering time never changes.
+const PACE_FACTOR = { brisk: 0.7, normal: 1, relaxed: 1.4 };
+const TIMING = {
+  introFirstMs:     5000,   // first time a category appears — long enough to read the how-to
+  introRepeatMs:    2200,   // later rounds of a known category — just the round number
+  buzzerMs:         2500,   // after "time's up": whoever answered at the last second still sees their result
+  earlyMinMs:       4000,   // once everyone has answered, the last one still gets this long on the result screen
+  revealMinS:       8,      // a leaderboard never disappears faster than this (its own animation takes ~4 s)
+  revealMaxS:       30,
+  revealPerPlayerS: 0.5,    // more players = more pins / lines / bars to look at
+};
+function paceMs(game, ms) { return scaleMs(game, Math.round(ms * (PACE_FACTOR[game.options.pace] || 1))); }
+
+// Everyone (still connected) has answered → close the question early, but leave
+// the personal result screens up for a moment first.
+function everyoneAnswered(game) {
+  clearGameTimer(game);
+  game.answersClosed = true;
+  const wait = paceMs(game, Math.max(TIMING.earlyMinMs, game.currentModule.earlyPause));
+  game.timerEndAt = Date.now() + wait;
+  game.timer = setTimeout(() => showLeaderboard(game), wait);
+}
+
 // ── Socket.io ─────────────────────────────────────────────────────────────────
 io.on('connection', (socket) => {
 
@@ -197,6 +223,7 @@ io.on('connection', (socket) => {
       gameMode:    opts.gameMode === 'tv' ? 'tv' : 'mobile',
       finalDouble: opts.finalDouble !== false,
       intros:      opts.intros !== false,
+      pace:        PACE_FACTOR[opts.pace] ? opts.pace : 'normal',
       fast:        IS_TEST && !!opts.testFast,
     };
 
@@ -309,7 +336,7 @@ io.on('connection', (socket) => {
   // PLAYER answers ────────────────────────────────────────────────────────────
   socket.on('submit-answer', ({ answer } = {}) => {
     const game = games[socket.gameId];
-    if (!game || game.state !== 'question' || game.isPaused) return;
+    if (!game || game.state !== 'question' || game.isPaused || game.answersClosed) return;
     const player = game.players.find(p => p.id === socket.id);
     if (!player || player.answer) return;
 
@@ -335,12 +362,7 @@ io.on('connection', (socket) => {
     io.to(game.hostId).emit('answer-progress', { answered, total: game.players.length, connected: connectedPlayers(game).length });
 
     // Everyone (who is still connected) has answered → show results early
-    if (connectedPlayers(game).every(p => p.answer)) {
-      clearGameTimer(game);
-      const wait = scaleMs(game, mod.earlyPause);
-      game.timerEndAt = Date.now() + wait;
-      game.timer = setTimeout(() => showLeaderboard(game), wait);
-    }
+    if (connectedPlayers(game).every(p => p.answer)) everyoneAnswered(game);
   });
 
   // HOST controls ─────────────────────────────────────────────────────────────
@@ -422,7 +444,10 @@ io.on('connection', (socket) => {
     if (game.state === 'question') game.pausedAccumMs += Date.now() - game.pauseStartedAt;
     const remaining = game.pausedRemainingMs || 3000;
     game.timerEndAt = Date.now() + remaining;
-    game.timer = setTimeout(() => game.state === 'question' ? showLeaderboard(game) : startQuestion(game), remaining);
+    game.timer = setTimeout(() => {
+      if (game.state !== 'question') return startQuestion(game);
+      return game.answersClosed ? showLeaderboard(game) : onTimeUp(game);
+    }, remaining);
     io.to(game.id).emit('game-resumed', { remainingMs: remaining, state: game.state });
   });
 
@@ -455,11 +480,8 @@ io.on('connection', (socket) => {
     } else {
       p.connected = false;   // keep their score; they can rejoin with their token
       // If everyone else already answered, don't wait for a ghost
-      if (game.state === 'question' && !game.isPaused && connectedPlayers(game).length && connectedPlayers(game).every(pl => pl.answer)) {
-        clearGameTimer(game);
-        const wait = scaleMs(game, game.currentModule.earlyPause);
-        game.timerEndAt = Date.now() + wait;
-        game.timer = setTimeout(() => showLeaderboard(game), wait);
+      if (game.state === 'question' && !game.isPaused && !game.answersClosed && connectedPlayers(game).length && connectedPlayers(game).every(pl => pl.answer)) {
+        everyoneAnswered(game);
       }
     }
     emitLobby(game);
@@ -482,6 +504,7 @@ function sendStateSnapshot(socket, game) {
     socket.emit('new-question', {
       questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
       category: categoryMeta(q.category), timeLimit: mod.timeLimit, remainingMs, paused: game.isPaused,
+      closed: !!game.answersClosed,      // time is up (or everyone answered) — the leaderboard is seconds away
       payload: game.currentPayload,
       isLast: game.currentIndex === game.questions.length - 1,
       multiplier: (game.options.finalDouble && game.currentIndex === game.questions.length - 1) ? 2 : 1,
@@ -516,7 +539,7 @@ function startQuestion(game) {
 
   if (game.options.intros) {
     game.state = 'intro';
-    const durationMs = scaleMs(game, firstTime ? 4000 : 1800);
+    const durationMs = paceMs(game, firstTime ? TIMING.introFirstMs : TIMING.introRepeatMs);
     game.timerEndAt = Date.now() + durationMs;
     io.to(game.id).emit('question-intro', {
       questionNumber: game.currentIndex + 1, totalQuestions: game.questions.length, type: mod.type,
@@ -539,6 +562,7 @@ function beginQuestion(game) {
   game.state             = 'question';
   game.questionStartTime = Date.now();
   game.pausedAccumMs     = 0;
+  game.answersClosed     = false;
   game.currentPayload    = payload;
   const timeLimitMs = scaleMs(game, mod.timeLimit * 1000);
   game.timerEndAt = Date.now() + timeLimitMs;
@@ -550,7 +574,20 @@ function beginQuestion(game) {
     multiplier: (game.options.finalDouble && game.currentIndex === game.questions.length - 1) ? 2 : 1,
   });
   io.to(game.hostId).emit('answer-progress', { answered: 0, total: game.players.length, connected: connectedPlayers(game).length });
-  game.timer = setTimeout(() => showLeaderboard(game), timeLimitMs);
+  game.timer = setTimeout(() => onTimeUp(game), timeLimitMs);
+}
+
+// The question timer ran out. Answers close now, but the leaderboard waits a
+// beat: players who locked in at the last second get to see their own result
+// screen, and everyone else sees "Time's up" instead of an abrupt jump.
+function onTimeUp(game) {
+  clearGameTimer(game);
+  if (game.state !== 'question') return;
+  game.answersClosed = true;
+  io.to(game.id).emit('time-up');
+  const wait = paceMs(game, TIMING.buzzerMs);
+  game.timerEndAt = Date.now() + wait;
+  game.timer = setTimeout(() => showLeaderboard(game), wait);
 }
 
 function showLeaderboard(game) {
@@ -576,7 +613,10 @@ function showLeaderboard(game) {
   let reveal = null;
   try { reveal = mod.reveal(q, answers, game); } catch (e) { console.error(`reveal() failed for ${mod.type}:`, e.message); }
 
-  const revealPause = Math.min(25, mod.revealPause + Math.max(0, connectedPlayers(game).length - 1) * 0.5);
+  // How long the leaderboard stays: the type's own reveal time, longer with more
+  // players, never shorter than the leaderboard animation itself, scaled by pace.
+  const baseS = Math.max(TIMING.revealMinS, mod.revealPause) + Math.max(0, connectedPlayers(game).length - 1) * TIMING.revealPerPlayerS;
+  const revealPause = Math.min(TIMING.revealMaxS, Math.round(baseS * (PACE_FACTOR[game.options.pace] || 1)));
   const payload = {
     leaderboard: buildLeaderboard(game),
     correctText: safe(() => mod.correctText(q), ''),

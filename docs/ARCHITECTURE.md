@@ -125,6 +125,16 @@ Notes
 * `evaluate` must be defensive: validate `answer` shape and clamp numbers. Bad input → return null.
 * Speed-scored types (`speedScored: true`) return `quality: 1` for correct, `null` for wrong;
   the core applies the speed factor.
+* **Difficulty tiers.** `game.setup.difficulty` is `'casual' | 'mixed' | 'expert'`. A module may use it
+  to change how much HELP the payload carries (markers, rulers, readouts, how much of a series is shown)
+  — never the truth or the scoring. Convention: a `tierFor(game)` helper, a `tier` field in the payload
+  so the client can show a hint line, and a "Difficulty tiers" table in `docs/games/<type>.md`. If the
+  tier changes what `evaluate()` scores against (curve does), `payload`, `evaluate` (via `ctx.game`) and
+  `reveal` must all derive it from the same `game`. Implemented for trace, sizeup, halves, curve, compass.
+* **Per-game shuffles** (MC-style option order, Spot-the-Fakes item order) are seeded from
+  `game.id + q.id` (`_shared.js` → `hashString` / `seededOrder` / `mcOrder`), so every client and every
+  reconnect sees the same order without server-side per-player state, and the same question is laid out
+  differently in the next game. Indices in `answer`, `result` and `reveal` are all in DISPLAYED order.
 
 ---
 
@@ -217,7 +227,7 @@ The leaderboard entry carries every component so the client can explain it:
 
 ## 8. Socket protocol
 
-Host → server: `create-game {rounds, categories[], regions[]|null, difficulty:'mixed'|'casual'|'expert', autoplay, gameMode:'mobile'|'tv', finalDouble, intros, testIds?}`
+Host → server: `create-game {rounds, categories[], regions[]|null, difficulty:'mixed'|'casual'|'expert', pace:'brisk'|'normal'|'relaxed', autoplay, gameMode:'mobile'|'tv', finalDouble, intros, testIds?}`
 → `game-created {gameId, gameMode, autoplay, hostToken}` | `create-error msg`
 
 Player → server: `join-game {gameId, nickname}` → `join-success {gameId, nickname, playerToken}` | `join-error msg`
@@ -228,13 +238,19 @@ Player → `submit-answer {answer}` → `answer-result {type, quality, soundCorr
 Server → room:
 * `lobby-update {players:[{nickname, connected}]}`
 * `question-intro {questionNumber, totalQuestions, type, category:{id,label,emoji,group,howTo}, firstTime, durationMs}`
-* `new-question {questionNumber, totalQuestions, type, category:{...}, timeLimit, remainingMs?, payload}`
+* `new-question {questionNumber, totalQuestions, type, category:{...}, timeLimit, remainingMs?, payload, isLast, multiplier}` — a reconnect snapshot also carries `paused`, `closed` (time is up, leaderboard imminent), `answered`, `myResult`
+* `time-up` — the question timer ran out and answers are closed; the leaderboard follows after a short buzzer pause so last-second answerers still see their result screen
 * `answer-progress {answered, total}` (host only)
 * `game-paused {remainingMs}` / `game-resumed {remainingMs}`
 * `show-leaderboard {leaderboard, correctText, type, category:{...}, questionNumber, totalQuestions, isLast, multiplier, reveal}`
 * `waiting-for-host` (host only, autoplay off)
 * `game-over {leaderboard, awards:[{emoji,title,nickname,detail}]}`
 * `host-left`, `kicked`
+
+Pacing (server.js `TIMING` + `PACE_FACTOR`): intro splash 5 s the first time a category appears, 2.2 s afterwards;
+once everyone has answered the leaderboard waits `max(4 s, module.earlyPause)`; after time-up a 2.5 s buzzer pause;
+the leaderboard stays `max(8 s, module.revealPause) + 0.5 s per extra player` (cap 30 s). The host's `pace` option
+scales all of these by 0.7 (brisk) / 1 (normal) / 1.4 (relaxed). The per-type `timeLimit` never changes.
 
 HTTP: `GET /api/games` → `{ types:[{type,timeLimit,speedScored,...}], categories:[{id,label,emoji,group,blurb,howTo,type,count}], groups:[{id,label,emoji}], regions:[...], presets:[{id,label,categories}] }`
 `GET /qr/:gameId` → SVG QR code of the join link. (`data/` is not served — modules put what the client needs in the payload.) `GET /?join=ABC123` prefills the join screen.

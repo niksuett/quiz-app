@@ -154,11 +154,29 @@
       container.innerHTML = '';
       const passive = api.role === 'host';
       const from = payload.from || {};
+      const tier = payload.tier || 'mixed';   // casual | mixed | expert — see games/compass.js tierFor()
+
+      // The idle hint doubles as the difficulty tell (same trick as trace.js's
+      // idleHint): casual/mixed name what the map is giving away, expert warns
+      // that nothing extra is. `from.lat` is only present at casual/mixed — see
+      // the locator-map guard a few lines down, which is what actually keeps
+      // this honest if the two ever disagree.
+      const idleHint = tier === 'expert'
+        ? "Expert: no locator map — you'll need to know both cities"
+        : tier === 'casual'
+          ? 'Casual: your starting point is shown, with how far away the target is'
+          : "You're shown where you're starting from";
+      // distanceKm only exists in the payload at the casual tier — omit the
+      // hint (rather than showing "about 0 km") when the server left it out.
+      const distHint = payload.distanceKm != null
+        ? `<p class="cp-dist-hint">About ${esc(fmtKm(payload.distanceKm))} away</p>` : '';
+
       const wrap = document.createElement('div');
       wrap.className = 'cp-wrap' + (api.tvMode ? ' is-tv' : '');
       wrap.innerHTML = `
         <div class="cp-body">
-          <p class="cp-hint">${passive ? 'Players are pointing their needles…' : (api.locked ? 'Locked in — waiting for the others' : 'Drag anywhere on the rose to aim, then lock in')}</p>
+          <p class="cp-hint">${passive ? 'Players are pointing their needles…' : (api.locked ? 'Locked in — waiting for the others' : idleHint)}</p>
+          ${distHint}
           <div class="cp-stage">
             <div class="cp-rose-host"></div>
             <div class="cp-center-label">${esc(from.name || '')}</div>
