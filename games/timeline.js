@@ -23,14 +23,22 @@ module.exports = {
   toRow(q)            { return { correct: String(q.correct), extra: { min: q.min, max: q.max, step: 1, unit: '' } }; },
   fromRow(row, extra) { return { min: extra.min, max: extra.max, step: 1, unit: '', correct: parseInt(row.correct, 10) }; },
 
-  payload(q) { return { question: q.question, min: q.min, max: q.max, imageUrl: q.imageUrl || null }; },
+  payload(q, game) {
+    // Same seeded window slide as slider (see games/slider.js shownRange): the
+    // authored year ranges sat almost dead-centre on the answer, so "drag to the
+    // middle" was worth 80/100 without knowing anything.
+    const { min, max } = slider._shownRange(q, game);
+    return { question: q.question, min, max, imageUrl: q.imageUrl || null };
+  },
 
-  evaluate(q, answer) {
+  evaluate(q, answer, ctx) {
     const raw = answer && typeof answer.value === 'number' ? Math.round(answer.value) : NaN;
     if (Number.isNaN(raw)) return null;
-    const value   = clamp(raw, q.min, q.max);
+    // Score against the range the player was shown, not the authored one.
+    const { min, max } = slider._shownRange(q, ctx && ctx.game);
+    const value   = clamp(raw, min, max);
     const diff    = Math.abs(value - q.correct);
-    const quality = slider._proximityQuality(value, q.correct, q.min, q.max);
+    const quality = slider._proximityQuality(value, q.correct, min, max);
     return {
       quality,
       detail: { value, diff },
@@ -38,9 +46,10 @@ module.exports = {
     };
   },
 
-  reveal(q, answers) {
+  reveal(q, answers, game) {
+    const { min, max } = slider._shownRange(q, game);
     return {
-      correctValue: q.correct, min: q.min, max: q.max,
+      correctValue: q.correct, min, max,
       guesses: answers.map(a => ({ nickname: a.nickname, value: a.detail.value, diff: a.detail.diff })),
     };
   },

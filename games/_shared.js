@@ -72,14 +72,20 @@ function hashString(s) {
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
   return h >>> 0;
 }
-function seededOrder(n, seed) {
+// mulberry32: a deterministic 0..1 generator. Anything derived from it can be
+// recomputed identically in payload(), evaluate() and reveal() without storing
+// per-game state — which is what lets a reconnecting player see the same thing.
+function seededRandom(seed) {
   let t = seed;
-  const rnd = () => {
+  return () => {
     t = (t + 0x6D2B79F5) | 0;
     let r = Math.imul(t ^ (t >>> 15), 1 | t);
     r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
     return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
   };
+}
+function seededOrder(n, seed) {
+  const rnd = seededRandom(seed);
   const order = Array.from({ length: n }, (_, i) => i);
   for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
   return order;
@@ -131,4 +137,4 @@ function revealMC(q, answers, game) {
   return { answers: order.map(i => q.answers[i]), correctIndex: order.indexOf(q.correct), counts, pickedBy };
 }
 
-module.exports = { shuffle, clamp, haversineKm, bearingDeg, formatYear, REGIONS, validateMC, validateCommon, hashString, seededOrder, mcOrder, mcAnswers, evaluateMC, revealMC };
+module.exports = { shuffle, clamp, haversineKm, bearingDeg, formatYear, REGIONS, validateMC, validateCommon, hashString, seededRandom, seededOrder, mcOrder, mcAnswers, evaluateMC, revealMC };
