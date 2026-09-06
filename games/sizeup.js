@@ -140,15 +140,26 @@ module.exports = {
   },
 
   // ── Payload: what every client gets when the question starts ───────────────
-  // The truth is NEVER sent. The slider range is randomised around the truth so
-  // that the midpoint of the slider carries no information: min = truth / r1 and
-  // max = truth × r2 with r1, r2 drawn independently from [4, 14].
+  // The truth is NEVER sent, but the range has to contain it, so the range can
+  // never be completely information-free. What it must not be is *systematically*
+  // informative — and the previous version was. It drew min = truth / r1 and
+  // max = truth × r2 with r1, r2 from the same [4, 14], which put the truth near
+  // the geometric centre of the range: sqrt(min × max) = truth × sqrt(r2 / r1),
+  // and sqrt(r2 / r1) clusters tightly around 1. Reading `range` out of devtools
+  // and answering sqrt(min × max) — no reasoning about the object at all — scored
+  // ~83/100 on average and was pixel-perfect a fifth of the time.
+  //
+  // Instead: pick a log-width for the window, then slide the window so the truth
+  // sits at a uniformly random position inside it. The geometric centre is then
+  // just as likely to be a factor of ten out as spot on. The truth is kept at
+  // least 12% of the span away from either end, so guessing an endpoint does not
+  // work either. Same overall range width as before, so play is unchanged.
   payload(q, game) {
     const truth = q.target.sizeM;
-    const r1 = 4 + Math.random() * 10;
-    const r2 = 4 + Math.random() * 10;
-    let min = round2sig(truth / r1);
-    let max = round2sig(truth * r2);
+    const span  = 4 + Math.random() * 2;                  // total width, in ln units (≈55×–400×)
+    const below = span * (0.12 + Math.random() * 0.76);   // how much of the span sits below the truth
+    let min = round2sig(truth / Math.exp(below));
+    let max = round2sig(truth * Math.exp(span - below));
     if (!(min > 0)) min = truth / 20;          // paranoia for very tiny targets
     if (max <= min * 2) max = round2sig(min * 8);
     return {

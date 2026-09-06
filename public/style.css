@@ -1208,6 +1208,9 @@ body.tv .award-detail { font-size: 1.05rem; }
   .prompt-card { padding: 14px 14px; }
   .question-text { font-size: 1.12rem; }
   /* intro type is handled by clamp() — no per-breakpoint sizes needed */
+  /* TV mode is sized for a big shared screen, but nothing stops a host from
+     opening it in a narrow window — at 360 px "Round 1 of 5" wrapped after "of". */
+  body.tv .lb-head h2 { font-size: 1.3rem; }
   .lb-row { padding: 9px 10px; gap: var(--sp-2); }
   .lb-metric { font-size: .88rem; }
   .podium-name { font-size: .8rem; }

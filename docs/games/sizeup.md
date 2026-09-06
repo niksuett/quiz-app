@@ -55,10 +55,27 @@ Adapted from [magnitudle.com/size-it-up](https://magnitudle.com/size-it-up).
 
 ## 2. `payload` — sent to every client when the question starts
 
-The true size is **never** sent. The slider range is randomised per question
-(`min = truth / r1`, `max = truth × r2`, `r1, r2` independent uniform in
-`[4, 14]`, each rounded to 2 significant digits), so the midpoint of the slider
-gives nothing away and the same question feels different every game.
+The true size is **never** sent. The range has to *contain* the truth, so it can
+never be completely information-free — the goal is that it carries no
+**systematic** signal.
+
+The range is randomised per question: pick a log-width `span` uniform in
+`[4, 6]` natural-log units (a total ratio of ≈55×–400×), then slide that window
+so the truth sits at a uniformly random position inside it, never closer than
+12% of the span to either end. Both bounds are rounded to 2 significant digits.
+This means the geometric centre of the range is as likely to be a factor of ten
+out as it is to be right, and guessing an endpoint is worse still.
+
+> **Do not go back to the old formula** (`min = truth / r1`, `max = truth × r2`
+> with `r1, r2` independent uniform in `[4, 14]`). Because both bounds derived
+> from the same truth with multipliers from the same range, the truth sat near
+> the geometric centre: `sqrt(min × max) = truth × sqrt(r2 / r1)`, and
+> `sqrt(r2 / r1)` clusters around 1. Measured over all 71 sizeup questions,
+> reading `range` out of devtools and answering `sqrt(min × max)` — with no
+> reasoning about the object at all — scored **83/100** average accuracy and was
+> perfect 20% of the time. Under the current formula the same attack scores
+> **26/100** and is perfect 3% of the time, and always-guess-an-endpoint scores
+> **1.7/100**.
 
 ```jsonc
 {

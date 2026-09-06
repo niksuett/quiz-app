@@ -38,13 +38,24 @@ const once = (s, ev) => new Promise(resolve => s.once(ev, resolve));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // Strings that would give away the answer if they appeared in a payload.
+// Two kinds of fingerprint:
+//   strict          — must not appear anywhere in the payload.
+//   outsideQuestion — must not appear anywhere EXCEPT the prompt the player reads.
+//                     A map question is allowed to name its own subject: "Where is
+//                     the Caspian Sea?" has to say "Caspian Sea", and knowing the
+//                     name is not knowing the coordinates. Checking those names
+//                     against the whole payload made this test fail at random,
+//                     depending only on which questions happened to be drawn.
 function answerFingerprints(q) {
-  const out = [];
-  if (q.type === 'mc' || q.type === 'flag' || q.type === 'silhouette' || q.type === 'tune') out.push(`"correct":${q.correct}`);
-  if (q.type === 'map') { out.push(String(q.correctLat), String(q.correctLng)); if (q.locationName) out.push(q.locationName); }
-  if (q.type === 'slider' || q.type === 'timeline') out.push(`"correct":${q.correct}`);
-  if (q.type === 'fakes') out.push('"fake":true');
-  return out;
+  const strict = [], outsideQuestion = [];
+  if (q.type === 'mc' || q.type === 'flag' || q.type === 'silhouette' || q.type === 'tune') strict.push(`"correct":${q.correct}`);
+  if (q.type === 'map') {
+    strict.push(String(q.correctLat), String(q.correctLng));
+    if (q.locationName) outsideQuestion.push(q.locationName);
+  }
+  if (q.type === 'slider' || q.type === 'timeline') strict.push(`"correct":${q.correct}`);
+  if (q.type === 'fakes') strict.push('"fake":true');
+  return { strict, outsideQuestion };
 }
 
 (async () => {
@@ -80,11 +91,15 @@ function answerFingerprints(q) {
     if (!mod) fail(`unknown type ${data.type}`);
     if (!data.payload) fail(`no payload for ${data.type}`);
     const json = JSON.stringify(data.payload);
+    const { question: _prompt, ...payloadRest } = data.payload;
+    const jsonNoPrompt = JSON.stringify(payloadRest);
     // leak check: find the question by matching module + payload
     const candidates = allQuestions.filter(q => q.type === data.type && q.category === data.category.id);
     for (const q of candidates) {
       if (q.question && data.payload.question === q.question) {
-        for (const fp of answerFingerprints(q)) if (fp && fp.length > 2 && json.includes(fp)) fail(`payload for "${q.question}" leaks "${fp}"`);
+        const { strict, outsideQuestion } = answerFingerprints(q);
+        for (const fp of strict) if (fp && fp.length > 2 && json.includes(fp)) fail(`payload for "${q.question}" leaks "${fp}"`);
+        for (const fp of outsideQuestion) if (fp && fp.length > 2 && jsonNoPrompt.includes(fp)) fail(`payload for "${q.question}" leaks "${fp}" outside the prompt`);
       }
     }
     if (verbose) console.log(`  Q${data.questionNumber}/${data.totalQuestions} ${data.type}/${data.category.id} — ${String(data.payload.question || '').slice(0, 60)}`);

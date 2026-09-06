@@ -639,9 +639,7 @@
         });
         // The basemap is faded right down: this screen is about the population
         // pattern, and a full-strength terrain map drowns the heat colours.
-        const base = QG.util.tiles.streets();
-        base.setOpacity(BASEMAP_FADE);
-        base.addTo(map);
+        QG.util.tiles.streets(BASEMAP_FADE).addTo(map);
         const fit = () => map.fitBounds(bboxBounds(bbox), { padding: [12, 12] });
         fit();
         // Same guard as in mount(): re-fit until somebody touches the map.

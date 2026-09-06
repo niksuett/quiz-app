@@ -236,6 +236,10 @@ module.exports = {
     if (typeof q.regionId !== 'string' || !q.regionId.trim()) errors.push('"regionId" must be an ISO3 code like "EGY"');
     else if (!INDEX.length) errors.push('data/halves/index.json is missing — run node tools/build-halves.js');
     else if (!COUNTRIES[q.regionId]) errors.push(`"regionId" ${q.regionId} has no data/halves/${q.regionId}.json`);
+    // A grid that exists but sums to zero collapses split()'s binary search to
+    // NaN, and those NaN coordinates end up in the reveal broadcast to everyone.
+    // Catch it at import time rather than mid-game.
+    else if (!(COUNTRIES[q.regionId].total > 0)) errors.push(`data/halves/${q.regionId}.json has an empty population grid — re-run node tools/build-halves.js`);
     return errors;
   },
 

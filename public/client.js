@@ -121,10 +121,15 @@ window.QuizGames = {
       //     its bright cyan sea clashes with the parchment theme.
       // A keyless, label-free basemap that still shows borders does not seem to
       // exist; a CARTO key stays the only way to get one back.
-      streets() {
+      // `fade` (0–1) dims the whole basemap — Population Split's reveal wants the
+      // terrain pushed right back so the heat colours read. It is a parameter
+      // rather than a setOpacity() call on the result because this returns a
+      // LayerGroup, which has no setOpacity, and because the satellite layer's
+      // opacity is driven by zoom and would overwrite anything set from outside.
+      streets(fade = 1) {
         if (CARTO_KEY) {
           return L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?api_key=${encodeURIComponent(CARTO_KEY)}`, {
-            attribution: '© OpenStreetMap © CARTO', maxZoom: 19,
+            attribution: '© OpenStreetMap © CARTO', maxZoom: 19, opacity: fade,
           });
         }
         // The physical map only exists up to zoom 8, so on its own it turns into
@@ -133,13 +138,13 @@ window.QuizGames = {
         // in from zoom 9 — wide views keep the parchment-friendly terrain
         // colours, close-ups become crisp aerial photography.
         const physical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
-          attribution: '© Esri', maxZoom: 19, maxNativeZoom: 8,
+          attribution: '© Esri', maxZoom: 19, maxNativeZoom: 8, opacity: fade,
         });
         const closeUp = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
           attribution: '© Esri', maxZoom: 19, minZoom: 9, opacity: 0,
         });
         const group = L.layerGroup([physical, closeUp]);
-        const opacityFor = z => (z < 9 ? 0 : z < 10 ? 0.55 : z < 11 ? 0.85 : 1);
+        const opacityFor = z => (z < 9 ? 0 : z < 10 ? 0.55 : z < 11 ? 0.85 : 1) * fade;
         const baseOnAdd = group.onAdd, baseOnRemove = group.onRemove;
         group.onAdd = function (map) {
           baseOnAdd.call(this, map);

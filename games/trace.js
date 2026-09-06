@@ -175,15 +175,22 @@ module.exports = {
   // ── Validation (import.js / admin) ──────────────────────────────────────────
   validate(q) {
     const errors = validateCommon(q);
+    let subject = null;
     if (q.category === 'rivers') {
       if (typeof q.riverId !== 'string' || !q.riverId) errors.push('"riverId" must be a non-empty string');
       else if (!RIVERS[q.riverId]) errors.push(`unknown riverId "${q.riverId}" — not in data/rivers.json`);
+      else subject = RIVERS[q.riverId];
     } else if (q.category === 'borders') {
       if (typeof q.pairId !== 'string' || !q.pairId) errors.push('"pairId" must be a non-empty string');
       else if (!BORDERS[q.pairId]) errors.push(`unknown pairId "${q.pairId}" — not in data/borders.json`);
+      else subject = BORDERS[q.pairId];
     } else {
       errors.push(`category "${q.category}" is not handled by the trace module`);
     }
+    // evaluate() projects through subject.bbox, so a record that exists but has
+    // no bbox throws for every player who answers. Fail at import instead.
+    if (subject && !(Array.isArray(subject.bbox) && subject.bbox.length === 4))
+      errors.push(`"${q.riverId || q.pairId}" has no usable bbox — re-run its tools/build-*.js`);
     return errors;
   },
 

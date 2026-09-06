@@ -50,6 +50,10 @@ module.exports = {
     const errors = [...validateCommon(q), ...validateMC(q)];
     if (typeof q.iso3 !== 'string' || !/^[A-Z]{3}$/.test(q.iso3)) errors.push('"iso3" must be a 3-letter upper-case code (e.g. "FRA")');
     else if (!COUNTRIES[q.iso3]) errors.push(`"iso3" ${q.iso3} is not in data/countries.json`);
+    // payload() ships c.rings/c.bbox straight to the client; if either is missing
+    // the question renders as an empty outline with no error anywhere.
+    else if (!Array.isArray(COUNTRIES[q.iso3].rings) || !COUNTRIES[q.iso3].rings.length || !Array.isArray(COUNTRIES[q.iso3].bbox))
+      errors.push(`"iso3" ${q.iso3} has no usable outline in data/countries.json — re-run node tools/build-countries.js`);
     if (!errors.length && Array.isArray(q.answers) && q.answers[q.correct] !== q.question)
       errors.push(`answers[correct] ("${q.answers[q.correct]}") must equal "question" ("${q.question}")`);
     return errors;
