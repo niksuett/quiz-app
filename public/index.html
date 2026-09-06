@@ -421,6 +421,12 @@
 <!-- Small notices (Reconnected, Host paused, …) -->
 <div id="toast-root" class="toast-root" aria-live="polite"></div>
 
+<!-- Stays up for as long as the connection is actually down, unlike a toast.
+     Without it a player whose phone lost signal just sees a frozen screen. -->
+<div id="offline-bar" class="offline-bar hidden" role="status" aria-live="polite">
+  <span class="offline-dot"></span><span id="offline-text">Connection lost — reconnecting…</span>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="client.js"></script>

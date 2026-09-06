@@ -375,6 +375,13 @@ io.on('connection', (socket) => {
   socket.on('skip-question', () => {
     const game = games[socket.gameId];
     if (!game || socket.role !== 'host') return;
+    // One tap = one step. Without this guard a double-tap chains: the first tap
+    // moves question → leaderboard, and the second immediately matches the
+    // 'leaderboard' branch below and starts the next question, so nobody ever
+    // sees the reveal (or, on the last round, the final leaderboard).
+    const now = Date.now();
+    if (now - (game.lastSkipAt || 0) < 600) return;
+    game.lastSkipAt = now;
     if (game.state === 'question' || game.state === 'intro') { game.isPaused = false; showLeaderboard(game); }
     else if (game.state === 'leaderboard') { startQuestion(game); }
   });
@@ -607,8 +614,13 @@ function showLeaderboard(game) {
     [...game.players].sort((a, b) => b.score - a.score).forEach((p, i) => { p.stats.midRank = i + 1; });
   }
 
+  // Everyone who actually submitted a readable answer. `p.answer` is only set once
+  // evaluate() accepted the answer, so this already excludes non-answerers. Do NOT
+  // also filter on `quality !== null`: the mc-family types score a wrong answer as
+  // quality null, so that would hide every wrong answer from the reveal — which is
+  // exactly the interesting part ("2 of you said UK").
   const answers = game.players
-    .filter(p => p.answer && p.answer.quality !== null)
+    .filter(p => p.answer)
     .map(p => ({ nickname: p.nickname, detail: p.answer.detail, quality: p.answer.quality, elapsed: p.answer.elapsed, roundPoints: p.round.roundPoints }));
   let reveal = null;
   try { reveal = mod.reveal(q, answers, game); } catch (e) { console.error(`reveal() failed for ${mod.type}:`, e.message); }

@@ -633,7 +633,12 @@ function createGame() {
 function settingsSummary() {
   const cat = QuizGames.catalog;
   const parts = [];
-  parts.push(config.rounds === 'infinite' ? 'Endless rounds' : `${state.totalQuestions || config.rounds} rounds`);
+  // "Endless" plays every question the filters match, once, and then ends — with a
+  // narrow selection that can be a lot shorter than the word suggests, so say how
+  // many there actually are rather than letting the host guess.
+  parts.push(config.rounds === 'infinite'
+    ? (state.totalQuestions ? `Endless — ${state.totalQuestions} questions` : 'Endless rounds')
+    : `${state.totalQuestions || config.rounds} rounds`);
   if (config.categories) parts.push(`${config.categories.length} categor${config.categories.length === 1 ? 'y' : 'ies'}`);
   if (config.regions && cat) parts.push(config.regions.map(r => (cat.regions.find(x => x.id === r) || {}).label || r).join(' + '));
   else parts.push('Worldwide');
@@ -915,6 +920,7 @@ async function showQuestion(data) {
     },
   };
   state.api = api;
+  state.apiQuestion = data;   // which question this api belongs to (see 'answer-rejected')
 
   // Wait for module scripts (normally already loaded), then mount on the next frame
   try { await loadModules(); } catch (e) { console.warn(e); }
@@ -1347,7 +1353,14 @@ socket.on('join-success', ({ gameId, nickname, playerToken }) => {
   showPlayerLobby();
 });
 socket.on('join-error', msg => showError('join-error', msg));
-socket.on('start-error', msg => { state.pendingHostNick = null; showError('start-error', msg); });
+// #start-error lives on the host-lobby screen. A failed *rematch* raises the same
+// event while the host is on the game-over screen, where that element is invisible —
+// so fall back to a toast whenever we're not looking at the lobby.
+socket.on('start-error', msg => {
+  state.pendingHostNick = null;
+  if (currentScreen === 'screen-host-lobby') showError('start-error', msg);
+  else toast(msg, { kind: 'warn', ms: 4000 });
+});
 
 socket.on('lobby-update', ({ players }) => {
   const before = new Set(state.lobbyPlayers.map(p => p.nickname));
@@ -1372,6 +1385,11 @@ socket.on('new-question', data => {
 
 socket.on('answer-result', data => onAnswerResult(data));
 socket.on('answer-rejected', msg => {
+  // A rejection sent for question N can arrive after N+1 has already mounted (an
+  // answer fired right at the buzzer). Without this guard it would unlock and
+  // reset the *new* question's inputs and toast about a submission the player
+  // never made this round, so drop anything that is not about what's on screen.
+  if (currentScreen !== 'screen-question' || state.apiQuestion !== state.question) return;
   if (state.api) {
     state.api.locked = false;
     $('locked-banner').classList.add('hidden');
@@ -1462,8 +1480,25 @@ socket.on('kicked', () => {
   setTimeout(() => location.replace(location.pathname), 1200);
 });
 
-socket.on('disconnect', () => { if (state.gameId) toast('Connection lost — reconnecting…', { kind: 'warn' }); });
-socket.io.on('reconnect', () => { const t = loadToken(); if (t && state.gameId) socket.emit('rejoin', { token: t }); });
+// A toast fades after ~3 s, but a dropped connection can last minutes — and while
+// it does, every button on screen silently does nothing. So the banner stays up
+// until we are genuinely back, and says so when reconnecting has given up.
+function setOffline(on, msg) {
+  const bar = $('offline-bar');
+  if (!bar) return;
+  if (msg) $('offline-text').textContent = msg;
+  bar.classList.toggle('hidden', !on);
+}
+socket.on('disconnect', () => { if (state.gameId) setOffline(true, 'Connection lost — reconnecting…'); });
+socket.on('connect', () => setOffline(false));
+socket.io.on('reconnect', () => {
+  setOffline(false);
+  const t = loadToken();
+  if (t && state.gameId) socket.emit('rejoin', { token: t });
+});
+socket.io.on('reconnect_failed', () => {
+  if (state.gameId) setOffline(true, 'Can’t reach the game — check your connection');
+});
 
 // ═════════════════════════════════════════════════════════════════════════════
 // 12. Wiring up buttons + boot
@@ -1473,7 +1508,11 @@ function closeHostMenu() { const p = $('host-menu-pop'); if (p) p.classList.add(
 function wireUI() {
   // Home
   $('btn-host').addEventListener('click', () => { Sound.click(); openConfig(); });
-  $('btn-join').addEventListener('click', () => { Sound.click(); showScreen('screen-join'); setTimeout(() => $('join-code').focus(), 260); });
+  // Start pulling the game modules down now. Players who arrive by QR link get this
+  // in boot(); players who type a code by hand used to get it only when question 1
+  // arrived — which cleared the answer area and started the countdown *before* the
+  // scripts had loaded, so they stared at a blank screen with a ticking timer.
+  $('btn-join').addEventListener('click', () => { Sound.click(); showScreen('screen-join'); loadModules(); setTimeout(() => $('join-code').focus(), 260); });
   $('btn-config-back').addEventListener('click', () => showScreen('screen-home'));
   $('btn-create').addEventListener('click', () => { Sound.click(); createGame(); });
 

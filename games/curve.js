@@ -192,7 +192,10 @@ module.exports = {
       known,
       xMin, xMax, yMin: q.yMin, yMax: q.yMax,
       xLabel: q.xLabel || 'Year', yLabel: q.yLabel || '', unit: q.unit || '', decimals: q.decimals ?? 2, source: q.source || '',
-      lines: answers.map(a => ({ nickname: a.nickname, ys: a.detail.ys, mae: a.detail.mae, score: Math.round(a.quality * 100) })),
+      // `a.quality` is null for types that score a wrong answer as "no merit"
+      // (see ARCHITECTURE §4) — curve always returns a number, but guard anyway
+      // so a null can never render as NaN.
+      lines: answers.map(a => ({ nickname: a.nickname, ys: a.detail.ys, mae: a.detail.mae, score: Math.round((a.quality || 0) * 100) })),
     };
   },
 

@@ -109,8 +109,12 @@ module.exports = {
   // Throwing or returning null = answer rejected (client gets `answer-rejected`).
   evaluate(q, answer, ctx /* { elapsed, timeLimit, game } */) { return { quality, detail, result }; },
 
-  // Reveal data for the leaderboard, sent to everyone. `answers` = players who answered:
+  // Reveal data for the leaderboard, sent to everyone. `answers` = every player who
+  // submitted an answer evaluate() accepted (non-answerers are already excluded):
   //   [{ nickname, detail, quality, elapsed, roundPoints }]
+  // NOTE: `quality` may be null here — the mc-family types score a wrong answer as
+  // quality null, and those players must still appear in the reveal (that is what
+  // makes "2 of you said UK" possible). Treat null as 0 if you do arithmetic on it.
   reveal(q, answers, game) { return { ... }; },
 
   // One-line correct answer for the leaderboard banner.

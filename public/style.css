@@ -469,6 +469,24 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
 .toast.show { opacity: 1; transform: none; }
 .toast-warn { border-color: var(--warn); }
 
+/* Connection-lost banner. Pinned to the top so it never sits under the play bar's
+   controls, and above everything (a dead socket outranks whatever is on screen). */
+.offline-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: calc(7px + env(safe-area-inset-top)) 14px 7px;
+  background: var(--warn); color: #2a1a06;
+  font-family: var(--font-cinzel); font-size: .74rem;
+  letter-spacing: .07em; text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+}
+.offline-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #2a1a06;
+  animation: offline-pulse 1.1s ease-in-out infinite;
+}
+@keyframes offline-pulse { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .offline-dot { animation: none; opacity: .8; } }
+
 /* ─── 7. Home ────────────────────────────────────────────────────────────── */
 .home {
   width: 100%; max-width: 760px;
@@ -631,8 +649,17 @@ button.pressed, .btn:active:not(:disabled) { transform: scale(.96); }
   position: sticky; bottom: -1px;
   margin: var(--sp-3) -24px -28px;
   padding: var(--sp-3) 24px 20px;
-  background: linear-gradient(to bottom, rgba(245,237,224,0), var(--parchment) 34%);
+  /* Solid, so the tally line below is always readable. The soft fade that keeps
+     scrolling cards from hard-cutting at the footer edge lives in ::before, in a
+     band *above* the bar — putting it in the bar's own background left the tally
+     sitting on a translucent strip with category cards showing through it. */
+  background: var(--parchment);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.config-footer::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 28px;
+  background: linear-gradient(to bottom, rgba(245,237,224,0), var(--parchment));
+  pointer-events: none;
 }
 .config-tally {
   text-align: center;
@@ -1192,7 +1219,10 @@ body.tv .award-detail { font-size: 1.05rem; }
   .pill-row > button { min-width: 44px; padding: 8px 10px; }
   .chip { padding: 8px 10px; font-size: .85rem; }
   .lb-top { flex-wrap: wrap; }
-  .play-round { display: none; }          /* only now is the bar genuinely out of room */
+  /* The bar still has ~80 px to spare at 360 px (category + timer + two icon
+     buttons), so the counter stays — players want to know how far through the
+     game they are. Just tighten it rather than hiding it. */
+  .play-round { font-size: .62rem; padding-left: 5px; }
 }
 
 /* Very short landscape phones: don't waste vertical space */
