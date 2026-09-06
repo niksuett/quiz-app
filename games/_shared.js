@@ -19,7 +19,10 @@ function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
 function haversineKm(lat1, lng1, lat2, lng2) {
   const R = 6371, toRad = d => d * Math.PI / 180;
   const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  // Clamped to [0,1]: for near-antipodal points floating-point cancellation can
+  // push `a` a hair above 1, and sqrt of a negative then makes the whole distance
+  // NaN. haversineKm(-58, 0, 58, 179.99999999999943) used to do exactly that.
+  const a = clamp(Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2, 0, 1);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 

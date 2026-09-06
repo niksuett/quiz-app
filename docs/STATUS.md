@@ -1,5 +1,44 @@
 # v2 — status
 
+## Playtest + audit pass (2026-09-06)
+
+Played the app on a 360 px viewport and audited the core; everything below was a real bug, not a cleanup.
+
+**Two of these were breaking live features and neither showed up in `test/simulate.js`:**
+* **MC option tally was always empty.** `showLeaderboard` built the reveal from players filtered by
+  `quality !== null`, but the mc-family types score a *wrong* answer as quality null — so every wrong
+  answer was dropped and "how many picked each option" read `0 / 0% / nobody` for all five button
+  categories (trivia, flags, silhouettes, tunes, emoji). One clause in `server.js`; non-answerers were
+  already excluded by `p.answer`. `docs/ARCHITECTURE.md` §4 now records that `reveal()` sees null quality.
+* **Population Split's reveal threw.** `public/games/halves.js` called `setOpacity()` on the result of
+  `util.tiles.streets()`, which became an `L.layerGroup` when the satellite fade-in was added — no heat
+  map, no player lines, for all 46 questions. `streets()` takes a `fade` argument now (mirrored into the
+  harness copy per the sync rule in CLAUDE.md).
+
+**Answer leak:** Size It Up's range was `truth/r1 … truth*r2` with `r1, r2` from the same `[4,14]`, which
+put the truth near the geometric centre. Reading `range` in devtools and answering `sqrt(min*max)` scored
+**83/100** average and was perfect 20% of the time, measured over all 71 questions. The window is now slid
+so the truth sits at a uniformly random position inside it: same attack scores **26/100**, endpoints 1.7.
+Measurements and a "don't reintroduce this" note are in `docs/games/sizeup.md` §2.
+
+**Also fixed:** a double-tap on Skip advanced two steps (players never saw the reveal); connection loss
+showed a 2.6 s toast and then left the player on a frozen screen (there is a persistent offline banner
+now); a reconnect remounted the open question and wiped 40-45 s of part-drawn answer; players who typed a
+game code never prefetched the modules, so question 1 was blank with a running timer; `answer-rejected`
+for question N could reset question N+1's inputs; `haversineKm` returned NaN for near-antipodal points;
+import-time guards for empty population grids / missing bbox / missing outlines; phone tap targets
+(Size It Up's zoom buttons *shrank* to 30 px below 400 px); safe-area insets on the play bar and the
+Create-game footer; the round counter was hidden on 375 px phones against its own comment's intent.
+
+**Content:** fact-checked all 512 hand-written trivia + emoji questions. One error — "In which country was
+basketball invented?" was keyed to Canada (it was Springfield, Massachusetts; Naismith was Canadian-born).
+
+**Test:** `test/simulate.js`'s payload leak check treated a map question's `locationName` as forbidden
+anywhere in the payload, but "Where is the Caspian Sea?" has to name its own subject — the suite failed at
+random depending on which questions were drawn. Names are now checked against the payload minus the prompt.
+
+Still open: user accounts; a free CARTO key (`CARTO_KEY`); pace defaults want real play-testing.
+
 ## Close-out pass (2026-09-05)
 
 * **Pacing** in one place (`server.js` `TIMING` + `PACE_FACTOR`): intros 5 s / 2.2 s, everyone-answered wait >= 4 s,
