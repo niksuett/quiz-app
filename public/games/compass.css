@@ -79,7 +79,7 @@
 .cp-readout-deg { font-size: 1.7rem; font-weight: 900; color: var(--gold); }
 .cp-readout-pt  { font-size: 1.1rem; font-weight: 700; color: var(--gold-muted); margin-left: 6px; }
 .cp-nudge-row { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-.cp-nudge { min-width: 64px; min-height: 40px; }
+.cp-nudge { min-width: 64px; min-height: 44px; }
 .cp-nudge:disabled { opacity: .4; }
 
 /* Locator inset map */

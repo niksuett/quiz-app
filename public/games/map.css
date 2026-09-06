@@ -102,7 +102,7 @@
 .map-aerial-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 2px 0; }
 .map-aerial-label { font-family: var(--font-cinzel); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; color: var(--aged-light); }
 .map-aerial-zoom {
-  min-height: 34px; padding: 6px 14px;
+  min-height: 44px; padding: 6px 14px;
   background: rgba(245,237,224,.1);
   border: 1px solid rgba(245,237,224,.3); border-radius: 3px;
   color: var(--parchment);

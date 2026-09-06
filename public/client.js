@@ -845,6 +845,30 @@ function showIntro(data) {
 }
 
 async function showQuestion(data) {
+  // On a reconnect the server resends whatever question is open — including the
+  // one already on screen. Remounting it would throw away a half-finished answer,
+  // and Border Draw / River Run / Draw the Curve / Population Split are 40-45 s of
+  // drawing to lose to a blip the player may not even have noticed. So if this is
+  // the same question and nothing has locked yet, keep the mounted module and only
+  // resync the clock (which the server may have moved on, or paused, meanwhile).
+  //
+  // state.question deliberately keeps its identity here: api.submit() closes over
+  // the question object it was mounted with and compares it by reference, so
+  // swapping in the new object would silently stop the player submitting at all.
+  // Every field that differs between the two is either identical (same question)
+  // or handled below.
+  if (state.handle && state.question && currentScreen === 'screen-question'
+      && state.question.questionNumber === data.questionNumber
+      && state.question.type === data.type
+      && !data.answered && !data.closed && !(state.api && state.api.locked)) {
+    state.paused = !!data.paused;
+    const totalMs = (data.timeLimit || 30) * 1000;
+    const left = typeof data.remainingMs === 'number' ? data.remainingMs : totalMs;
+    startTimer(left, totalMs);
+    if (data.paused) pauseTimer(left);
+    updatePauseButtons();
+    return;
+  }
   destroyQuestion();
   destroyReveal();
   stopLbCountdown();

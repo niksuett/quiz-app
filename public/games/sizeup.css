@@ -143,8 +143,10 @@
 /* Zoom buttons (top right) and fine-tune nudge (top left) float over the sky. */
 .su-zoom, .su-nudge {
   position: absolute; top: 8px;
-  display: flex; align-items: center; gap: 4px;
-  padding: 3px;
+  /* No padding and a tight gap: the buttons inside are a full 44 px thumb target,
+     and the pill would otherwise read as a heavy slab over a 326 px-tall stage. */
+  display: flex; align-items: center; gap: 2px;
+  padding: 0;
   background: rgba(26,18,8,.72);
   border: 1px solid rgba(232,201,122,.35);
   border-radius: 999px;
@@ -155,7 +157,8 @@
 .su-nudge { left: 8px; }
 .su-stage.has-ruler .su-nudge { left: 40px; }
 .su-zbtn, .su-nbtn {
-  min-width: 34px; height: 34px; padding: 0 10px;
+  /* 44 px: these float over the canvas and are used against a 30 s clock. */
+  min-width: 44px; height: 44px; padding: 0 10px;
   border: 0; border-radius: 999px;
   background: transparent; color: var(--gold-pale);
   font-family: var(--font-cinzel); font-size: 1.05rem; font-weight: 700; line-height: 1;
@@ -300,7 +303,9 @@
   .su-cap-name { font-size: .66rem; }
   .su-cap-size { font-size: .6rem; }
   .su-ro-val { font-size: 1.3rem; }
-  .su-zbtn, .su-nbtn { min-width: 30px; height: 30px; padding: 0 8px; font-size: .95rem; }
+  /* Keep the 44 px thumb target on phones — this used to shrink them to 30 px,
+     which made the smallest screens the hardest to hit. Trim padding instead. */
+  .su-zbtn, .su-nbtn { min-width: 44px; height: 44px; padding: 0 6px; font-size: .95rem; }
   .su-nlabel { display: none; }
   .su-rv-item { min-width: 38px; }
 }
