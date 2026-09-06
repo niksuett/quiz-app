@@ -105,17 +105,30 @@
   </div>
 
   <script>
-    if (new URLSearchParams(window.location.search).get('error') === '1') {
-      document.getElementById('error-msg').classList.add('visible');
-    }
+    const errorEl = document.getElementById('error-msg');
+    function showError(text) { errorEl.textContent = text; errorEl.classList.add('visible'); }
 
     document.getElementById('pw-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') submitPassword();
     });
 
-    function submitPassword() {
+    // POST, not a redirect with ?pw= in the URL: a password in a query string ends
+    // up in proxy access logs and in the browser's history.
+    async function submitPassword() {
       const pw = document.getElementById('pw-input').value;
-      window.location.href = '/admin-auth?pw=' + encodeURIComponent(pw);
+      errorEl.classList.remove('visible');
+      try {
+        const res  = await fetch('/admin-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pw }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) { window.location.href = '/admin.html'; return; }
+        showError(data.error || 'Incorrect password. Try again.');
+      } catch (e) {
+        showError('Could not reach the server. Try again.');
+      }
     }
   </script>
 </body>

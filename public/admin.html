@@ -476,12 +476,14 @@
 
 <script>
 // ═════════════════════════════════════════════════════════════════════════════
-// Auth guard — the server sets this cookie on /admin-auth. Without it every
-// /admin/* request answers 401, so send the browser to the login page early.
+// Auth guard. The session cookie is httpOnly, so this page cannot (and must not)
+// read it — the server is the only thing that can say whether we are logged in.
+// Asking it is also the only correct check: the previous version compared the
+// cookie against a hard-coded 'ilikehistory99', so it both leaked the default
+// password to anyone who viewed source and redirect-looped for anybody who had
+// actually set ADMIN_PASSWORD.
 // ═════════════════════════════════════════════════════════════════════════════
-if (!document.cookie.split(';').some(c => c.trim() === 'adminAuth=ilikehistory99')) {
-  window.location.href = '/admin-login.html';
-}
+function goToLogin() { window.location.href = '/admin-login.html'; }
 
 // ═════════════════════════════════════════════════════════════════════════════
 // State
@@ -550,7 +552,7 @@ function regionLabel(id)  { const r = catalog.regions.find(r => r.id === id); re
 // Fetch wrapper that sends the user back to the login page on a 401.
 async function api(url, opts) {
   const res = await fetch(url, opts);
-  if (res.status === 401) { window.location.href = '/admin-login.html'; throw new Error('Not authorised'); }
+  if (res.status === 401) { goToLogin(); throw new Error('Not authorised'); }
   return res;
 }
 

@@ -26,42 +26,141 @@ const io     = new Server(server, { maxHttpBufferSize: 2e6 });
 
 const IS_TEST = process.env.QUIZ_TEST === '1';
 
+// Railway (and most hosts) terminate TLS in front of us, so without this req.secure
+// is always false and req.ip is the proxy's address — which would make the admin
+// cookie's `secure` flag and the login throttle useless in production.
+app.set('trust proxy', 1);
+
 app.use(compression());
-app.use(express.json({ limit: '25mb' }));
+// Small default body limit; the admin bulk-save is the only route that
+// legitimately posts anything big, and it carries its own 25 MB parser. The
+// 25 MB limit used to be global and ran *before* any auth check, so an anonymous
+// client could make the server parse 25 MB of JSON on any URL. This parser has to
+// step aside for that one route, or it would reject the body first.
+const ADMIN_SAVE_PATH = '/admin/questions';
+const smallJson = express.json({ limit: '100kb' });
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.path === ADMIN_SAVE_PATH) return next();
+  smallJson(req, res, next);
+});
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // NOTE: data/ is intentionally NOT served — files like borders.json and halves/*.json contain the answers.
 // Game modules send exactly what the client needs inside each question payload.
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
+// The cookie holds an opaque, server-generated session id — never the password.
+// It used to hold the password itself, which meant (a) any XSS on the origin
+// handed over the real credential rather than just a session, (b) "log out" only
+// cleared the browser's copy while the value stayed valid, and (c) admin.html
+// compared the cookie against a hard-coded 'ilikehistory99', so setting
+// ADMIN_PASSWORD — exactly what you are told to do before deploying — locked the
+// editor into a redirect loop.
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ilikehistory99';
+const ADMIN_SESSION_MS = 8 * 60 * 60 * 1000;
+const adminSessions = new Map();   // sessionId -> expiry timestamp
 
-app.get('/admin-auth', (req, res) => {
-  if (req.query.pw === ADMIN_PASSWORD) {
-    res.cookie('adminAuth', ADMIN_PASSWORD, { maxAge: 8 * 60 * 60 * 1000, httpOnly: false });
-    res.redirect('/admin.html');
-  } else {
-    res.redirect('/admin-login.html?error=1');
-  }
+function newAdminSession() {
+  const id = crypto.randomBytes(24).toString('hex');
+  adminSessions.set(id, Date.now() + ADMIN_SESSION_MS);
+  return id;
+}
+function adminSessionValid(id) {
+  if (!id) return false;
+  const expires = adminSessions.get(id);
+  if (!expires) return false;
+  if (expires < Date.now()) { adminSessions.delete(id); return false; }
+  return true;
+}
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, exp] of adminSessions) if (exp < now) adminSessions.delete(id);
+}, 30 * 60 * 1000).unref();
+
+// Constant-time compare so the password can't be recovered a character at a time.
+function passwordMatches(given) {
+  const a = Buffer.from(String(given ?? ''), 'utf8');
+  const b = Buffer.from(ADMIN_PASSWORD, 'utf8');
+  // timingSafeEqual throws on a length mismatch, so hash both to a fixed width first.
+  const ha = crypto.createHash('sha256').update(a).digest();
+  const hb = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+// Crude per-IP throttle: there is no other brake on guessing the password.
+const loginAttempts = new Map();   // ip -> { count, resetAt }
+const LOGIN_WINDOW_MS = 15 * 60 * 1000, LOGIN_MAX_TRIES = 10;
+function loginThrottled(ip) {
+  const now = Date.now();
+  const rec = loginAttempts.get(ip);
+  if (!rec || rec.resetAt < now) { loginAttempts.set(ip, { count: 1, resetAt: now + LOGIN_WINDOW_MS }); return false; }
+  rec.count++;
+  return rec.count > LOGIN_MAX_TRIES;
+}
+
+function adminCookieOptions(req) {
+  return {
+    maxAge: ADMIN_SESSION_MS,
+    httpOnly: true,                  // script can no longer read it
+    sameSite: 'lax',
+    secure: req.secure || req.get('x-forwarded-proto') === 'https',
+  };
+}
+
+// POST, not GET: the password used to travel in a query string, which lands in
+// proxy access logs and browser history in plain text.
+app.post('/admin-auth', (req, res) => {
+  const ip = req.ip || 'unknown';
+  if (loginThrottled(ip)) return res.status(429).json({ error: 'Too many attempts. Wait 15 minutes.' });
+  if (!passwordMatches(req.body && req.body.pw)) return res.status(401).json({ error: 'Incorrect password.' });
+  loginAttempts.delete(ip);
+  res.cookie('adminAuth', newAdminSession(), adminCookieOptions(req));
+  res.json({ ok: true });
 });
-app.get('/admin-logout', (req, res) => { res.clearCookie('adminAuth'); res.redirect('/'); });
+
+app.get('/admin-logout', (req, res) => {
+  const id = req.cookies && req.cookies.adminAuth;
+  if (id) adminSessions.delete(id);          // kill it server-side, not just in this browser
+  res.clearCookie('adminAuth');
+  res.redirect('/');
+});
 
 function requireAdmin(req, res, next) {
-  if (req.cookies && req.cookies.adminAuth === ADMIN_PASSWORD) return next();
+  if (req.cookies && adminSessionValid(req.cookies.adminAuth)) return next();
   res.status(401).json({ error: 'Not authorised' });
 }
 
 // ── Admin API ─────────────────────────────────────────────────────────────────
 app.get('/admin/questions', requireAdmin, (req, res) => res.json(loadAllQuestions()));
 
-app.post('/admin/questions', requireAdmin, (req, res) => {
+// This route is a whole-table replace, so it is the one place a big body is
+// legitimate — hence its own limit rather than a 25 MB limit on every URL.
+app.post('/admin/questions', requireAdmin, express.json({ limit: '25mb' }), (req, res) => {
   const questions = req.body;
   if (!Array.isArray(questions)) return res.status(400).json({ error: 'Expected an array' });
+
+  // The save is "DELETE FROM questions, then insert what was posted", so an empty
+  // or near-empty array silently destroys the question bank in one request. A real
+  // save never shrinks the library by more than a few rows at a time; require an
+  // explicit ?force=1 for anything that looks like a wipe.
+  const existing = db.prepare('SELECT COUNT(*) AS n FROM questions').get().n;
+  const forced = req.query.force === '1';
+  if (!forced && existing > 0 && questions.length < existing * 0.5) {
+    return res.status(409).json({
+      error: `Refusing to save: this would cut the library from ${existing} questions to ${questions.length}. `
+           + `If that is really what you want, repeat the request with ?force=1.`,
+    });
+  }
+
   const errors = [];
   questions.forEach((q, i) => {
     const mod = registry.get(q.type || 'mc');
     if (!mod) { errors.push(`#${i + 1}: unknown type "${q.type}"`); return; }
-    if (!registry.categoryById[q.category]) errors.push(`#${i + 1}: unknown category "${q.category}"`);
+    const cat = registry.categoryById[q.category];
+    if (!cat) errors.push(`#${i + 1}: unknown category "${q.category}"`);
+    // Same check import.js makes: a category is declared with one type, and a row
+    // whose type disagrees plays with a different mechanic than its intro claims.
+    else if (cat.type !== (q.type || 'mc')) errors.push(`#${i + 1}: category "${q.category}" is type "${cat.type}", not "${q.type || 'mc'}"`);
     for (const e of mod.validate({ ...q, type: q.type || 'mc' })) errors.push(`#${i + 1}: ${e}`);
   });
   if (errors.length) return res.status(400).json({ error: 'Validation failed', details: errors.slice(0, 50) });
@@ -153,6 +252,10 @@ function pickQuestions(all, { categories, regions, difficulty, rounds }) {
 // ── Game state ────────────────────────────────────────────────────────────────
 const games  = {};   // gameId → game
 const tokens = {};   // token → { gameId, role: 'host'|'player', nickname }
+// Ceiling on live games. Creating one needs no auth and an abandoned lobby is
+// only swept after 3 hours, so this is the only thing standing between the
+// server and an unbounded `games` map. Far above any real party's needs.
+const MAX_LIVE_GAMES = 500;
 
 function makePlayer(socketId, nickname) {
   return { id: socketId, token: newToken(), nickname, score: 0, streak: 0, connected: true,
@@ -214,6 +317,10 @@ io.on('connection', (socket) => {
 
   // HOST creates a game ───────────────────────────────────────────────────────
   socket.on('create-game', (opts = {}) => {
+    // Nothing about creating a game is authenticated, and abandoned lobbies are
+    // only swept after 3 hours — so without a ceiling a scripted client can grow
+    // the in-memory `games` map until the process runs out of memory.
+    if (Object.keys(games).length >= MAX_LIVE_GAMES) return socket.emit('create-error', 'Too many games are running right now. Try again in a few minutes.');
     const rounds     = opts.rounds === 'infinite' ? 'infinite' : Math.max(1, Math.min(100, parseInt(opts.rounds, 10) || 10));
     const categories = (Array.isArray(opts.categories) ? opts.categories : []).filter(c => registry.categoryById[c]);
     const regions    = Array.isArray(opts.regions) ? opts.regions.filter(r => registry.REGIONS.some(x => x.id === r)) : null;
@@ -263,6 +370,13 @@ io.on('connection', (socket) => {
     gameId   = String(gameId || '').trim().toUpperCase();
     nickname = String(nickname || '').trim().replace(/\s+/g, ' ');
     const game = games[gameId];
+    // One connection = one player. Without this a single socket could join the
+    // same game repeatedly under different nicknames, and on disconnect only the
+    // first record got marked disconnected — the leftover "ghost" then kept the
+    // everyone-has-answered check from ever completing, stalling every round
+    // until its timer ran out.
+    if (socket.gameId && games[socket.gameId])
+                                        return socket.emit('join-error', 'You are already in a game on this device.');
     if (!game)                          return socket.emit('join-error', 'Game not found. Double-check the Game ID.');
     if (game.state !== 'lobby')         return socket.emit('join-error', 'Sorry, this game has already started.');
     if (!nickname)                      return socket.emit('join-error', 'Please enter a nickname.');

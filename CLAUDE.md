@@ -10,7 +10,7 @@ A multiplayer quiz game inspired by gameon.world. A host configures and starts a
 - **Maps:** Leaflet.js. Basemap is CARTO Voyager (no labels) if an API key is set, otherwise Esri World Physical Map with label-free Esri satellite imagery fading in from zoom 9 (keyless fallback — see "Client architecture" below)
 - **Storage:** SQLite (`quiz.db`) via `better-sqlite3` for questions; all live game state lives in server memory (lost on restart — there's no game-state database)
 - **Entry point:** `server.js` exports `{ app, server, io, start, games, registry }`. Run directly with `node server.js` (reads `PORT`, defaults to 3000) or `require('./server').start(port)` from a test.
-- **Env vars:** `PORT` (server port, default 3000), `ADMIN_PASSWORD` (password for `/admin.html`, default `ilikehistory99` — change it before deploying anywhere public), `QUIZ_DB` (override the SQLite file path, used by tests), `QUIZ_TEST=1` (shortens game-over cleanup delay and unlocks a `testFast` option for `test/simulate.js`)
+- **Env vars:** `PORT` (server port, default 3000), `ADMIN_PASSWORD` (password for `/admin.html`, default `ilikehistory99` — change it before deploying anywhere public; setting it genuinely works now, it used to lock the editor into a redirect loop because `admin.html` compared the cookie against the hard-coded default), `QUIZ_DB` (override the SQLite file path, used by tests), `QUIZ_TEST=1` (shortens game-over cleanup delay and unlocks a `testFast` option for `test/simulate.js`)
 
 ## Project structure
 ```
@@ -40,7 +40,9 @@ quiz-app/
 │   ├── migrate-v2.js                  merged the old facts/science/sports/entertainment categories into "trivia", tagged regions
 │   ├── set-fields.js / delete-ids.js   bulk-edit or bulk-delete existing DB rows from a JSON list (used for the difficulty-tag and prune passes)
 │   └── lib/geo.js                     shared geometry helpers for the builders: Natural Earth loader, point-in-polygon, continentOf()/countryOf()
-├── test/simulate.js         headless end-to-end test: starts the server in-process, host + bots play a full game over socket.io-client
+├── test/
+│   ├── simulate.js          headless end-to-end test: starts the server in-process, host + bots play a full game over socket.io-client
+│   └── security.js          answer-leak + admin-auth checks (tile proxy zoom pinning, session cookie, save guards, static exposure)
 ├── docs/
 │   ├── ARCHITECTURE.md      binding contract for server modules (§4), client modules (§5), socket protocol (§8), question JSON (§9) — read this first when touching game logic
 │   ├── games/<type>.md      one spec per new v2 type (compass, curve, fakes, halves, silhouette, sizeup, trace, tune) — question JSON shape + UI notes
@@ -79,6 +81,16 @@ node test/simulate.js [--rounds N] [--bots N] [--categories a,b] [--port P]
 ```
 Spins up the server in-process, creates a game, joins `N` bots (default a handful), plays every round with a plausible random answer per type, and asserts every player gets `new-question` → `show-leaderboard` for each round, scores never go negative, no answer ever leaks through a question `payload`, and `game-over` fires. Exit code 0 = pass. `--categories` restricts which categories are exercised; omit it to test everything.
 
+**Security checks (run these too before a push that touches `server.js`, `games/map.js` or the admin editor):**
+```
+node test/security.js
+```
+Runs against a *copy* of `quiz.db` in the temp directory, so it can exercise the destructive admin save path safely. Covers the two things a player must never be able to do — read an answer they haven't earned, and touch the question bank:
+- **Satellite tile proxy** — the zoom is pinned to the one the question was authored at. Every tile is *centred* on the secret point and the token is in the question payload, so accepting any zoom let a player ask for zoom 3 and get a continent-scale view centred on the answer.
+- **Admin auth** — the cookie is an opaque session id (never the password), `HttpOnly`, killed server-side on logout, and login is throttled per IP.
+- **The question bank** — a save that would shrink the library by more than half is refused with a 409 unless you repeat it with `?force=1`. `POST /admin/questions` is a whole-table replace, so an empty array used to wipe all 2188 rows in one request.
+- **Static exposure** — `data/`, `content/`, `quiz.db` and the server-side modules are not reachable over HTTP. (`/games/<type>.js` *is* served and should be: that path resolves to `public/games/<type>.js`, the browser module.)
+
 It also checks the **reveal** of every round, which is where two live bugs hid in Sept 2026:
 - `reveal` must not be `null` — the server catches a throwing `reveal()` and sends null, so a crashed payoff screen would otherwise look like a pass.
 - **Every player whose answer the server accepted must appear in the reveal** (matched by nickname, which every module includes in its per-player entries). This is what catches a reveal that silently drops players — the mc-family option tally showed `0 / 0% / nobody` for months because wrong answers were filtered out before `reveal()` saw them.
@@ -99,7 +111,7 @@ node import.js content/<file>.json [--dry-run]
 ```
 Validates every question in the file against its game module's `validate()` first — if anything fails, nothing is written. `--dry-run` checks without writing. Existing rows are never touched; import only appends. To regenerate a whole geodata-backed category (e.g. after Natural Earth updates upstream), re-run its `tools/build-<type>.js` — each one documents at the top of the file what it downloads (cached under `tools/raw/`) and what it writes to `data/` and `content/`.
 
-`quiz.db` is committed to git and is the source of truth. To add or edit questions day-to-day, use the admin editor at `/admin.html` (enter the `ADMIN_PASSWORD`) — it saves straight to `quiz.db` via the admin API, no restart needed. Then commit and push `quiz.db` — Railway redeploys from `main` and picks up the new questions automatically. **Only push once the server and the client agree on every category** — a category whose client module (`public/games/<type>.js`) doesn't exist yet will break for anyone who selects it.
+`quiz.db` is committed to git and is the source of truth. To add or edit questions day-to-day, use the admin editor at `/admin.html` (enter the `ADMIN_PASSWORD`) — it saves straight to `quiz.db` via the admin API, no restart needed. Saving replaces the whole table, so a save that would drop more than half the library is refused; if a big prune really is intended, repeat the request with `?force=1`. Then commit and push `quiz.db` — Railway redeploys from `main` and picks up the new questions automatically. **Only push once the server and the client agree on every category** — a category whose client module (`public/games/<type>.js`) doesn't exist yet will break for anyone who selects it.
 
 `migrate.js` is the old v1 loader (questions.json → quiz.db) and is no longer the way new content gets in; it's kept only as a historical reference. The v2 equivalent, `tools/migrate-v2.js`, was a one-time script that merged the old MC categories into `trivia` and tagged regions — it doesn't need to be run again.
 

@@ -119,7 +119,18 @@ module.exports = {
       if (!entry || entry.expires < Date.now()) return res.status(404).end();
       const z  = parseInt(req.params.z, 10);
       const dx = parseInt(req.params.dx, 10), dy = parseInt(req.params.dy, 10);
-      if (!Number.isInteger(z) || z < 3 || z > 19 || Math.abs(dx) > 3 || Math.abs(dy) > 3) return res.status(400).end();
+      // The zoom is pinned to the one the question was authored at. The token is
+      // handed to every player in the question payload, and the whole point of
+      // proxying is that the browser must not learn the real coordinates before
+      // the reveal — but each tile is *centred* on the secret point, so allowing
+      // any z meant a player could ask for /map/sat/<their own token>/3/0/0 and
+      // get a continent-scale tile centred on the answer. The client only ever
+      // requests sat.zoom (its "Zoom out" button widens the tile grid via dx/dy,
+      // it does not change z), so nothing legitimate needs any other value.
+      if (!Number.isInteger(z) || z !== entry.zoom) return res.status(400).end();
+      // Number.isInteger, not just a magnitude check: Math.abs(NaN) > 3 is false,
+      // so a non-numeric dx/dy used to slip through into the tile key.
+      if (!Number.isInteger(dx) || !Number.isInteger(dy) || Math.abs(dx) > 3 || Math.abs(dy) > 3) return res.status(400).end();
       const n = Math.pow(2, z);
       const x = (((Math.floor(lngToTileX(entry.lng, z)) + dx) % n) + n) % n;
       const y = Math.floor(latToTileY(entry.lat, z)) + dy;
