@@ -97,6 +97,8 @@ It also checks the **reveal** of every round, which is where two live bugs hid i
 - `correctText` must be a non-empty string.
 - No `payload()` or `reveal()` may return a non-finite number. This one is checked by wrapping the modules **server-side**: socket.io serialises with JSON, which turns `NaN` into `null`, so a NaN is undetectable by the time it reaches a client.
 
+Before a push that touches client modules, it is also worth sweeping every type through the dev harness (select each type, click Mount / Show result / Show reveal, watch the console). That is how the Population Split reveal crash was found — it threw on every game and nothing in the test suite noticed.
+
 What it still does **not** check: anything about how a screen actually renders. `simulate.js` passing means the loop and the data are sound, not that the game looks right — for that, play it (`/dev/harness.html?type=<type>` for one type in isolation).
 
 **Trying one game type in isolation**, without spinning up a full game:

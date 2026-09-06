@@ -1,5 +1,35 @@
 # v2 — status
 
+## Security + fairness pass (2026-09-06, second wave)
+
+Everything below was found by attacking the app rather than playing it, and none of it was reachable from `test/simulate.js`.
+
+* **Bird's Eye leaked its answer.** The satellite tile proxy range-checked the zoom (3–19) but never compared it to the
+  zoom the question was authored at. Every tile is *centred* on the secret point and the token is in the question payload,
+  so any player could request `/map/sat/<their token>/3/0/0` and get a continent-scale tile centred on the answer.
+  Demonstrated before the fix (zooms 3/5/8/10 all returned 200); the zoom is now pinned. `games/map.js`.
+* **Estimation and Timeline answers sat in the middle of the range.** Mean position 0.49, sd 0.12 across all 184
+  questions; 39% of timeline answers within 5% of dead centre. "Drag to the exact middle" scored **80/100** with no
+  knowledge. The range window is now slid per game (`shownRange` in `games/slider.js`, seeded like the mc shuffle),
+  keeping the **width** because the width is the scoring tolerance. Midpoint now scores 65.
+* **Admin auth was the password in a readable cookie.** Now an opaque server-side session, HttpOnly, killed on logout,
+  POST login, constant-time compare, per-IP throttle. This also fixed a plain bug: `admin.html` compared the cookie to a
+  hard-coded `ilikehistory99`, so setting `ADMIN_PASSWORD` — what you are told to do before deploying — sent the editor
+  into a redirect loop, and view-source disclosed the default.
+* **`POST /admin/questions` with `[]` deleted all 2188 rows** and returned `{ok:true}`. A save that shrinks the library
+  by more than half now needs `?force=1`.
+* DoS: the 25 MB body limit was global and ran before auth (now 100 KB, with the big limit scoped to the one route);
+  live games are capped; one socket can no longer join twice (which also fixes a real stall — the leftover ghost kept
+  the everyone-answered check from completing).
+* **In a 30-player game a player never saw their own row** — 2,600 px of leaderboard, page jumped to the top, auto-advance
+  after 8–30 s. The player's row is now scrolled into view, with an instant fallback because a smooth scroll needs
+  animation frames a backgrounded tab never gets.
+* Two trivia questions contained their own answer (Shrek, Amelie) — rewritten. No duplicates anywhere in the 2188.
+
+**New:** `node test/security.js` (25 checks: tile proxy, admin auth, save guards, static exposure) and reveal assertions
+in `simulate.js` — verified by seeding four regressions and confirming each one fails. Swept all 14 types through
+`/dev/harness.html` (mount + result + reveal): all render, zero console errors.
+
 ## Playtest + audit pass (2026-09-06)
 
 Played the app on a 360 px viewport and audited the core; everything below was a real bug, not a cleanup.
