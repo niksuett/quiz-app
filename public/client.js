@@ -275,6 +275,8 @@ const state = {
   lbLoad: null,           // token identifying the newest leaderboard (see showLeaderboard)
   resultTimeout: null,
   flipTimeout: null,
+  myRowTimeout: null,
+  myRowFallback: null,
   lbCountdown: null,      // interval for the autoplay countdown
   lbEndAt: 0,
   lbRemainingMs: 0,
@@ -1131,8 +1133,36 @@ function metricText(e, data) {
 }
 
 // Phase 1: rows in "this round" order. Phase 2 (after ~3 s): FLIP into total-score order.
+// With a big group the standings run several screens long — 30 players is about
+// 3,500 px — and showScreen() has just jumped the page to the top. A player down
+// in 22nd would never see their own row before the leaderboard auto-advances, so
+// bring it into view. Only for players: the TV host is not in the list, and the
+// shared screen should stay put on the top of the table.
+function scrollMyRowIntoView(listEl) {
+  if (!state.myNickname || (state.gameMode === 'tv' && state.amHost)) return;
+  const mine = listEl.querySelector('.lb-row.me');
+  if (!mine) return;
+  const onScreen = () => {
+    const r = mine.getBoundingClientRect();
+    return r.top >= 0 && r.bottom <= window.innerHeight;
+  };
+  if (onScreen()) return;
+  if (REDUCED_MOTION) { mine.scrollIntoView({ block: 'center', behavior: 'auto' }); return; }
+
+  mine.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  // A smooth scroll is animated frame by frame, and a backgrounded or throttled
+  // tab is not given frames — the scroll then simply never happens and the row
+  // never arrives. Check shortly after and jump there outright if it stalled.
+  clearTimeout(state.myRowFallback);
+  state.myRowFallback = setTimeout(() => {
+    if (!onScreen()) mine.scrollIntoView({ block: 'center', behavior: 'auto' });
+  }, 700);
+}
+
 function renderLeaderboardRows(listEl, entries, data) {
   clearTimeout(state.flipTimeout); state.flipTimeout = null;
+  clearTimeout(state.myRowTimeout); state.myRowTimeout = null;
+  clearTimeout(state.myRowFallback); state.myRowFallback = null;
   listEl.innerHTML = '';
   const sortLabel = $('lb-sort-label');
   sortLabel.textContent = 'This round'; sortLabel.style.opacity = '1';
@@ -1166,6 +1196,11 @@ function renderLeaderboardRows(listEl, entries, data) {
     listEl.appendChild(li);
     if (e.roundPoints) setTimeout(() => animateCount(li.querySelector('.lb-total'), prev, e.score), i * 70 + 500);
   });
+
+  // Once the rows have finished dealing in, make sure the player can see theirs.
+  clearTimeout(state.myRowTimeout);
+  clearTimeout(state.myRowFallback);
+  state.myRowTimeout = setTimeout(() => scrollMyRowIntoView(listEl), Math.min(entries.length * 70 + 700, 2400));
 
   if (entries.length > 1) {
     const delay = (entries.length - 1) * 70 + 3000;
@@ -1204,7 +1239,12 @@ function flipToTotalOrder(listEl, entries) {
   void listEl.offsetHeight;
   newLis.forEach(li => { li.style.transition = 'transform .6s cubic-bezier(.22,.8,.3,1)'; li.style.transform = ''; });
   swapLabel();
-  setTimeout(() => newLis.forEach(li => { li.style.transition = ''; li.style.transform = ''; }), 700);
+  setTimeout(() => {
+    newLis.forEach(li => { li.style.transition = ''; li.style.transform = ''; });
+    // The flip has just moved everyone into final-standings order, so the
+    // player's row is somewhere new — follow it.
+    scrollMyRowIntoView(listEl);
+  }, 700);
 }
 
 // ── Autoplay countdown on the leaderboard ────────────────────────────────────
@@ -1263,6 +1303,8 @@ function updatePauseButtons() {
 function showGameOver(data) {
   destroyQuestion(); destroyReveal(); stopLbCountdown();
   clearTimeout(state.flipTimeout);
+  clearTimeout(state.myRowTimeout);
+  clearTimeout(state.myRowFallback);
   Sound.gameOver();
   const lb = [...(data.leaderboard || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
 
@@ -1354,6 +1396,8 @@ function confetti(canvas) {
 function resetForNewGame() {
   destroyQuestion(); destroyReveal(); stopLbCountdown();
   clearTimeout(state.flipTimeout);
+  clearTimeout(state.myRowTimeout);
+  clearTimeout(state.myRowFallback);
   state.paused = false; state.myStreak = 0; state.question = null;
   document.body.classList.remove('tv');
 }
