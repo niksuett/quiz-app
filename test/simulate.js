@@ -58,8 +58,76 @@ function answerFingerprints(q) {
   return { strict, outsideQuestion };
 }
 
+// ── Reveal checks ────────────────────────────────────────────────────────────
+// The reveal is the payoff screen — the drawn lines, the dropped pins, the "2 of
+// you said UK" bars. It used to be checked only for `!== undefined`, which meant
+// two whole classes of bug sailed through: a reveal() that *threw* (the server
+// catches it and sends null, which is not undefined) and a reveal that came back
+// structurally fine but with the players missing from it. Both actually happened.
+const answeredThisQuestion = new Map();   // questionNumber -> Set of nicknames the server accepted
+
+// JSON.stringify turns NaN into null, so a NaN has to be hunted for directly.
+function findNaN(value, path = 'reveal') {
+  if (typeof value === 'number') return Number.isFinite(value) ? null : `${path} = ${value}`;
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) { const hit = findNaN(value[i], `${path}[${i}]`); if (hit) return hit; }
+    return null;
+  }
+  if (value && typeof value === 'object') {
+    for (const k of Object.keys(value)) { const hit = findNaN(value[k], `${path}.${k}`); if (hit) return hit; }
+    return null;
+  }
+  return null;
+}
+
+function checkReveal(data) {
+  const where = `${data.type} (Q${data.questionNumber})`;
+  if (data.reveal === undefined) fail(`no reveal for ${where}`);
+  // null means reveal() threw and server.js swallowed it — the players see an
+  // empty payoff screen with nothing in the logs but one console.error.
+  if (data.reveal === null) fail(`reveal() returned null (it threw) for ${where}`);
+  if (typeof data.reveal !== 'object') return fail(`reveal for ${where} is not an object`);
+
+  if (typeof data.correctText !== 'string' || !data.correctText.trim()) {
+    fail(`correctText missing/empty for ${where}`);
+  }
+
+  // Everyone whose answer the server accepted must be somewhere in the reveal.
+  // Every module puts answering players in it under some key (pickedBy, pins,
+  // lines, guesses, arrows, playerAnswers, scores…), so a name-presence check is
+  // type-agnostic — and it is exactly the check that the mc-family types failed
+  // when wrong answers were being filtered out before reveal() ever saw them.
+  const answered = answeredThisQuestion.get(data.questionNumber);
+  if (answered && answered.size) {
+    const blob = JSON.stringify(data.reveal);
+    const missing = [...answered].filter(n => !blob.includes(`"${n}"`));
+    if (missing.length) fail(`reveal for ${where} omits ${missing.length} of ${answered.size} answering player(s): ${missing.join(', ')}`);
+  }
+  answeredThisQuestion.delete(data.questionNumber);
+}
+
+// NaN does not survive the socket: socket.io serialises with JSON, which turns it
+// into null, so by the time a payload/reveal reaches the client the evidence is
+// gone. The server runs in-process here, so wrap the modules and look at what
+// they actually returned, before it goes on the wire.
+function watchForNaN() {
+  for (const mod of registry.all()) {
+    for (const fn of ['payload', 'reveal']) {
+      if (typeof mod[fn] !== 'function') continue;
+      const orig = mod[fn].bind(mod);
+      mod[fn] = (...args) => {
+        const out = orig(...args);
+        const hit = findNaN(out, `${mod.type}.${fn}()`);
+        if (hit) fail(`${mod.type} ${fn}() produced a non-finite number: ${hit}`);
+        return out;
+      };
+    }
+  }
+}
+
 (async () => {
   const port = await start(0);
+  watchForNaN();
   console.log(`Server on :${port} — categories: ${categories.join(', ')}`);
 
   const host = await connect(port);
@@ -114,13 +182,17 @@ function answerFingerprints(q) {
       if (e.roundPoints < 0) fail('negative round points');
       if (e.quality !== null && (e.quality < 0 || e.quality > 1)) fail(`quality out of range: ${e.quality}`);
     }
-    if (data.reveal === undefined) fail(`no reveal for ${data.type}`);
+    checkReveal(data);
     if (verbose) console.log(`     → ${data.type}: ${data.leaderboard.map(e => `${e.nickname}=${e.score}(+${e.roundPoints}${e.quality !== null ? ' q' + e.quality.toFixed(2) : ' —'})`).join('  ')}`);
   });
 
   // Bots answer every question with a sample answer
-  for (const s of botSockets) {
+  for (let i = 0; i < botSockets.length; i++) {
+    const s = botSockets[i];
+    const nickname = `Bot${i + 1}`;
+    let currentQ = 0;
     s.on('new-question', (data) => {
+      currentQ = data.questionNumber;
       const mod = registry.get(data.type);
       if (!mod) return;
       let answer;
@@ -128,7 +200,15 @@ function answerFingerprints(q) {
       setTimeout(() => s.emit('submit-answer', { answer }), 20 + Math.random() * 60);
     });
     s.on('answer-rejected', (m) => fail(`answer rejected: ${m}`));
-    s.on('answer-result', (r) => { if (r.quality !== null && (r.quality < 0 || r.quality > 1)) fail('result quality out of range'); });
+    s.on('answer-result', (r) => {
+      if (r.quality !== null && (r.quality < 0 || r.quality > 1)) fail('result quality out of range');
+      // answer-result is only emitted once the server has accepted and stored the
+      // answer, so this is the authoritative "who answered" set for the reveal
+      // check. Note it must NOT be derived from quality: the mc-family types
+      // score a wrong answer as null, and those are the ones that went missing.
+      if (!answeredThisQuestion.has(currentQ)) answeredThisQuestion.set(currentQ, new Set());
+      answeredThisQuestion.get(currentQ).add(nickname);
+    });
   }
 
   host.emit('start-game', {});

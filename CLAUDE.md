@@ -79,6 +79,14 @@ node test/simulate.js [--rounds N] [--bots N] [--categories a,b] [--port P]
 ```
 Spins up the server in-process, creates a game, joins `N` bots (default a handful), plays every round with a plausible random answer per type, and asserts every player gets `new-question` → `show-leaderboard` for each round, scores never go negative, no answer ever leaks through a question `payload`, and `game-over` fires. Exit code 0 = pass. `--categories` restricts which categories are exercised; omit it to test everything.
 
+It also checks the **reveal** of every round, which is where two live bugs hid in Sept 2026:
+- `reveal` must not be `null` — the server catches a throwing `reveal()` and sends null, so a crashed payoff screen would otherwise look like a pass.
+- **Every player whose answer the server accepted must appear in the reveal** (matched by nickname, which every module includes in its per-player entries). This is what catches a reveal that silently drops players — the mc-family option tally showed `0 / 0% / nobody` for months because wrong answers were filtered out before `reveal()` saw them.
+- `correctText` must be a non-empty string.
+- No `payload()` or `reveal()` may return a non-finite number. This one is checked by wrapping the modules **server-side**: socket.io serialises with JSON, which turns `NaN` into `null`, so a NaN is undetectable by the time it reaches a client.
+
+What it still does **not** check: anything about how a screen actually renders. `simulate.js` passing means the loop and the data are sound, not that the game looks right — for that, play it (`/dev/harness.html?type=<type>` for one type in isolation).
+
 **Trying one game type in isolation**, without spinning up a full game:
 ```
 http://localhost:3000/dev/harness.html?type=compass&show=both
